@@ -55,22 +55,22 @@ const HomeFeed = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-primary to-primary/90 rounded-xl p-6 text-white shadow-lg">
         <h2 className="text-2xl font-bold mb-2">Welcome to BuildLink Kenya</h2>
-        <p className="text-primary-50 mb-4">Connecting Kenya's built environment professionals</p>
+        <p className="text-primary-100 mb-6">Connecting Kenya's built environment professionals</p>
         
-        {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        {/* Statistics Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div key={index} className="text-center">
+              <div key={index} className="text-center bg-white/10 rounded-lg p-4 backdrop-blur-sm">
                 <div className="flex justify-center mb-2">
-                  <Icon className="h-6 w-6 text-primary-100" />
+                  <Icon className="h-6 w-6 text-white" />
                 </div>
-                <div className="text-2xl font-bold">{stat.number}</div>
+                <div className="text-2xl font-bold text-white">{stat.number}</div>
                 <div className="text-sm text-primary-100">{stat.label}</div>
               </div>
             );
@@ -79,30 +79,37 @@ const HomeFeed = () => {
       </div>
 
       {/* Quick Actions */}
-      <Card className="border-0 shadow-sm">
+      <Card className="shadow-sm border-0">
         <CardContent className="p-4">
           <div className="flex space-x-3">
-            <Avatar>
-              <AvatarFallback className="bg-primary text-white">You</AvatarFallback>
+            <Avatar className="h-12 w-12">
+              <AvatarFallback className="bg-primary text-white text-lg font-semibold">You</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <Button 
                 variant="outline" 
-                className="w-full justify-start text-gray-500 hover:bg-gray-50"
+                className="w-full justify-start text-gray-500 hover:bg-gray-50 h-12 rounded-full border-gray-300"
               >
-                Share an update, project, or insight...
+                Start a post, share an update...
               </Button>
             </div>
           </div>
-          <div className="flex space-x-4 mt-3 pt-3 border-t">
-            <Button variant="ghost" size="sm" className="text-primary">
-              📷 Photo
+          <div className="flex justify-between mt-4 pt-3 border-t border-gray-100">
+            <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 flex items-center space-x-2">
+              <span>📷</span>
+              <span className="hidden sm:inline">Media</span>
             </Button>
-            <Button variant="ghost" size="sm" className="text-primary">
-              💼 Job
+            <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 flex items-center space-x-2">
+              <span>💼</span>
+              <span className="hidden sm:inline">Job</span>
             </Button>
-            <Button variant="ghost" size="sm" className="text-primary">
-              📚 Article
+            <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 flex items-center space-x-2">
+              <span>📝</span>
+              <span className="hidden sm:inline">Write article</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 flex items-center space-x-2">
+              <span>🎉</span>
+              <span className="hidden sm:inline">Celebrate</span>
             </Button>
           </div>
         </CardContent>
@@ -110,29 +117,29 @@ const HomeFeed = () => {
 
       {/* Posts */}
       {posts.map((post) => (
-        <Card key={post.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+        <Card key={post.id} className="shadow-sm border-0 hover:shadow-md transition-all duration-200">
           <CardHeader className="pb-3">
             <div className="flex items-start space-x-3">
               <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-primary text-white font-semibold">
+                <AvatarFallback className="bg-primary text-white font-semibold text-lg">
                   {post.author.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-1">
-                  <h3 className="font-semibold text-base">{post.author}</h3>
+                  <h3 className="font-semibold text-base hover:text-primary cursor-pointer">{post.author}</h3>
                   {post.isVerified && (
-                    <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-xs">✓</span>
                     </div>
                   )}
                   {post.isJobPost && (
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
                       {post.jobType}
                     </span>
                   )}
                   {post.isAnnouncement && (
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
                       Announcement
                     </span>
                   )}
@@ -148,46 +155,52 @@ const HomeFeed = () => {
           <CardContent className="pt-0">
             {post.isJobPost ? (
               <div className="space-y-3">
-                <h4 className="text-lg font-semibold text-gray-900">{post.content}</h4>
+                <h4 className="text-lg font-semibold text-gray-900 hover:text-primary cursor-pointer">{post.content}</h4>
                 {post.location && (
                   <div className="flex items-center text-gray-600">
-                    <MapPin className="h-4 w-4 mr-2" />
+                    <MapPin className="h-4 w-4 mr-2 text-gray-400" />
                     <span className="text-sm">{post.location}</span>
                   </div>
                 )}
                 {post.description && (
                   <p className="text-sm text-gray-700 leading-relaxed">{post.description}</p>
                 )}
-                <Button className="bg-primary hover:bg-primary/90 text-white">
-                  Apply Now
-                </Button>
+                <div className="pt-2">
+                  <Button className="bg-primary hover:bg-primary/90 text-white rounded-full px-6">
+                    Easy Apply
+                  </Button>
+                </div>
               </div>
             ) : (
               <div>
                 <p className="text-sm text-gray-800 mb-3 leading-relaxed">{post.content}</p>
                 {post.image && (
                   <div className="w-full h-48 bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                    <span className="text-gray-400">Project Image</span>
+                    <span className="text-gray-400">Project Image Placeholder</span>
                   </div>
                 )}
               </div>
             )}
             
-            <div className="flex items-center justify-between pt-3 border-t">
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-4">
               <div className="flex space-x-6">
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary p-0">
-                  <Heart className="h-4 w-4 mr-1" />
-                  {post.likes}
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
+                  <div className="flex items-center space-x-1">
+                    <Heart className="h-4 w-4" />
+                    <span className="text-sm">{post.likes}</span>
+                  </div>
                 </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary p-0">
-                  <MessageSquare className="h-4 w-4 mr-1" />
-                  {post.comments}
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
+                  <div className="flex items-center space-x-1">
+                    <MessageSquare className="h-4 w-4" />
+                    <span className="text-sm">{post.comments}</span>
+                  </div>
                 </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary p-0">
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
                   <Share2 className="h-4 w-4" />
                 </Button>
               </div>
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary p-0">
+              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
                 <Bookmark className="h-4 w-4" />
               </Button>
             </div>
