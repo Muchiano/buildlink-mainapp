@@ -2,14 +2,17 @@
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { Heart, MessageSquare, Share2, Bookmark, MapPin, Clock, Building2, Users, Briefcase, Award } from "lucide-react";
+import { Heart, MessageSquare, Share2, Bookmark, MapPin, Clock, Users, Building2, MoreHorizontal, UserPlus, Repeat2 } from "lucide-react";
+import { useState } from "react";
 
 const HomeFeed = () => {
+  const [likedPosts, setLikedPosts] = useState<number[]>([]);
+  const [savedPosts, setSavedPosts] = useState<number[]>([]);
+  const [followedUsers, setFollowedUsers] = useState<number[]>([]);
+
   const stats = [
-    { number: "1,247", label: "Active Jobs", icon: Briefcase },
     { number: "3,892", label: "Professionals", icon: Users },
-    { number: "156", label: "Mentors", icon: Award },
-    { number: "89", label: "Projects", icon: Building2 }
+    { number: "245", label: "Companies", icon: Building2 }
   ];
 
   const posts = [
@@ -24,6 +27,7 @@ const HomeFeed = () => {
       description: "Join our team to work on iconic skyscrapers in Nairobi. Experience with concrete design and high-rise construction required. Competitive salary and benefits package.",
       likes: 45,
       comments: 12,
+      shares: 8,
       isVerified: true,
       isJobPost: true,
       jobType: "Job Opening"
@@ -38,6 +42,7 @@ const HomeFeed = () => {
       image: "/placeholder.svg",
       likes: 78,
       comments: 23,
+      shares: 15,
       isVerified: true
     },
     {
@@ -49,10 +54,35 @@ const HomeFeed = () => {
       content: "📢 NEW CPD COURSE ALERT: 'Digital Construction Management' now available. Earn 20 CPD points. Early bird pricing ends this Friday! #CPD #ProfessionalDevelopment",
       likes: 156,
       comments: 34,
+      shares: 42,
       isVerified: true,
       isAnnouncement: true
     }
   ];
+
+  const handleLike = (postId: number) => {
+    setLikedPosts(prev => 
+      prev.includes(postId) 
+        ? prev.filter(id => id !== postId)
+        : [...prev, postId]
+    );
+  };
+
+  const handleSave = (postId: number) => {
+    setSavedPosts(prev => 
+      prev.includes(postId) 
+        ? prev.filter(id => id !== postId)
+        : [...prev, postId]
+    );
+  };
+
+  const handleFollow = (userId: number) => {
+    setFollowedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -62,7 +92,7 @@ const HomeFeed = () => {
         <p className="text-primary-100 mb-6">Connecting Kenya's built environment professionals</p>
         
         {/* Statistics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -82,7 +112,7 @@ const HomeFeed = () => {
       <Card className="shadow-sm border-0">
         <CardContent className="p-4">
           <div className="flex space-x-3">
-            <Avatar className="h-12 w-12">
+            <Avatar className="h-12 w-12 cursor-pointer">
               <AvatarFallback className="bg-primary text-white text-lg font-semibold">You</AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -119,36 +149,68 @@ const HomeFeed = () => {
       {posts.map((post) => (
         <Card key={post.id} className="shadow-sm border-0 hover:shadow-md transition-all duration-200">
           <CardHeader className="pb-3">
-            <div className="flex items-start space-x-3">
-              <Avatar className="h-12 w-12">
-                <AvatarFallback className="bg-primary text-white font-semibold text-lg">
-                  {post.author.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-1">
-                  <h3 className="font-semibold text-base hover:text-primary cursor-pointer">{post.author}</h3>
-                  {post.isVerified && (
-                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                  )}
-                  {post.isJobPost && (
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
-                      {post.jobType}
-                    </span>
-                  )}
-                  {post.isAnnouncement && (
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-                      Announcement
-                    </span>
-                  )}
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-3">
+                <Avatar className="h-12 w-12 cursor-pointer hover:opacity-80">
+                  <AvatarFallback className="bg-primary text-white font-semibold text-lg">
+                    {post.author.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <h3 className="font-semibold text-base hover:text-primary cursor-pointer">{post.author}</h3>
+                    {post.isVerified && (
+                      <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                    )}
+                    {post.isJobPost && (
+                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                        {post.jobType}
+                      </span>
+                    )}
+                    {post.isAnnouncement && (
+                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                        Announcement
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600">{post.title} • {post.company}</p>
+                  <div className="flex items-center text-xs text-gray-500 mt-1">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {post.time}
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600">{post.title} • {post.company}</p>
-                <div className="flex items-center text-xs text-gray-500 mt-1">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {post.time}
-                </div>
+              </div>
+              
+              {/* Top Right Actions */}
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleFollow(post.id)}
+                  className={`text-xs px-3 py-1 ${
+                    followedUsers.includes(post.id)
+                      ? 'bg-gray-100 text-gray-600'
+                      : 'text-primary hover:bg-primary/10'
+                  }`}
+                >
+                  <UserPlus className="h-3 w-3 mr-1" />
+                  {followedUsers.includes(post.id) ? 'Following' : 'Follow'}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleSave(post.id)}
+                  className={`p-1 ${
+                    savedPosts.includes(post.id) ? 'text-primary' : 'text-gray-600 hover:text-primary'
+                  }`}
+                >
+                  <Bookmark className={`h-4 w-4 ${savedPosts.includes(post.id) ? 'fill-current' : ''}`} />
+                </Button>
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary p-1">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </CardHeader>
@@ -184,25 +246,35 @@ const HomeFeed = () => {
             
             <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-4">
               <div className="flex space-x-6">
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleLike(post.id)}
+                  className={`hover:bg-red-50 p-2 h-auto ${
+                    likedPosts.includes(post.id) ? 'text-red-600' : 'text-gray-600 hover:text-red-600'
+                  }`}
+                >
                   <div className="flex items-center space-x-1">
-                    <Heart className="h-4 w-4" />
-                    <span className="text-sm">{post.likes}</span>
+                    <Heart className={`h-4 w-4 ${likedPosts.includes(post.id) ? 'fill-current' : ''}`} />
+                    <span className="text-sm">{post.likes + (likedPosts.includes(post.id) ? 1 : 0)}</span>
                   </div>
                 </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-2 h-auto">
                   <div className="flex items-center space-x-1">
                     <MessageSquare className="h-4 w-4" />
                     <span className="text-sm">{post.comments}</span>
+                  </div>
+                </Button>
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-green-600 hover:bg-green-50 p-2 h-auto">
+                  <div className="flex items-center space-x-1">
+                    <Repeat2 className="h-4 w-4" />
+                    <span className="text-sm">{post.shares}</span>
                   </div>
                 </Button>
                 <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
                   <Share2 className="h-4 w-4" />
                 </Button>
               </div>
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
-                <Bookmark className="h-4 w-4" />
-              </Button>
             </div>
           </CardContent>
         </Card>
