@@ -100,6 +100,9 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
     setPostInteractions(prev => ({
       ...prev,
       [postId]: {
+        liked: false,
+        bookmarked: false,
+        following: false,
         ...prev[postId],
         [type === 'follow' ? 'following' : type === 'like' ? 'liked' : 'bookmarked']: 
           !prev[postId]?.[type === 'follow' ? 'following' : type === 'like' ? 'liked' : 'bookmarked']
@@ -142,7 +145,12 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       <div className="space-y-4">
         {filteredPosts.length > 0 ? (
           filteredPosts.map((post) => {
-            const interactions = postInteractions[post.id] || {};
+            const interactions = {
+              liked: false,
+              bookmarked: false,
+              following: false,
+              ...postInteractions[post.id]
+            };
             
             return (
               <div key={post.id} className="bg-white rounded-lg border p-6 space-y-4">
