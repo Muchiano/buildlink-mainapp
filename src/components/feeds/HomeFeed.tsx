@@ -1,284 +1,264 @@
-
-import { Card, CardContent, CardHeader } from "../ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
-import { Heart, MessageSquare, Share2, Bookmark, MapPin, Clock, Users, Building2, MoreHorizontal, UserPlus, Repeat2 } from "lucide-react";
 import { useState } from "react";
+import { Heart, MessageCircle, Share, Repeat2, Bookmark, UserPlus, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const HomeFeed = () => {
-  const [likedPosts, setLikedPosts] = useState<number[]>([]);
-  const [savedPosts, setSavedPosts] = useState<number[]>([]);
-  const [followedUsers, setFollowedUsers] = useState<number[]>([]);
+interface HomeFeedProps {
+  activeFilter: string;
+}
+
+const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
+  const [isLiked, setIsLiked] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const stats = [
-    { number: "3,892", label: "Professionals", icon: Users },
-    { number: "245", label: "Companies", icon: Building2 }
+    { label: "Professionals", value: "12,547" },
+    { label: "Companies", value: "1,284" },
   ];
 
   const posts = [
     {
       id: 1,
-      author: "Sameer Group",
-      title: "Construction Company",
-      company: "Verified Employer",
+      author: "Dr. Sarah Mwangi",
+      role: "Structural Engineer",
+      company: "KenStruct Ltd",
       time: "2 hours ago",
-      content: "Senior Structural Engineer - High-rise Projects",
-      location: "Nairobi, Kenya",
-      description: "Join our team to work on iconic skyscrapers in Nairobi. Experience with concrete design and high-rise construction required. Competitive salary and benefits package.",
-      likes: 45,
-      comments: 12,
+      content: "Excited to share that our team has completed the structural design for the new Nairobi Metropolitan Hospital. This 15-story facility will serve over 50,000 patients annually. The design incorporates seismic-resistant features and sustainable construction practices. #StructuralEngineering #Healthcare #Kenya",
+      image: "/placeholder.svg",
+      likes: 156,
+      comments: 23,
       shares: 8,
-      isVerified: true,
-      isJobPost: true,
-      jobType: "Job Opening"
+      isLiked: false,
+      isBookmarked: false,
+      isFollowing: false
     },
     {
       id: 2,
-      author: "John Kamau",
-      title: "Senior Architect",
-      company: "Nairobi Design Studio",
-      time: "4h",
-      content: "Excited to share our latest project - a sustainable housing development in Kiambu. The integration of local materials with modern design principles is creating affordable yet beautiful homes. #SustainableArchitecture #KenyaBuilds",
+      author: "Eng. James Omondi",
+      role: "Civil Engineer",
+      company: "BuildRight Contractors",
+      time: "1 day ago",
+      content: "Just broke ground on a new residential complex in Kilimani. This project aims to provide affordable housing solutions with modern amenities. We're using eco-friendly materials to minimize our environmental impact. #CivilEngineering #AffordableHousing #Sustainability",
       image: "/placeholder.svg",
-      likes: 78,
-      comments: 23,
-      shares: 15,
-      isVerified: true
+      likes: 89,
+      comments: 15,
+      shares: 5,
+      isLiked: true,
+      isBookmarked: false,
+      isFollowing: true
     },
     {
       id: 3,
-      author: "BuildLink Kenya",
-      title: "Official",
-      company: "Platform Updates",
-      time: "6h",
-      content: "📢 NEW CPD COURSE ALERT: 'Digital Construction Management' now available. Earn 20 CPD points. Early bird pricing ends this Friday! #CPD #ProfessionalDevelopment",
-      likes: 156,
-      comments: 34,
-      shares: 42,
-      isVerified: true,
-      isAnnouncement: true
+      author: "Jane Wanjiku",
+      role: "Architect",
+      company: "ArchVision Studios",
+      time: "3 days ago",
+      content: "Delighted to announce that our design for the Innovation Hub in Konza Technopolis has been approved. This state-of-the-art facility will foster collaboration and drive technological advancements in Kenya. #Architecture #Innovation #KonzaTechnopolis",
+      image: "/placeholder.svg",
+      likes: 210,
+      comments: 35,
+      shares: 12,
+      isLiked: false,
+      isBookmarked: true,
+      isFollowing: false
+    },
+    {
+      id: 4,
+      author: "Peter Kamau",
+      role: "Quantity Surveyor",
+      company: "CostWise Consultants",
+      time: "5 days ago",
+      content: "Sharing insights on effective cost management in construction projects. Proper budgeting and resource allocation are crucial for project success. Contact us for expert advice on quantity surveying. #QuantitySurveying #CostManagement #Construction",
+      image: "/placeholder.svg",
+      likes: 123,
+      comments: 18,
+      shares: 7,
+      isLiked: false,
+      isBookmarked: false,
+      isFollowing: false
+    },
+    {
+      id: 5,
+      author: "Emily Achieng",
+      role: "Construction Manager",
+      company: "EliteBuild Solutions",
+      time: "1 week ago",
+      content: "Our team is making great progress on the new commercial tower in Upper Hill. Despite facing logistical challenges, we're committed to delivering this project on time and within budget. #ConstructionManagement #UpperHill #ProjectUpdate",
+      image: "/placeholder.svg",
+      likes: 187,
+      comments: 29,
+      shares: 10,
+      isLiked: false,
+      isBookmarked: false,
+      isFollowing: false
     }
   ];
 
+  // Filter posts based on active filter
+  const filteredPosts = posts.filter(post => {
+    switch (activeFilter) {
+      case "news":
+        return post.content.includes("news") || post.content.includes("announcement");
+      case "jobs":
+        return post.content.includes("hiring") || post.content.includes("opportunity") || post.content.includes("job");
+      case "portfolios":
+        return post.content.includes("project") || post.content.includes("design") || post.content.includes("completed");
+      default:
+        return true; // Show all posts for "latest"
+    }
+  });
+
   const handleLike = (postId: number) => {
-    setLikedPosts(prev => 
-      prev.includes(postId) 
-        ? prev.filter(id => id !== postId)
-        : [...prev, postId]
-    );
+    // Handle like functionality
+    console.log("Liked post:", postId);
   };
 
-  const handleSave = (postId: number) => {
-    setSavedPosts(prev => 
-      prev.includes(postId) 
-        ? prev.filter(id => id !== postId)
-        : [...prev, postId]
-    );
+  const handleBookmark = (postId: number) => {
+    // Handle bookmark functionality
+    console.log("Bookmarked post:", postId);
   };
 
-  const handleFollow = (userId: number) => {
-    setFollowedUsers(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    );
+  const handleFollow = (postId: number) => {
+    // Handle follow functionality
+    console.log("Followed user:", postId);
+  };
+
+  const handleShare = (postId: number) => {
+    // Handle share functionality
+    console.log("Shared post:", postId);
+  };
+
+  const handleRepost = (postId: number) => {
+    // Handle repost functionality
+    console.log("Reposted:", postId);
   };
 
   return (
-    <div className="space-y-4">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary to-primary/90 rounded-xl p-6 text-white shadow-lg">
-        <h2 className="text-2xl font-bold mb-2">Welcome to BuildLink Kenya</h2>
-        <p className="text-primary-100 mb-6">Connecting Kenya's built environment professionals</p>
-        
-        {/* Statistics Grid */}
-        <div className="grid grid-cols-2 gap-6">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div key={index} className="text-center bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                <div className="flex justify-center mb-2">
-                  <Icon className="h-6 w-6 text-white" />
-                </div>
-                <div className="text-2xl font-bold text-white">{stat.number}</div>
-                <div className="text-sm text-primary-100">{stat.label}</div>
-              </div>
-            );
-          })}
+    <div className="space-y-6">
+      {/* Stats Banner */}
+      <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-6 text-white">
+        <h2 className="text-2xl font-bold mb-4">Welcome to BuildLink Kenya</h2>
+        <p className="text-primary-foreground/90 mb-6">
+          Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          {stats.map((stat, index) => (
+            <div key={index} className="text-center">
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-sm text-primary-foreground/80">{stat.label}</div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <Card className="shadow-sm border-0">
-        <CardContent className="p-4">
-          <div className="flex space-x-3">
-            <Avatar className="h-12 w-12 cursor-pointer">
-              <AvatarFallback className="bg-primary text-white text-lg font-semibold">You</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start text-gray-500 hover:bg-gray-50 h-12 rounded-full border-gray-300"
-              >
-                Start a post, share an update...
-              </Button>
-            </div>
-          </div>
-          <div className="flex justify-between mt-4 pt-3 border-t border-gray-100">
-            <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 flex items-center space-x-2">
-              <span>📷</span>
-              <span className="hidden sm:inline">Media</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 flex items-center space-x-2">
-              <span>💼</span>
-              <span className="hidden sm:inline">Job</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 flex items-center space-x-2">
-              <span>📝</span>
-              <span className="hidden sm:inline">Write article</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 flex items-center space-x-2">
-              <span>🎉</span>
-              <span className="hidden sm:inline">Celebrate</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Filter Results Info */}
+      {activeFilter !== "latest" && (
+        <div className="bg-white rounded-lg p-4 border">
+          <p className="text-sm text-gray-600">
+            Showing {filteredPosts.length} {activeFilter} posts
+          </p>
+        </div>
+      )}
 
-      {/* Posts */}
-      {posts.map((post) => (
-        <Card key={post.id} className="shadow-sm border-0 hover:shadow-md transition-all duration-200">
-          <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-3">
-                <Avatar className="h-12 w-12 cursor-pointer hover:opacity-80">
-                  <AvatarFallback className="bg-primary text-white font-semibold text-lg">
-                    {post.author.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h3 className="font-semibold text-base hover:text-primary cursor-pointer">{post.author}</h3>
-                    {post.isVerified && (
-                      <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">✓</span>
-                      </div>
-                    )}
-                    {post.isJobPost && (
-                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
-                        {post.jobType}
-                      </span>
-                    )}
-                    {post.isAnnouncement && (
-                      <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-                        Announcement
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600">{post.title} • {post.company}</p>
-                  <div className="flex items-center text-xs text-gray-500 mt-1">
-                    <Clock className="h-3 w-3 mr-1" />
-                    {post.time}
+      {/* Posts Feed */}
+      <div className="space-y-4">
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((post) => (
+            <div key={post.id} className="bg-white rounded-lg border p-6 space-y-4">
+              {/* Post Header */}
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3 cursor-pointer">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src="/placeholder.svg" />
+                    <AvatarFallback>{post.author.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 hover:text-primary">{post.author}</h3>
+                    <p className="text-sm text-gray-600">{post.role} at {post.company}</p>
+                    <p className="text-xs text-gray-500">{post.time}</p>
                   </div>
                 </div>
-              </div>
-              
-              {/* Top Right Actions */}
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleFollow(post.id)}
-                  className={`text-xs px-3 py-1 ${
-                    followedUsers.includes(post.id)
-                      ? 'bg-gray-100 text-gray-600'
-                      : 'text-primary hover:bg-primary/10'
-                  }`}
-                >
-                  <UserPlus className="h-3 w-3 mr-1" />
-                  {followedUsers.includes(post.id) ? 'Following' : 'Follow'}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleSave(post.id)}
-                  className={`p-1 ${
-                    savedPosts.includes(post.id) ? 'text-primary' : 'text-gray-600 hover:text-primary'
-                  }`}
-                >
-                  <Bookmark className={`h-4 w-4 ${savedPosts.includes(post.id) ? 'fill-current' : ''}`} />
-                </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary p-1">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            {post.isJobPost ? (
-              <div className="space-y-3">
-                <h4 className="text-lg font-semibold text-gray-900 hover:text-primary cursor-pointer">{post.content}</h4>
-                {post.location && (
-                  <div className="flex items-center text-gray-600">
-                    <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                    <span className="text-sm">{post.location}</span>
-                  </div>
-                )}
-                {post.description && (
-                  <p className="text-sm text-gray-700 leading-relaxed">{post.description}</p>
-                )}
-                <div className="pt-2">
-                  <Button className="bg-primary hover:bg-primary/90 text-white rounded-full px-6">
-                    Easy Apply
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleBookmark(post.id)}
+                    className={post.isBookmarked ? "text-primary" : "text-gray-500"}
+                  >
+                    <Bookmark className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleFollow(post.id)}
+                    className={post.isFollowing ? "bg-primary text-white" : "text-primary border border-primary"}
+                  >
+                    <UserPlus className="h-4 w-4 mr-1" />
+                    {post.isFollowing ? "Following" : "Follow"}
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-            ) : (
-              <div>
-                <p className="text-sm text-gray-800 mb-3 leading-relaxed">{post.content}</p>
+
+              {/* Post Content */}
+              <div className="space-y-3">
+                <p className="text-gray-800">{post.content}</p>
                 {post.image && (
-                  <div className="w-full h-48 bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                    <span className="text-gray-400">Project Image Placeholder</span>
-                  </div>
+                  <img 
+                    src={post.image} 
+                    alt="Post content" 
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
                 )}
               </div>
-            )}
-            
-            <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-4">
-              <div className="flex space-x-6">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => handleLike(post.id)}
-                  className={`hover:bg-red-50 p-2 h-auto ${
-                    likedPosts.includes(post.id) ? 'text-red-600' : 'text-gray-600 hover:text-red-600'
-                  }`}
+
+              {/* Post Actions */}
+              <div className="flex items-center justify-between pt-3 border-t">
+                <div className="flex items-center space-x-6">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLike(post.id)}
+                    className={`flex items-center space-x-2 ${post.isLiked ? 'text-red-500' : 'text-gray-500'} hover:text-red-500`}
+                  >
+                    <Heart className={`h-5 w-5 ${post.isLiked ? 'fill-current' : ''}`} />
+                    <span>{post.likes}</span>
+                  </Button>
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-500 hover:text-primary">
+                    <MessageCircle className="h-5 w-5" />
+                    <span>{post.comments}</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRepost(post.id)}
+                    className="flex items-center space-x-2 text-gray-500 hover:text-green-500"
+                  >
+                    <Repeat2 className="h-5 w-5" />
+                    <span>Repost</span>
+                  </Button>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleShare(post.id)}
+                  className="flex items-center space-x-2 text-gray-500 hover:text-primary"
                 >
-                  <div className="flex items-center space-x-1">
-                    <Heart className={`h-4 w-4 ${likedPosts.includes(post.id) ? 'fill-current' : ''}`} />
-                    <span className="text-sm">{post.likes + (likedPosts.includes(post.id) ? 1 : 0)}</span>
-                  </div>
-                </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-blue-600 hover:bg-blue-50 p-2 h-auto">
-                  <div className="flex items-center space-x-1">
-                    <MessageSquare className="h-4 w-4" />
-                    <span className="text-sm">{post.comments}</span>
-                  </div>
-                </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-green-600 hover:bg-green-50 p-2 h-auto">
-                  <div className="flex items-center space-x-1">
-                    <Repeat2 className="h-4 w-4" />
-                    <span className="text-sm">{post.shares}</span>
-                  </div>
-                </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary hover:bg-primary/10 p-2 h-auto">
-                  <Share2 className="h-4 w-4" />
+                  <Share className="h-5 w-5" />
+                  <span>{post.shares}</span>
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      ))}
+          ))
+        ) : (
+          <div className="bg-white rounded-lg border p-8 text-center">
+            <p className="text-gray-500">No {activeFilter} posts found.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

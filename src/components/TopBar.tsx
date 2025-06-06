@@ -9,16 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "./ui/navigation-menu";
 import { useState } from "react";
 
-const TopBar = () => {
+interface TopBarProps {
+  onSidebarToggle: () => void;
+}
+
+const TopBar = ({ onSidebarToggle }: TopBarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   
@@ -71,64 +68,25 @@ const TopBar = () => {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
       <div className="flex items-center justify-between max-w-6xl mx-auto">
-        {/* Logo and Navigation Menu */}
+        {/* Navigation Menu Button (Desktop) + Logo */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-3">
+          {/* Sidebar Toggle Button - Desktop Only */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onSidebarToggle}
+            className="hidden md:flex text-gray-600 hover:text-primary"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          
+          {/* Logo */}
+          <div className="flex items-center space-x-3 cursor-pointer">
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">BL</span>
             </div>
             <h1 className="text-xl font-bold text-primary hidden sm:block">BuildLink Kenya</h1>
           </div>
-          
-          {/* Navigation Menu */}
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-gray-700 hover:text-primary">
-                  <Menu className="h-4 w-4 mr-2" />
-                  Menu
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-80">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-gray-900">Connect</h4>
-                        <div className="space-y-2">
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Find Professionals</a>
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Browse Companies</a>
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Industry Groups</a>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-gray-900">Opportunities</h4>
-                        <div className="space-y-2">
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Job Board</a>
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Project Listings</a>
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Tender Notices</a>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-gray-900">Learn</h4>
-                        <div className="space-y-2">
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">CPD Courses</a>
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Webinars</a>
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Industry News</a>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-gray-900">Resources</h4>
-                        <div className="space-y-2">
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Tools & Calculators</a>
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Standards & Codes</a>
-                          <a href="#" className="block text-sm text-gray-600 hover:text-primary">Templates</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
         </div>
 
         {/* Search Bar */}
