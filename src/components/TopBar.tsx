@@ -1,23 +1,30 @@
 
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search, User, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { SidebarTrigger } from "./ui/sidebar";
 
-const TopBar = () => {
+interface TopBarProps {
+  onLogoClick?: () => void;
+}
+
+const TopBar = ({ onLogoClick }: TopBarProps) => {
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
       <div className="flex items-center justify-between">
         {/* Left Section */}
         <div className="flex items-center space-x-4">
-          {/* Mobile Sidebar Trigger */}
-          <div className="md:hidden">
-            <SidebarTrigger />
-          </div>
+          {/* Navigation Menu Trigger */}
+          <SidebarTrigger />
           
-          {/* Logo */}
+          {/* Logo - clickable home button */}
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-primary">BUILDLINK</h1>
+            <button 
+              onClick={onLogoClick}
+              className="text-xl font-bold text-primary hover:text-primary/80 transition-colors"
+            >
+              BUILDLINK
+            </button>
           </div>
         </div>
 

@@ -7,17 +7,27 @@ import { cn } from "@/lib/utils";
 interface ContentFiltersProps {
   activeFilter: string;
   onFilterChange: (filter: string) => void;
+  filterType?: string;
 }
 
-const ContentFilters = ({ activeFilter, onFilterChange }: ContentFiltersProps) => {
+const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: ContentFiltersProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const filters = [
+  const homeFilters = [
     { id: "latest", label: "Latest" },
     { id: "news", label: "News" },
     { id: "jobs", label: "Jobs" },
     { id: "portfolios", label: "Portfolios" },
   ];
+
+  const skillUpFilters = [
+    { id: "courses", label: "Courses" },
+    { id: "webinars", label: "Webinars" },
+    { id: "articles", label: "Articles" },
+    { id: "certifications", label: "Certifications" },
+  ];
+
+  const filters = filterType === "skillup" ? skillUpFilters : homeFilters;
 
   return (
     <div className="bg-white border-b border-gray-200 sticky top-16 z-40">

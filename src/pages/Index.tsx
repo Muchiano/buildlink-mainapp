@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import TopBar from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -16,6 +16,11 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [activeFilter, setActiveFilter] = useState("latest");
 
+  const handleLogoClick = () => {
+    setActiveTab("home");
+    setActiveFilter("latest");
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case "home":
@@ -25,7 +30,7 @@ const Index = () => {
       case "post":
         return <PostCreate />;
       case "skillup":
-        return <SkillUpFeed />;
+        return <SkillUpFeed activeFilter={activeFilter} />;
       case "profile":
         return <ProfileBoard />;
       default:
@@ -33,26 +38,25 @@ const Index = () => {
     }
   };
 
-  const shouldShowFilters = activeTab === "home";
+  const shouldShowFilters = activeTab === "home" || activeTab === "skillup";
 
   return (
     <SidebarProvider>
       <div className="min-h-screen bg-gray-50 flex w-full">
-        {/* Desktop Sidebar */}
-        <div className="hidden md:block">
-          <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        </div>
+        {/* Sidebar */}
+        <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top Navigation */}
-          <TopBar />
+          <TopBar onLogoClick={handleLogoClick} />
           
           {/* Content Filters */}
           {shouldShowFilters && (
             <ContentFilters
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
+              filterType={activeTab}
             />
           )}
           

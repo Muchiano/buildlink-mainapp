@@ -2,15 +2,16 @@ import { useState } from "react";
 import { Heart, MessageCircle, Share, Repeat2, Bookmark, UserPlus, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import UserProfile from "@/components/UserProfile";
 
 interface HomeFeedProps {
   activeFilter: string;
 }
 
 const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [postInteractions, setPostInteractions] = useState<{[key: number]: {liked: boolean, bookmarked: boolean, following: boolean}}>({});
 
   const stats = [
     { label: "Professionals", value: "12,547" },
@@ -29,9 +30,17 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       likes: 156,
       comments: 23,
       shares: 8,
-      isLiked: false,
-      isBookmarked: false,
-      isFollowing: false
+      type: "news",
+      user: {
+        name: "Dr. Sarah Mwangi",
+        role: "Structural Engineer",
+        company: "KenStruct Ltd",
+        location: "Nairobi, Kenya",
+        joinedDate: "March 2020",
+        followers: 2156,
+        following: 342,
+        projects: 18
+      }
     },
     {
       id: 2,
@@ -39,14 +48,22 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       role: "Civil Engineer",
       company: "BuildRight Contractors",
       time: "1 day ago",
-      content: "Just broke ground on a new residential complex in Kilimani. This project aims to provide affordable housing solutions with modern amenities. We're using eco-friendly materials to minimize our environmental impact. #CivilEngineering #AffordableHousing #Sustainability",
+      content: "We're hiring! Looking for experienced civil engineers to join our team. Great opportunity for career growth in affordable housing projects. #Jobs #CivilEngineering #Hiring",
       image: "/placeholder.svg",
       likes: 89,
       comments: 15,
       shares: 5,
-      isLiked: true,
-      isBookmarked: false,
-      isFollowing: true
+      type: "jobs",
+      user: {
+        name: "Eng. James Omondi",
+        role: "Civil Engineer",
+        company: "BuildRight Contractors",
+        location: "Mombasa, Kenya",
+        joinedDate: "January 2019",
+        followers: 1543,
+        following: 287,
+        projects: 24
+      }
     },
     {
       id: 3,
@@ -54,84 +71,44 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       role: "Architect",
       company: "ArchVision Studios",
       time: "3 days ago",
-      content: "Delighted to announce that our design for the Innovation Hub in Konza Technopolis has been approved. This state-of-the-art facility will foster collaboration and drive technological advancements in Kenya. #Architecture #Innovation #KonzaTechnopolis",
+      content: "Check out our latest residential project portfolio - modern sustainable homes that blend traditional Kenyan architecture with contemporary design. #Architecture #Portfolio #Sustainability",
       image: "/placeholder.svg",
       likes: 210,
       comments: 35,
       shares: 12,
-      isLiked: false,
-      isBookmarked: true,
-      isFollowing: false
-    },
-    {
-      id: 4,
-      author: "Peter Kamau",
-      role: "Quantity Surveyor",
-      company: "CostWise Consultants",
-      time: "5 days ago",
-      content: "Sharing insights on effective cost management in construction projects. Proper budgeting and resource allocation are crucial for project success. Contact us for expert advice on quantity surveying. #QuantitySurveying #CostManagement #Construction",
-      image: "/placeholder.svg",
-      likes: 123,
-      comments: 18,
-      shares: 7,
-      isLiked: false,
-      isBookmarked: false,
-      isFollowing: false
-    },
-    {
-      id: 5,
-      author: "Emily Achieng",
-      role: "Construction Manager",
-      company: "EliteBuild Solutions",
-      time: "1 week ago",
-      content: "Our team is making great progress on the new commercial tower in Upper Hill. Despite facing logistical challenges, we're committed to delivering this project on time and within budget. #ConstructionManagement #UpperHill #ProjectUpdate",
-      image: "/placeholder.svg",
-      likes: 187,
-      comments: 29,
-      shares: 10,
-      isLiked: false,
-      isBookmarked: false,
-      isFollowing: false
+      type: "portfolios",
+      user: {
+        name: "Jane Wanjiku",
+        role: "Architect",
+        company: "ArchVision Studios",
+        location: "Kisumu, Kenya",
+        joinedDate: "July 2018",
+        followers: 3241,
+        following: 456,
+        projects: 31
+      }
     }
   ];
 
   // Filter posts based on active filter
   const filteredPosts = posts.filter(post => {
-    switch (activeFilter) {
-      case "news":
-        return post.content.includes("news") || post.content.includes("announcement");
-      case "jobs":
-        return post.content.includes("hiring") || post.content.includes("opportunity") || post.content.includes("job");
-      case "portfolios":
-        return post.content.includes("project") || post.content.includes("design") || post.content.includes("completed");
-      default:
-        return true; // Show all posts for "latest"
-    }
+    if (activeFilter === "latest") return true;
+    return post.type === activeFilter;
   });
 
-  const handleLike = (postId: number) => {
-    // Handle like functionality
-    console.log("Liked post:", postId);
+  const handleInteraction = (postId: number, type: 'like' | 'bookmark' | 'follow') => {
+    setPostInteractions(prev => ({
+      ...prev,
+      [postId]: {
+        ...prev[postId],
+        [type === 'follow' ? 'following' : type === 'like' ? 'liked' : 'bookmarked']: 
+          !prev[postId]?.[type === 'follow' ? 'following' : type === 'like' ? 'liked' : 'bookmarked']
+      }
+    }));
   };
 
-  const handleBookmark = (postId: number) => {
-    // Handle bookmark functionality
-    console.log("Bookmarked post:", postId);
-  };
-
-  const handleFollow = (postId: number) => {
-    // Handle follow functionality
-    console.log("Followed user:", postId);
-  };
-
-  const handleShare = (postId: number) => {
-    // Handle share functionality
-    console.log("Shared post:", postId);
-  };
-
-  const handleRepost = (postId: number) => {
-    // Handle repost functionality
-    console.log("Reposted:", postId);
+  const handleUserClick = (user: any) => {
+    setSelectedUser(user);
   };
 
   return (
@@ -164,101 +141,114 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       {/* Posts Feed */}
       <div className="space-y-4">
         {filteredPosts.length > 0 ? (
-          filteredPosts.map((post) => (
-            <div key={post.id} className="bg-white rounded-lg border p-6 space-y-4">
-              {/* Post Header */}
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-3 cursor-pointer">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src="/placeholder.svg" />
-                    <AvatarFallback>{post.author.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 hover:text-primary">{post.author}</h3>
-                    <p className="text-sm text-gray-600">{post.role} at {post.company}</p>
-                    <p className="text-xs text-gray-500">{post.time}</p>
+          filteredPosts.map((post) => {
+            const interactions = postInteractions[post.id] || {};
+            
+            return (
+              <div key={post.id} className="bg-white rounded-lg border p-6 space-y-4">
+                {/* Post Header */}
+                <div className="flex items-start justify-between">
+                  <div 
+                    className="flex items-center space-x-3 cursor-pointer"
+                    onClick={() => handleUserClick(post.user)}
+                  >
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src="/placeholder.svg" />
+                      <AvatarFallback>{post.author.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 hover:text-primary">{post.author}</h3>
+                      <p className="text-sm text-gray-600">{post.role} at {post.company}</p>
+                      <p className="text-xs text-gray-500">{post.time}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleInteraction(post.id, 'bookmark')}
+                      className={interactions.bookmarked ? "text-primary" : "text-gray-500"}
+                    >
+                      <Bookmark className={`h-4 w-4 ${interactions.bookmarked ? 'fill-current' : ''}`} />
+                    </Button>
+                    <Button
+                      variant={interactions.following ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleInteraction(post.id, 'follow')}
+                      className={interactions.following ? "bg-primary text-white" : "text-primary border border-primary"}
+                    >
+                      <UserPlus className="h-4 w-4 mr-1" />
+                      {interactions.following ? "Following" : "Follow"}
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+
+                {/* Post Content */}
+                <div className="space-y-3">
+                  <p className="text-gray-800">{post.content}</p>
+                  {post.image && (
+                    <img 
+                      src={post.image} 
+                      alt="Post content" 
+                      className="w-full h-64 object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+
+                {/* Post Actions */}
+                <div className="flex items-center justify-between pt-3 border-t">
+                  <div className="flex items-center space-x-6">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleInteraction(post.id, 'like')}
+                      className={`flex items-center space-x-2 ${interactions.liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-500`}
+                    >
+                      <Heart className={`h-5 w-5 ${interactions.liked ? 'fill-current' : ''}`} />
+                      <span>{post.likes + (interactions.liked ? 1 : 0)}</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-500 hover:text-primary">
+                      <MessageCircle className="h-5 w-5" />
+                      <span>{post.comments}</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center space-x-2 text-gray-500 hover:text-green-500"
+                    >
+                      <Repeat2 className="h-5 w-5" />
+                      <span>Repost</span>
+                    </Button>
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleBookmark(post.id)}
-                    className={post.isBookmarked ? "text-primary" : "text-gray-500"}
+                    className="flex items-center space-x-2 text-gray-500 hover:text-primary"
                   >
-                    <Bookmark className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleFollow(post.id)}
-                    className={post.isFollowing ? "bg-primary text-white" : "text-primary border border-primary"}
-                  >
-                    <UserPlus className="h-4 w-4 mr-1" />
-                    {post.isFollowing ? "Following" : "Follow"}
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <MoreHorizontal className="h-4 w-4" />
+                    <Share className="h-5 w-5" />
+                    <span>{post.shares}</span>
                   </Button>
                 </div>
               </div>
-
-              {/* Post Content */}
-              <div className="space-y-3">
-                <p className="text-gray-800">{post.content}</p>
-                {post.image && (
-                  <img 
-                    src={post.image} 
-                    alt="Post content" 
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
-                )}
-              </div>
-
-              {/* Post Actions */}
-              <div className="flex items-center justify-between pt-3 border-t">
-                <div className="flex items-center space-x-6">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleLike(post.id)}
-                    className={`flex items-center space-x-2 ${post.isLiked ? 'text-red-500' : 'text-gray-500'} hover:text-red-500`}
-                  >
-                    <Heart className={`h-5 w-5 ${post.isLiked ? 'fill-current' : ''}`} />
-                    <span>{post.likes}</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-500 hover:text-primary">
-                    <MessageCircle className="h-5 w-5" />
-                    <span>{post.comments}</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRepost(post.id)}
-                    className="flex items-center space-x-2 text-gray-500 hover:text-green-500"
-                  >
-                    <Repeat2 className="h-5 w-5" />
-                    <span>Repost</span>
-                  </Button>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleShare(post.id)}
-                  className="flex items-center space-x-2 text-gray-500 hover:text-primary"
-                >
-                  <Share className="h-5 w-5" />
-                  <span>{post.shares}</span>
-                </Button>
-              </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="bg-white rounded-lg border p-8 text-center">
             <p className="text-gray-500">No {activeFilter} posts found.</p>
           </div>
         )}
       </div>
+
+      {/* User Profile Modal */}
+      {selectedUser && (
+        <UserProfile 
+          user={selectedUser} 
+          onClose={() => setSelectedUser(null)} 
+        />
+      )}
     </div>
   );
 };
