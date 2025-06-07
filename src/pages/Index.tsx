@@ -43,11 +43,13 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen bg-gray-50 flex w-full">
-        {/* Sidebar */}
-        <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        {/* Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
+          <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0">
+        {/* Main Content Area - Instagram-like width on desktop */}
+        <div className="flex-1 flex flex-col min-w-0 max-w-full md:max-w-[975px] md:mx-auto">
           {/* Top Navigation */}
           <TopBar onLogoClick={handleLogoClick} />
           
@@ -60,13 +62,17 @@ const Index = () => {
             />
           )}
           
-          {/* Main Content */}
+          {/* Main Content - Instagram-like constraints */}
           <main className={cn(
-            "flex-1 px-4 max-w-4xl mx-auto w-full",
+            "flex-1 w-full",
+            // Mobile: full width with padding
+            "px-4",
+            // Desktop: Instagram-like max width (935px content + 20px padding each side)
+            "md:px-5 md:max-w-[935px] md:mx-auto",
             shouldShowFilters ? "pt-4" : "pt-6",
             "pb-20 md:pb-8"
           )}>
-            <div className="animate-fade-in">
+            <div className="animate-fade-in w-full">
               {renderContent()}
             </div>
           </main>

@@ -45,8 +45,8 @@ const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
   ];
 
   return (
-    <Sidebar>
-      <SidebarContent>
+    <Sidebar className="fixed left-0 top-0 h-full z-30 w-64">
+      <SidebarContent className="pt-16">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -55,6 +55,7 @@ const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.id)}
                     isActive={activeTab === item.id}
+                    className="w-full justify-start"
                   >
                     <item.icon />
                     <span>{item.title}</span>

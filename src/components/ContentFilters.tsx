@@ -30,8 +30,14 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
   const filters = filterType === "skillup" ? skillUpFilters : homeFilters;
 
   return (
-    <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
-      <div className="px-4 py-3">
+    <div className="bg-white border-b border-gray-200 sticky top-16 z-40 w-full">
+      <div className={cn(
+        "py-3 w-full",
+        // Mobile: full width with padding
+        "px-4",
+        // Desktop: Instagram-like max width
+        "md:px-5 md:max-w-[935px] md:mx-auto"
+      )}>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-gray-700">Filters</h3>
           <Button
@@ -49,14 +55,14 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
         </div>
         
         {isExpanded && (
-          <div className="flex space-x-1 overflow-x-auto">
+          <div className="flex space-x-1 overflow-x-auto pb-1">
             {filters.map((filter) => (
               <Button
                 key={filter.id}
                 variant={activeFilter === filter.id ? "default" : "ghost"}
                 onClick={() => onFilterChange(filter.id)}
                 className={cn(
-                  "whitespace-nowrap",
+                  "whitespace-nowrap flex-shrink-0",
                   activeFilter === filter.id 
                     ? "bg-primary text-white" 
                     : "text-gray-600 hover:text-primary hover:bg-gray-100"
