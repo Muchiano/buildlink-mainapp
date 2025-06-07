@@ -3,7 +3,7 @@ import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { MapPin, Building2, Calendar, Users, Award, Camera, Edit, Plus, MessageCircle, Phone, Mail, Heart, MessageSquare, Share2, Repeat2 } from "lucide-react";
+import { MapPin, Building2, Calendar, Users, Award, Camera, Edit, Plus, MessageCircle, Phone, Mail, Heart, MessageSquare, Share2, Repeat2, Globe, Linkedin } from "lucide-react";
 import { useState } from "react";
 
 const ProfileBoard = () => {
@@ -15,11 +15,38 @@ const ProfileBoard = () => {
     company: "BuildTech Solutions",
     location: "Nairobi, Kenya",
     joinedDate: "January 2020",
-    followers: 2847,
-    following: 456,
     connections: 1234,
     about: "Experienced Civil Engineer with over 8 years in construction project management. Passionate about sustainable building practices and innovative construction technologies. I specialize in large-scale infrastructure projects and have led teams in delivering complex construction solutions across East Africa.",
-    specializations: ["Project Management", "Structural Engineering", "BIM Technology", "Sustainable Construction"],
+    contactInfo: {
+      email: "john.kamau@buildtech.co.ke",
+      phone: "+254 712 345 678",
+      website: "www.johnkamau.dev",
+      linkedin: "linkedin.com/in/johnkamau"
+    },
+    skills: [
+      "Project Management",
+      "Structural Engineering", 
+      "BIM Technology",
+      "Sustainable Construction",
+      "AutoCAD",
+      "Revit",
+      "STAAD Pro",
+      "Construction Planning"
+    ],
+    education: [
+      {
+        institution: "University of Nairobi",
+        degree: "Bachelor of Civil Engineering",
+        year: "2014-2018",
+        description: "First Class Honours"
+      },
+      {
+        institution: "Kenya Institute of Management",
+        degree: "Project Management Certificate",
+        year: "2020",
+        description: "Advanced Project Management and Leadership"
+      }
+    ],
     experience: [
       {
         title: "Senior Civil Engineer",
@@ -147,20 +174,11 @@ const ProfileBoard = () => {
                 </Button>
               </div>
               
-              {/* Basic Info and Specializations */}
+              {/* Basic Info */}
               <div className="flex-1">
                 <h1 className="text-2xl font-bold text-gray-900 mb-1">{userProfile.name}</h1>
                 <p className="text-lg text-gray-700 mb-1">{userProfile.role}</p>
                 <p className="text-gray-600 mb-3">{userProfile.company}</p>
-                
-                {/* Specialization Tags */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {userProfile.specializations.map((spec, index) => (
-                    <Badge key={index} variant="secondary" className="px-3 py-1">
-                      {spec}
-                    </Badge>
-                  ))}
-                </div>
                 
                 <div className="flex items-center text-sm text-gray-500 space-x-4">
                   <div className="flex items-center">
@@ -185,22 +203,6 @@ const ProfileBoard = () => {
                 <Plus className="h-4 w-4 mr-1" />
                 Connect
               </Button>
-            </div>
-          </div>
-          
-          {/* Followers and Connections Stats */}
-          <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t">
-            <div className="text-center">
-              <div className="text-xl font-bold text-gray-900">{userProfile.followers}</div>
-              <div className="text-sm text-gray-500">Followers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-xl font-bold text-gray-900">{userProfile.following}</div>
-              <div className="text-sm text-gray-500">Following</div>
-            </div>
-            <div className="text-center">
-              <div className="text-xl font-bold text-gray-900">{userProfile.connections}</div>
-              <div className="text-sm text-gray-500">Connections</div>
             </div>
           </div>
         </CardContent>
@@ -230,6 +232,16 @@ const ProfileBoard = () => {
             >
               Activity
             </button>
+            <button
+              onClick={() => setActiveTab("contact")}
+              className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                activeTab === "contact"
+                  ? "text-primary border-b-2 border-primary bg-primary/5"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              Contact Info
+            </button>
           </div>
         </CardContent>
       </Card>
@@ -247,6 +259,52 @@ const ProfileBoard = () => {
                 </Button>
               </div>
               <p className="text-gray-700 leading-relaxed">{userProfile.about}</p>
+            </CardContent>
+          </Card>
+
+          {/* Skills & Specialization Section */}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">Skills & Specialization</h2>
+                <Button variant="ghost" size="sm">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {userProfile.skills.map((skill, index) => (
+                  <Badge key={index} variant="secondary" className="px-3 py-1">
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Education & Training Section */}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">Education & Training</h2>
+                <Button variant="ghost" size="sm">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="space-y-6">
+                {userProfile.education.map((edu, index) => (
+                  <div key={index} className="flex space-x-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <Award className="h-6 w-6 text-gray-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900">{edu.degree}</h3>
+                      <p className="text-gray-600">{edu.institution}</p>
+                      <p className="text-sm text-gray-500">{edu.year}</p>
+                      <p className="text-sm text-gray-700 mt-2">{edu.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
 
@@ -288,6 +346,37 @@ const ProfileBoard = () => {
             </div>
             <div className="space-y-4">
               {userProfile.activity.map(renderActivityItem)}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === "contact" && (
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Contact Information</h2>
+              <Button variant="ghost" size="sm">
+                <Edit className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-gray-500" />
+                <span className="text-gray-700">{userProfile.contactInfo.email}</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-gray-500" />
+                <span className="text-gray-700">{userProfile.contactInfo.phone}</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Globe className="h-5 w-5 text-gray-500" />
+                <span className="text-gray-700">{userProfile.contactInfo.website}</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Linkedin className="h-5 w-5 text-gray-500" />
+                <span className="text-gray-700">{userProfile.contactInfo.linkedin}</span>
+              </div>
             </div>
           </CardContent>
         </Card>
