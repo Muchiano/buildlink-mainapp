@@ -39,51 +39,60 @@ const TopBar = ({ onLogoClick }: TopBarProps) => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
-      <div className="flex items-center justify-between">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
+      <div className="flex items-center justify-between px-3 py-2 md:px-4 md:py-3">
         {/* Left Section */}
-        <div className="flex items-center space-x-4">
-          {/* Navigation Menu Trigger */}
-          <SidebarTrigger />
+        <div className="flex items-center space-x-2 md:space-x-4 min-w-0">
+          {/* Navigation Menu Trigger - Only visible on mobile */}
+          <div className="md:hidden">
+            <SidebarTrigger />
+          </div>
           
           {/* Logo - clickable home button */}
-          <div className="flex items-center">
+          <div className="flex items-center min-w-0">
             <button 
               onClick={onLogoClick}
-              className="text-xl font-bold text-primary hover:text-primary/80 transition-colors"
+              className="text-lg md:text-xl font-bold text-primary hover:text-primary/80 transition-colors truncate"
             >
               BUILDLINK
             </button>
           </div>
         </div>
 
-        {/* Center Section - Search */}
-        <div className="flex-1 max-w-md mx-4">
-          <div className="relative">
+        {/* Center Section - Search (Hidden on very small screens) */}
+        <div className="hidden sm:flex flex-1 max-w-xs md:max-w-md mx-2 md:mx-4">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               type="search"
               placeholder="Search..."
-              className="pl-10 bg-gray-50 border-gray-200"
+              className="pl-10 bg-gray-50 border-gray-200 text-sm"
             />
           </div>
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 md:space-x-2">
+          {/* Search button for mobile */}
+          <div className="sm:hidden">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Search className="h-4 w-4" />
+            </Button>
+          </div>
+
           {/* Notifications Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="relative h-8 w-8 md:h-10 md:w-10">
+                <Bell className="h-4 w-4 md:h-5 md:w-5" />
                 {notifications.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                  <Badge className="absolute -top-1 -right-1 h-4 w-4 md:h-5 md:w-5 rounded-full p-0 flex items-center justify-center text-xs">
                     {notifications.length}
                   </Badge>
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuContent align="end" className="w-72 md:w-80">
               <DropdownMenuLabel>Notifications</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {notifications.map((notification) => (
@@ -107,11 +116,11 @@ const TopBar = ({ onLogoClick }: TopBarProps) => {
           {/* Account Menu Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10">
+                <User className="h-4 w-4 md:h-5 md:w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-48 md:w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>

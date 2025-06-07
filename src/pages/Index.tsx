@@ -48,8 +48,8 @@ const Index = () => {
           <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
-        {/* Main Content Area - Instagram-like width on desktop */}
-        <div className="flex-1 flex flex-col min-w-0 max-w-full md:max-w-[975px] md:mx-auto">
+        {/* Main Content Area - Full width on mobile, Instagram-like on desktop */}
+        <div className="flex-1 flex flex-col min-w-0 w-full md:max-w-[975px] md:mx-auto">
           {/* Top Navigation */}
           <TopBar onLogoClick={handleLogoClick} />
           
@@ -62,15 +62,16 @@ const Index = () => {
             />
           )}
           
-          {/* Main Content - Instagram-like constraints */}
+          {/* Main Content */}
           <main className={cn(
-            "flex-1 w-full",
-            // Mobile: full width with padding
-            "px-4",
-            // Desktop: Instagram-like max width (935px content + 20px padding each side)
+            "flex-1 w-full overflow-x-hidden",
+            // Mobile: minimal padding for max content width
+            "px-3",
+            // Desktop: Instagram-like max width with proper padding
             "md:px-5 md:max-w-[935px] md:mx-auto",
-            shouldShowFilters ? "pt-4" : "pt-6",
-            "pb-20 md:pb-8"
+            shouldShowFilters ? "pt-3 md:pt-4" : "pt-4 md:pt-6",
+            // Bottom padding to account for mobile navigation
+            "pb-24 md:pb-8"
           )}>
             <div className="animate-fade-in w-full">
               {renderContent()}

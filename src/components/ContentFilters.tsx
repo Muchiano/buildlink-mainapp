@@ -32,9 +32,9 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
   return (
     <div className="bg-white border-b border-gray-200 sticky top-16 z-40 w-full">
       <div className={cn(
-        "py-3 w-full",
-        // Mobile: full width with padding
-        "px-4",
+        "py-2 md:py-3 w-full",
+        // Mobile: minimal padding for max content width
+        "px-3",
         // Desktop: Instagram-like max width
         "md:px-5 md:max-w-[935px] md:mx-auto"
       )}>
@@ -55,14 +55,15 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
         </div>
         
         {isExpanded && (
-          <div className="flex space-x-1 overflow-x-auto pb-1">
+          <div className="flex space-x-1 overflow-x-auto pb-1 scrollbar-hide">
             {filters.map((filter) => (
               <Button
                 key={filter.id}
                 variant={activeFilter === filter.id ? "default" : "ghost"}
                 onClick={() => onFilterChange(filter.id)}
+                size="sm"
                 className={cn(
-                  "whitespace-nowrap flex-shrink-0",
+                  "whitespace-nowrap flex-shrink-0 text-xs md:text-sm px-3 py-1.5 md:px-4 md:py-2",
                   activeFilter === filter.id 
                     ? "bg-primary text-white" 
                     : "text-gray-600 hover:text-primary hover:bg-gray-100"
