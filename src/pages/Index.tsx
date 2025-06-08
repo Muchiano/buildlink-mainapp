@@ -30,17 +30,17 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "home":
-        return <HomeFeed />;
+        return <HomeFeed activeFilter={activeFilter} />;
       case "mentorship":
         return <MentorshipHub />;
       case "post":
         return <PostCreate />;
       case "skillup":
-        return <SkillUpFeed />;
+        return <SkillUpFeed activeFilter={activeFilter} />;
       case "profile":
         return <ProfileBoard />;
       default:
-        return <HomeFeed />;
+        return <HomeFeed activeFilter={activeFilter} />;
     }
   };
 
