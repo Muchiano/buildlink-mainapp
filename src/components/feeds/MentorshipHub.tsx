@@ -1,183 +1,353 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Star, Clock, DollarSign, MessageSquare } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Star, Clock, Users, Search, Plus } from "lucide-react";
+import { useState } from "react";
 
 const MentorshipHub = () => {
-  const [activeTab, setActiveTab] = useState('mentors');
+  const [selectedField, setSelectedField] = useState("");
+  const [selectedExperience, setSelectedExperience] = useState("");
+  const [showMentors, setShowMentors] = useState(false);
+  const [showBecomeMentor, setShowBecomeMentor] = useState(false);
 
   const mentors = [
     {
       id: 1,
-      name: "Dr. Grace Wanjiku",
-      title: "Senior Software Engineer",
-      company: "Safaricom",
-      avatar: "/placeholder.svg",
+      name: "Eng. Mary Njoki",
+      title: "Senior Structural Engineer",
+      company: "Kenya Railways",
       rating: 4.9,
-      reviews: 127,
-      hourlyRate: 50,
-      expertise: ["Software Development", "Career Growth", "Leadership"],
-      experience: "8+ years",
-      bio: "Passionate about helping junior developers navigate their careers in tech. Specializing in software architecture and team leadership."
+      sessions: 127,
+      specialties: ["Structural Design", "Project Management", "Code Compliance"],
+      bio: "15+ years in infrastructure development. Passionate about mentoring young engineers.",
+      price: "KSh 3,000/session",
+      expertise: "Civil Engineering",
+      experience: "15+ years"
     },
     {
       id: 2,
-      name: "Michael Ochieng",
-      title: "Product Manager", 
-      company: "Twiga Foods",
-      avatar: "/placeholder.svg",
+      name: "Arch. Peter Mwangi",
+      title: "Principal Architect",
+      company: "Mwangi & Associates",
       rating: 4.8,
-      reviews: 89,
-      hourlyRate: 40,
-      expertise: ["Product Management", "Strategy", "Market Research"],
-      experience: "6+ years",
-      bio: "Former consultant turned product manager. I help aspiring PMs understand the product lifecycle and strategic thinking."
+      sessions: 89,
+      specialties: ["Sustainable Design", "Urban Planning", "BIM"],
+      bio: "Award-winning architect specializing in eco-friendly commercial buildings.",
+      price: "KSh 2,500/session",
+      expertise: "Architecture",
+      experience: "12+ years"
     },
     {
       id: 3,
-      name: "Sarah Muthoni",
-      title: "Data Scientist",
-      company: "NCBA Bank",
-      avatar: "/placeholder.svg",
+      name: "QS. Sarah Wanjiku",
+      title: "Senior Quantity Surveyor",
+      company: "Cost Consultants Ltd",
       rating: 4.7,
-      reviews: 64,
-      hourlyRate: 45,
-      expertise: ["Data Science", "Machine Learning", "Analytics"],
-      experience: "5+ years", 
-      bio: "Helping students and professionals transition into data science. Experienced in financial modeling and predictive analytics."
+      sessions: 65,
+      specialties: ["Cost Estimation", "Contract Administration", "Risk Management"],
+      bio: "Expert in construction economics with focus on residential and commercial projects.",
+      price: "KSh 2,800/session",
+      expertise: "Quantity Surveying",
+      experience: "10+ years"
     }
   ];
 
-  const sessions = [
+  const mentees = [
     {
       id: 1,
-      mentor: "Dr. Grace Wanjiku",
-      topic: "Career Transition to Tech",
-      date: "Dec 12, 2024",
-      time: "2:00 PM",
-      status: "upcoming"
+      name: "Grace Akinyi",
+      field: "Architecture Student",
+      university: "University of Nairobi",
+      seeking: "Portfolio Review & Career Guidance",
+      year: "Final Year"
     },
     {
       id: 2,
-      mentor: "Michael Ochieng",
-      topic: "Product Strategy Fundamentals",
-      date: "Dec 10, 2024", 
-      time: "4:00 PM",
-      status: "completed"
+      name: "David Kimani",
+      field: "Junior Engineer",
+      company: "Fresh Graduate",
+      seeking: "Industry Transition Support",
+      year: "New Graduate"
     }
   ];
 
+  const handleFindMentors = () => {
+    setShowMentors(true);
+    setShowBecomeMentor(false);
+  };
+
+  const handleBecomeMentor = () => {
+    setShowBecomeMentor(true);
+    setShowMentors(false);
+  };
+
+  const filteredMentors = mentors.filter(mentor => {
+    const fieldMatch = !selectedField || mentor.specialties.some(specialty => 
+      specialty.toLowerCase().includes(selectedField.toLowerCase())
+    );
+    return fieldMatch;
+  });
+
   return (
     <div className="space-y-6">
-      <div className="flex space-x-4 border-b border-gray-200">
-        <Button
-          variant={activeTab === 'mentors' ? 'default' : 'ghost'}
-          onClick={() => setActiveTab('mentors')}
-          className="pb-2"
-        >
-          Find Mentors
-        </Button>
-        <Button
-          variant={activeTab === 'sessions' ? 'default' : 'ghost'}
-          onClick={() => setActiveTab('sessions')}
-          className="pb-2"
-        >
-          My Sessions
-        </Button>
+      {/* Mentorship Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="text-center border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-primary">150+</div>
+            <div className="text-xs text-gray-600">Active Mentors</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-primary">1.2K</div>
+            <div className="text-xs text-gray-600">Mentees Matched</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center border-0 shadow-sm">
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-primary">95%</div>
+            <div className="text-xs text-gray-600">Success Rate</div>
+          </CardContent>
+        </Card>
       </div>
 
-      {activeTab === 'mentors' && (
-        <div className="space-y-4">
-          {mentors.map(mentor => (
-            <Card key={mentor.id}>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={mentor.avatar} />
-                    <AvatarFallback>{mentor.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-900">{mentor.name}</h3>
-                        <p className="text-gray-600">{mentor.title} at {mentor.company}</p>
-                        <p className="text-sm text-gray-500 mt-1">{mentor.experience} experience</p>
+      {/* Quick Match */}
+      <Card className="border-0 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-lg text-primary">Find Your Perfect Mentor</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <select 
+              className="w-full p-3 border rounded-lg"
+              value={selectedField}
+              onChange={(e) => setSelectedField(e.target.value)}
+            >
+              <option value="">Select your field</option>
+              <option value="Architecture">Architecture</option>
+              <option value="Civil Engineering">Civil Engineering</option>
+              <option value="Structural Engineering">Structural Engineering</option>
+              <option value="Quantity Surveying">Quantity Surveying</option>
+              <option value="Project Management">Project Management</option>
+            </select>
+            <select 
+              className="w-full p-3 border rounded-lg"
+              value={selectedExperience}
+              onChange={(e) => setSelectedExperience(e.target.value)}
+            >
+              <option value="">Experience level</option>
+              <option value="Student">Student</option>
+              <option value="Fresh Graduate">Fresh Graduate</option>
+              <option value="1-3 years">1-3 years</option>
+              <option value="3-5 years">3-5 years</option>
+            </select>
+            <div className="flex space-x-3">
+              <Button 
+                className="flex-1 bg-primary hover:bg-primary-800"
+                onClick={handleFindMentors}
+              >
+                <Search className="h-4 w-4 mr-2" />
+                Find Mentors
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1 border-primary text-primary hover:bg-primary/10"
+                onClick={handleBecomeMentor}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Become a Mentor
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Become a Mentor Profile */}
+      {showBecomeMentor && (
+        <Card className="border-0 shadow-sm border-l-4 border-l-primary">
+          <CardHeader>
+            <CardTitle className="text-lg text-primary">Setup Your Mentor Profile</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Areas of Expertise</label>
+                <div className="flex flex-wrap gap-2">
+                  {["Structural Design", "Architecture", "Project Management", "BIM", "Sustainable Design", "Cost Estimation"].map((skill) => (
+                    <Badge key={skill} variant="outline" className="cursor-pointer hover:bg-primary hover:text-white">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
+                <select className="w-full p-3 border rounded-lg">
+                  <option>5-10 years</option>
+                  <option>10-15 years</option>
+                  <option>15+ years</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Hourly Rate (KSh)</label>
+                <input type="number" placeholder="2500" className="w-full p-3 border rounded-lg" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Brief Bio</label>
+                <textarea 
+                  placeholder="Describe your experience and what you can offer to mentees..."
+                  className="w-full p-3 border rounded-lg h-24"
+                ></textarea>
+              </div>
+              <Button className="w-full bg-primary hover:bg-primary-800">
+                Submit Mentor Application
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Mentor Results */}
+      {showMentors && (
+        <div>
+          <h2 className="text-lg font-semibold mb-3 text-gray-800">
+            Recommended Mentors {selectedField && `for ${selectedField}`}
+          </h2>
+          <div className="space-y-4">
+            {filteredMentors.map((mentor) => (
+              <Card key={mentor.id} className="border-0 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-4">
+                    <Avatar className="w-16 h-16">
+                      <AvatarFallback className="bg-primary text-white">
+                        {mentor.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800">{mentor.name}</h3>
+                      <p className="text-sm text-gray-600">{mentor.title}</p>
+                      <p className="text-xs text-gray-500 mb-2">{mentor.company}</p>
+                      
+                      <div className="flex items-center space-x-4 mb-2">
+                        <div className="flex items-center">
+                          <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                          <span className="text-sm font-medium">{mentor.rating}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <Users className="h-4 w-4 mr-1" />
+                          <span className="text-sm">{mentor.sessions} sessions</span>
+                        </div>
                       </div>
                       
-                      <div className="text-right">
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium">{mentor.rating}</span>
-                          <span className="text-gray-500">({mentor.reviews})</span>
-                        </div>
-                        <div className="flex items-center space-x-1 mt-1">
-                          <DollarSign className="h-4 w-4 text-gray-400" />
-                          <span className="font-medium">${mentor.hourlyRate}/hr</span>
-                        </div>
+                      <p className="text-sm text-gray-700 mb-3">{mentor.bio}</p>
+                      
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {mentor.specialties.map((specialty, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {specialty}
+                          </Badge>
+                        ))}
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-primary">{mentor.price}</span>
+                        <Button size="sm" className="bg-primary hover:bg-primary-800">
+                          Book Session
+                        </Button>
                       </div>
                     </div>
-                    
-                    <p className="text-gray-700 mt-3">{mentor.bio}</p>
-                    
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {mentor.expertise.map(skill => (
-                        <Badge key={skill} variant="secondary">{skill}</Badge>
-                      ))}
-                    </div>
-                    
-                    <div className="flex space-x-3 mt-4">
-                      <Button className="flex-1">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Request Session
-                      </Button>
-                      <Button variant="outline">View Profile</Button>
-                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
 
-      {activeTab === 'sessions' && (
-        <div className="space-y-4">
-          {sessions.map(session => (
-            <Card key={session.id}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{session.topic}</h3>
-                    <p className="text-gray-600">with {session.mentor}</p>
-                    <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
-                      <div className="flex items-center space-x-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{session.date} at {session.time}</span>
+      {/* Default Featured Mentors */}
+      {!showMentors && !showBecomeMentor && (
+        <div>
+          <h2 className="text-lg font-semibold mb-3 text-gray-800">Featured Mentors</h2>
+          <div className="space-y-4">
+            {mentors.slice(0, 2).map((mentor) => (
+              <Card key={mentor.id} className="border-0 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-4">
+                    <Avatar className="w-16 h-16">
+                      <AvatarFallback className="bg-primary text-white">
+                        {mentor.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800">{mentor.name}</h3>
+                      <p className="text-sm text-gray-600">{mentor.title}</p>
+                      <p className="text-xs text-gray-500 mb-2">{mentor.company}</p>
+                      
+                      <div className="flex items-center space-x-4 mb-2">
+                        <div className="flex items-center">
+                          <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                          <span className="text-sm font-medium">{mentor.rating}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <Users className="h-4 w-4 mr-1" />
+                          <span className="text-sm">{mentor.sessions} sessions</span>
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm text-gray-700 mb-3">{mentor.bio}</p>
+                      
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {mentor.specialties.map((specialty, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {specialty}
+                          </Badge>
+                        ))}
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-primary">{mentor.price}</span>
+                        <Button size="sm" className="bg-primary hover:bg-primary-800">
+                          Book Session
+                        </Button>
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <Badge variant={session.status === 'upcoming' ? 'default' : 'secondary'}>
-                      {session.status}
-                    </Badge>
-                    <div className="mt-2">
-                      {session.status === 'upcoming' ? (
-                        <Button size="sm">Join Session</Button>
-                      ) : (
-                        <Button variant="outline" size="sm">Leave Review</Button>
-                      )}
-                    </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mentees Looking for Mentors */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3 text-gray-800">Mentees Seeking Guidance</h2>
+        <div className="space-y-3">
+          {mentees.map((mentee) => (
+            <Card key={mentee.id} className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                  <Avatar>
+                    <AvatarFallback className="bg-gray-200">
+                      {mentee.name.split(' ').map(n => n[0]).join('')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-800">{mentee.name}</h3>
+                    <p className="text-sm text-gray-600">{mentee.field} • {mentee.year}</p>
+                    <p className="text-sm text-gray-500">{mentee.seeking}</p>
                   </div>
+                  <Button variant="outline" size="sm">
+                    Offer Mentorship
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
-      )}
+      </div>
     </div>
   );
 };
