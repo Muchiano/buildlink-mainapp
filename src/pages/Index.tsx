@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import TopBar from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -15,10 +15,15 @@ import ProfileBoard from "@/components/feeds/ProfileBoard";
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [activeFilter, setActiveFilter] = useState("latest");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogoClick = () => {
     setActiveTab("home");
     setActiveFilter("latest");
+  };
+
+  const handleMenuClick = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   const renderContent = () => {
@@ -49,7 +54,7 @@ const Index = () => {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top Navigation */}
-          <TopBar onLogoClick={handleLogoClick} />
+          <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
           
           {/* Content Filters */}
           {shouldShowFilters && (
