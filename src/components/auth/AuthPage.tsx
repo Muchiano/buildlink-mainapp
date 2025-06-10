@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
@@ -54,10 +55,12 @@ const AuthPage = () => {
     const password = formData.get('password') as string;
     const fullName = formData.get('fullName') as string;
     const userType = formData.get('userType') as string;
+    const profession = formData.get('profession') as string;
 
     const { error } = await signUp(email, password, {
       full_name: fullName,
-      user_type: userType
+      user_type: userType,
+      profession: profession
     });
 
     if (error) {
@@ -174,16 +177,39 @@ const AuthPage = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-usertype">Account Type</Label>
-                    <select
-                      id="signup-usertype"
-                      name="userType"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      required
-                    >
-                      <option value="student">Student</option>
-                      <option value="mentor">Mentor</option>
-                      <option value="professional">Professional</option>
-                    </select>
+                    <Select name="userType" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select account type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="student">Student</SelectItem>
+                        <SelectItem value="graduate">Graduate</SelectItem>
+                        <SelectItem value="professional">Professional</SelectItem>
+                        <SelectItem value="company">Company</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-profession">Profession</Label>
+                    <Select name="profession" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your profession" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="architecture">Architecture</SelectItem>
+                        <SelectItem value="interior-design">Interior Design</SelectItem>
+                        <SelectItem value="quantity-surveying">Quantity Surveying</SelectItem>
+                        <SelectItem value="civil-engineering">Civil Engineering</SelectItem>
+                        <SelectItem value="mep-engineering">MEP Engineering</SelectItem>
+                        <SelectItem value="project-management">Project Management</SelectItem>
+                        <SelectItem value="construction-supplies">Construction & Supplies</SelectItem>
+                        <SelectItem value="health-safety">Health & Safety</SelectItem>
+                        <SelectItem value="real-estate-development">Real Estate Development</SelectItem>
+                        <SelectItem value="urban-planning">Urban Planning</SelectItem>
+                        <SelectItem value="governance-policy">Governance & Policy</SelectItem>
+                        <SelectItem value="advocacy-awareness">Advocacy & Awareness</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Creating account...' : 'Create Account'}
