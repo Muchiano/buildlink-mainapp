@@ -15,12 +15,21 @@ interface CreatePostDialogProps {
   onPostCreated?: () => void;
 }
 
+type PostCategory = 'general' | 'project' | 'career' | 'technical' | 'news';
+
+interface FormData {
+  title: string;
+  content: string;
+  category: PostCategory;
+  image_url: string;
+}
+
 const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     content: '',
     category: 'general',
@@ -59,8 +68,12 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCategoryChange = (value: PostCategory) => {
+    setFormData(prev => ({ ...prev, category: value }));
   };
 
   return (
@@ -93,7 +106,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
             <Label htmlFor="category">Category</Label>
             <Select
               value={formData.category}
-              onValueChange={(value) => handleInputChange('category', value)}
+              onValueChange={handleCategoryChange}
             >
               <SelectTrigger>
                 <SelectValue />
