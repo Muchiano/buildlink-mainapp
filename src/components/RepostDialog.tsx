@@ -23,7 +23,7 @@ const RepostDialog = ({ isOpen, onClose, post, onRepost }: RepostDialogProps) =>
   const [submitting, setSubmitting] = useState(false);
 
   const handleRepost = async () => {
-    if (!user) return;
+    if (!user || !post) return;
 
     setSubmitting(true);
     try {
@@ -54,6 +54,11 @@ const RepostDialog = ({ isOpen, onClose, post, onRepost }: RepostDialogProps) =>
       setSubmitting(false);
     }
   };
+
+  // Don't render if post is null
+  if (!post) {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -94,13 +99,13 @@ const RepostDialog = ({ isOpen, onClose, post, onRepost }: RepostDialogProps) =>
                 </AvatarFallback>
               </Avatar>
               <span className="font-medium text-sm">
-                {post.profiles?.full_name}
+                {post.profiles?.full_name || 'Anonymous User'}
               </span>
             </div>
             <p className="text-sm text-gray-700">
-              {post.content.length > 150 
+              {post.content && post.content.length > 150 
                 ? `${post.content.substring(0, 150)}...` 
-                : post.content
+                : post.content || 'No content'
               }
             </p>
           </div>
