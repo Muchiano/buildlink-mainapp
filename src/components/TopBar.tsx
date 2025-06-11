@@ -3,6 +3,8 @@ import { Bell, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import UserProfileButton from "@/components/UserProfileButton";
+import SearchDialog from "@/components/SearchDialog";
+import NotificationsDropdown from "@/components/NotificationsDropdown";
 
 interface TopBarProps {
   onLogoClick: () => void;
@@ -31,23 +33,26 @@ const TopBar = ({ onLogoClick, onMenuClick }: TopBarProps) => {
 
         {/* Center - Search Bar */}
         <div className="hidden md:flex flex-1 max-w-md mx-4">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Search posts, mentors, courses..."
-              className="pl-10 w-full"
-            />
-          </div>
+          <SearchDialog>
+            <div className="relative w-full cursor-pointer">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search posts, mentors, courses..."
+                className="pl-10 w-full cursor-pointer"
+                readOnly
+              />
+            </div>
+          </SearchDialog>
         </div>
 
         {/* Right side actions */}
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Search className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
+          <SearchDialog>
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <Search className="h-5 w-5" />
+            </Button>
+          </SearchDialog>
+          <NotificationsDropdown />
           <UserProfileButton />
         </div>
       </div>

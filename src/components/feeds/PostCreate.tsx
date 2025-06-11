@@ -2,13 +2,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Camera, FileText, Briefcase, Users, MapPin } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { postsService } from "@/services/dataService";
+import { useToast } from "@/hooks/use-toast";
 
 const PostCreate = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [postType, setPostType] = useState("update");
   const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const postTypes = [
     { id: "update", label: "Share Update", icon: FileText, description: "Share project milestones, insights, or industry thoughts" },
@@ -16,6 +22,57 @@ const PostCreate = () => {
     { id: "project", label: "Showcase Project", icon: Camera, description: "Display your latest work and achievements" },
     { id: "collaboration", label: "Seek Collaboration", icon: Users, description: "Find partners for projects or business ventures" }
   ];
+
+  const handleSubmit = async () => {
+    if (!user || !content.trim()) {
+      toast({
+        title: "Error",
+        description: "Please write something before posting",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await postsService.createPost({
+        content,
+        category: postType,
+        user_id: user.id
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Your post has been created successfully!"
+      });
+
+      setContent("");
+      setPostType("update");
+    } catch (error) {
+      console.error('Error creating post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <Card className="border-0 shadow-sm">
+        <CardContent className="p-6 text-center">
+          <p className="text-gray-600">Please sign in to create posts</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -63,11 +120,16 @@ const PostCreate = () => {
         <CardContent className="p-4">
           <div className="flex space-x-3 mb-4">
             <Avatar>
-              <AvatarFallback className="bg-primary text-white">You</AvatarFallback>
+              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarFallback className="bg-primary text-white">
+                {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-medium text-gray-800">Your Name</h3>
-              <p className="text-sm text-gray-600">Your Professional Title</p>
+              <h3 className="font-medium text-gray-800">
+                {user?.user_metadata?.full_name || 'Your Name'}
+              </h3>
+              <p className="text-sm text-gray-600">Professional</p>
             </div>
           </div>
           
@@ -86,68 +148,7 @@ const PostCreate = () => {
             className="min-h-[120px] resize-none border-0 text-base p-0"
           />
 
-          {/* Additional Fields for Job Posts */}
-          {postType === "job" && (
-            <div className="space-y-3 mt-4 pt-4 border-t">
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="Job Title"
-                  className="p-3 border rounded-lg"
-                />
-                <input
-                  type="text"
-                  placeholder="Company"
-                  className="p-3 border rounded-lg"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="Location"
-                  className="p-3 border rounded-lg"
-                />
-                <select className="p-3 border rounded-lg">
-                  <option>Job Type</option>
-                  <option>Full-time</option>
-                  <option>Part-time</option>
-                  <option>Contract</option>
-                  <option>Freelance</option>
-                  <option>Internship</option>
-                </select>
-              </div>
-              <input
-                type="text"
-                placeholder="Salary Range (Optional)"
-                className="w-full p-3 border rounded-lg"
-              />
-            </div>
-          )}
-
-          {/* Project Details */}
-          {postType === "project" && (
-            <div className="space-y-3 mt-4 pt-4 border-t">
-              <input
-                type="text"
-                placeholder="Project Name"
-                className="w-full p-3 border rounded-lg"
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="Project Location"
-                  className="p-3 border rounded-lg"
-                />
-                <input
-                  type="text"
-                  placeholder="Duration"
-                  className="p-3 border rounded-lg"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Media Upload */}
+          {/* Media Upload Options */}
           <div className="flex items-center space-x-4 mt-4 pt-4 border-t">
             <Button variant="ghost" size="sm" className="text-gray-600">
               <Camera className="h-4 w-4 mr-2" />
@@ -166,9 +167,11 @@ const PostCreate = () => {
           <div className="flex justify-end mt-4">
             <Button 
               className="bg-primary hover:bg-primary-800"
-              disabled={!content.trim()}
+              disabled={!content.trim() || isLoading}
+              onClick={handleSubmit}
             >
-              {postType === "job" ? "Post Job" : 
+              {isLoading ? 'Posting...' : 
+               postType === "job" ? "Post Job" : 
                postType === "project" ? "Share Project" :
                postType === "collaboration" ? "Seek Collaboration" : "Share Update"}
             </Button>
