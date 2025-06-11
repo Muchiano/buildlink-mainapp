@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { Heart, MessageCircle, Share, Repeat2, Bookmark, UserPlus, MoreHorizontal } from "lucide-react";
+import { Heart, MessageCircle, Share, Repeat2, Bookmark, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +8,8 @@ import { postsService } from "@/services/dataService";
 import { useToast } from "@/hooks/use-toast";
 import UserProfile from "@/components/UserProfile";
 import CreatePostDialog from "@/components/CreatePostDialog";
+import CommentsDialog from "@/components/CommentsDialog";
+import RepostDialog from "@/components/RepostDialog";
 
 interface HomeFeedProps {
   activeFilter: string;
@@ -20,7 +21,9 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [postInteractions, setPostInteractions] = useState<{[key: string]: {liked: boolean, bookmarked: boolean}}>({});
+  const [postInteractions, setPostInteractions] = useState<{[key: string]: {liked: boolean, bookmarked: boolean, reposted: boolean}}>({});
+  const [commentsDialog, setCommentsDialog] = useState<{isOpen: boolean, postId: string}>({isOpen: false, postId: ''});
+  const [repostDialog, setRepostDialog] = useState<{isOpen: boolean, post: any}>({isOpen: false, post: null});
 
   const stats = [
     { label: "Professionals", value: "12,547" },
@@ -90,6 +93,51 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       });
     } catch (error) {
       console.error('Error handling like:', error);
+    }
+  };
+
+  const handleComment = (postId: string) => {
+    setCommentsDialog({isOpen: true, postId});
+  };
+
+  const handleRepost = (post: any) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to repost",
+        variant: "destructive"
+      });
+      return;
+    }
+    setRepostDialog({isOpen: true, post});
+  };
+
+  const handleShare = async (postId: string) => {
+    try {
+      const { data, error } = await postsService.sharePost(postId);
+      
+      if (error) throw error;
+
+      if (navigator.share) {
+        await navigator.share({
+          title: data.title,
+          text: data.text,
+          url: data.url
+        });
+      } else {
+        await navigator.clipboard.writeText(data.url);
+        toast({
+          title: "Success",
+          description: "Post URL copied to clipboard!",
+        });
+      }
+    } catch (error) {
+      console.error('Error sharing post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to share post",
+        variant: "destructive"
+      });
     }
   };
 
@@ -163,6 +211,7 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
             const interactions = {
               liked: false,
               bookmarked: false,
+              reposted: false,
               ...postInteractions[post.id]
             };
             
@@ -225,16 +274,31 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
                       <Heart className={`h-5 w-5 ${interactions.liked ? 'fill-current' : ''}`} />
                       <span>Like</span>
                     </Button>
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-500 hover:text-primary">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleComment(post.id)}
+                      className="flex items-center space-x-2 text-gray-500 hover:text-primary"
+                    >
                       <MessageCircle className="h-5 w-5" />
                       <span>Comment</span>
                     </Button>
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-500 hover:text-green-500">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleRepost(post)}
+                      className={`flex items-center space-x-2 ${interactions.reposted ? 'text-green-500' : 'text-gray-500'} hover:text-green-500`}
+                    >
                       <Repeat2 className="h-5 w-5" />
-                      <span>Share</span>
+                      <span>Repost</span>
                     </Button>
                   </div>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-gray-500 hover:text-primary">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleShare(post.id)}
+                    className="flex items-center space-x-2 text-gray-500 hover:text-primary"
+                  >
                     <Share className="h-5 w-5" />
                   </Button>
                 </div>
@@ -257,6 +321,21 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
           onClose={() => setSelectedUser(null)} 
         />
       )}
+
+      {/* Comments Dialog */}
+      <CommentsDialog
+        isOpen={commentsDialog.isOpen}
+        onClose={() => setCommentsDialog({isOpen: false, postId: ''})}
+        postId={commentsDialog.postId}
+      />
+
+      {/* Repost Dialog */}
+      <RepostDialog
+        isOpen={repostDialog.isOpen}
+        onClose={() => setRepostDialog({isOpen: false, post: null})}
+        post={repostDialog.post}
+        onRepost={loadPosts}
+      />
     </div>
   );
 };

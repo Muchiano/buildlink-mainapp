@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Posts Service
@@ -8,7 +7,9 @@ export const postsService = {
       .from('posts')
       .select(`
         *,
-        profiles!posts_author_id_fkey(*)
+        profiles!posts_author_id_fkey(*),
+        comments(count),
+        reposts(count)
       `);
     
     if (category && category !== 'all' && category !== 'latest') {
@@ -82,6 +83,93 @@ export const postsService = {
         .single();
       return { data, error, action: 'liked' };
     }
+  },
+
+  async getComments(postId: string) {
+    const { data, error } = await supabase
+      .from('comments')
+      .select(`
+        *,
+        profiles!comments_author_id_fkey(*)
+      `)
+      .eq('post_id', postId)
+      .is('parent_id', null)
+      .order('created_at', { ascending: false });
+    
+    return { data, error };
+  },
+
+  async createComment(commentData: {
+    post_id: string;
+    author_id: string;
+    content: string;
+    parent_id?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('comments')
+      .insert(commentData)
+      .select(`
+        *,
+        profiles!comments_author_id_fkey(*)
+      `)
+      .single();
+    
+    return { data, error };
+  },
+
+  async repostPost(postId: string, userId: string, comment?: string) {
+    // Check if already reposted
+    const { data: existingRepost } = await supabase
+      .from('reposts')
+      .select('id')
+      .eq('post_id', postId)
+      .eq('user_id', userId)
+      .single();
+
+    if (existingRepost) {
+      // Remove repost
+      const { data, error } = await supabase
+        .from('reposts')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userId);
+      return { data, error, action: 'unreposted' };
+    } else {
+      // Add repost
+      const { data, error } = await supabase
+        .from('reposts')
+        .insert({ post_id: postId, user_id: userId, comment })
+        .select()
+        .single();
+      return { data, error, action: 'reposted' };
+    }
+  },
+
+  async sharePost(postId: string) {
+    // Get post data for sharing
+    const { data: post, error } = await supabase
+      .from('posts')
+      .select(`
+        *,
+        profiles!posts_author_id_fkey(*)
+      `)
+      .eq('id', postId)
+      .single();
+
+    if (error) return { data: null, error };
+
+    // Create share URL
+    const shareUrl = `${window.location.origin}/?post=${postId}`;
+    const shareText = `Check out this post by ${post.profiles?.full_name}: ${post.content.substring(0, 100)}...`;
+
+    return { 
+      data: { 
+        url: shareUrl, 
+        text: shareText,
+        title: `Post by ${post.profiles?.full_name}`
+      }, 
+      error: null 
+    };
   },
 
   async getPostInteractions(postId: string) {
