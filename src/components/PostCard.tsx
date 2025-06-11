@@ -29,15 +29,25 @@ const PostCard = ({ post, onLike, onComment }: PostCardProps) => {
     
     setIsLiking(true);
     try {
-      if (isLiked) {
-        await postsService.unlikePost(post.id, user.id);
-        setIsLiked(false);
-        setLikesCount(prev => prev - 1);
-      } else {
-        await postsService.likePost(post.id, user.id);
+      const { action, error } = await postsService.likePost(post.id, user.id);
+      
+      if (error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to update like status',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if (action === 'liked') {
         setIsLiked(true);
         setLikesCount(prev => prev + 1);
+      } else {
+        setIsLiked(false);
+        setLikesCount(prev => prev - 1);
       }
+      
       onLike?.();
     } catch (error) {
       toast({
