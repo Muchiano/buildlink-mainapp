@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
-import { mentorsService } from '@/services/dataService';
+import { mentorshipService } from '@/services/dataService';
 import { useToast } from '@/hooks/use-toast';
 import { Mentor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -48,13 +48,12 @@ const SessionBookingDialog = ({ mentor, open, onOpenChange, onBookingComplete }:
       const [hours, minutes] = selectedTime.split(':').map(Number);
       scheduledAt.setHours(hours, minutes, 0, 0);
 
-      const { error } = await mentorsService.bookSession({
+      const { error } = await mentorshipService.bookSession({
         mentor_id: mentor.id,
         mentee_id: user.id,
-        title: formData.title,
-        description: formData.description,
-        scheduled_at: scheduledAt.toISOString(),
-        duration_minutes: formData.duration_minutes
+        topic: formData.title,
+        duration: `${formData.duration_minutes} minutes`,
+        message: formData.description
       });
 
       if (error) throw error;
