@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -25,6 +24,7 @@ const ProfileBoard = () => {
   const [profile, setProfile] = useState<any>(null);
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAboutExpanded, setIsAboutExpanded] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -102,6 +102,40 @@ const ProfileBoard = () => {
             </div>
           </div>
         </div>
+      </div>
+    );
+  };
+
+  const renderAboutContent = () => {
+    if (!profile.bio) {
+      return (
+        <div className="text-gray-500 italic">
+          No professional summary available yet. Click edit to add your story and let others know about your journey, expertise, and career aspirations.
+        </div>
+      );
+    }
+
+    const characterLimit = 220;
+    const shouldTruncate = profile.bio.length > characterLimit;
+    const displayText = isAboutExpanded || !shouldTruncate 
+      ? profile.bio 
+      : profile.bio.substring(0, characterLimit) + '...';
+
+    return (
+      <div className="space-y-3">
+        <div className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
+          {displayText}
+        </div>
+        {shouldTruncate && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsAboutExpanded(!isAboutExpanded)}
+            className="text-primary hover:text-primary/80 p-0 h-auto font-medium"
+          >
+            {isAboutExpanded ? 'Show less' : 'Read more'}
+          </Button>
+        )}
       </div>
     );
   };
@@ -263,15 +297,7 @@ const ProfileBoard = () => {
                 </AboutEditDialog>
               </div>
               <div className="prose prose-gray max-w-none">
-                {profile.bio ? (
-                  <div className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
-                    {profile.bio}
-                  </div>
-                ) : (
-                  <div className="text-gray-500 italic">
-                    No professional summary available yet. Click edit to add your story and let others know about your journey, expertise, and career aspirations.
-                  </div>
-                )}
+                {renderAboutContent()}
               </div>
             </CardContent>
           </Card>
