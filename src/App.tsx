@@ -4,13 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import AuthPage from "./components/auth/AuthPage";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import AdminResourcesPage from "@/pages/AdminResources";
-import AdminAnalyticsPage from "@/pages/AdminAnalytics";
-import AdminRoute from "@/components/auth/AdminRoute";
+import AppRoutes from "./AppRoutes";
 
 const queryClient = new QueryClient();
 
@@ -21,36 +15,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route 
-              path="/" 
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } 
-            />
-            {/* Admin Panel routes (only accessible if isAdmin) */}
-            <Route
-              path="/admin-resources"
-              element={
-                <AdminRoute>
-                  <AdminResourcesPage />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/admin-analytics"
-              element={
-                <AdminRoute>
-                  <AdminAnalyticsPage />
-                </AdminRoute>
-              }
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
