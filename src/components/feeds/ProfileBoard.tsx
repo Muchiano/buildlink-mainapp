@@ -16,6 +16,11 @@ import EducationEditDialog from "../profile-sections/EducationEditDialog";
 import CertificationsEditDialog from "../profile-sections/CertificationsEditDialog";
 import InterestsEditDialog from "../profile-sections/InterestsEditDialog";
 import AvatarUploader from "../profile-sections/AvatarUploader";
+import ProfileBanner from "./ProfileBanner";
+import ProfileHeader from "./ProfileHeader";
+import ProfileTabs from "./ProfileTabs";
+import ProfileAbout from "./ProfileAbout";
+import ProfileActivity from "./ProfileActivity";
 
 const ProfileBoard = () => {
   const { user } = useAuth();
@@ -243,323 +248,30 @@ const ProfileBoard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Profile Banner */}
-      <Card className="border-0 shadow-sm overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-primary to-primary/80 relative">
-          <BannerEditDialog 
-            currentProfile={profile}
-            onProfileUpdated={handleProfileUpdate}
-          >
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm"
-            >
-              <Camera className="h-4 w-4 mr-1" />
-              Edit Cover
-            </Button>
-          </BannerEditDialog>
-        </div>
-      </Card>
-
-      {/* Profile Header (AvatarUploader is now integrated here) */}
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
-            {/* Profile Info */}
-            <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
-              {/* Profile Photo with AvatarUploader */}
-              <div className="relative">
-                <AvatarUploader
-                  avatarUrl={profile.avatar || ""}
-                  fullName={profile.full_name}
-                  uploading={uploading}
-                  onAvatarChange={handleAvatarChange}
-                  onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
-                />
-              </div>
-              
-              {/* Basic Info */}
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                  {profile.full_name || 'User'}
-                </h1>
-                <p className="text-lg text-gray-700 mb-1">
-                  {profile.profession || 'No profession specified'}
-                </p>
-                <p className="text-gray-600 mb-3">
-                  {profile.organization || 'No organization specified'}
-                </p>
-                
-                <div className="flex items-center text-sm text-gray-500 space-x-4">
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    Kenya
-                  </div>
-                  <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-1" />
-                    {userPosts.length} posts
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="flex space-x-2">
-              <Button variant="outline">
-                <MessageCircle className="h-4 w-4 mr-1" />
-                Message
-              </Button>
-              <ProfileEditDialog 
-                currentProfile={profile}
-                onProfileUpdated={handleProfileUpdate}
-              >
-                <Button>
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit Profile
-                </Button>
-              </ProfileEditDialog>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Navigation Tabs */}
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-0">
-          <div className="flex border-b">
-            <button
-              onClick={() => setActiveTab("about")}
-              className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
-                activeTab === "about"
-                  ? "text-primary border-b-2 border-primary bg-primary/5"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
-            >
-              About
-            </button>
-            <button
-              onClick={() => setActiveTab("activity")}
-              className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
-                activeTab === "activity"
-                  ? "text-primary border-b-2 border-primary bg-primary/5"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
-            >
-              Activity ({userPosts.length})
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Tab Content */}
-      {activeTab === "about" && (
-        <div className="space-y-6">
-          {/* About Section */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">About</h2>
-                <AboutEditDialog 
-                  currentProfile={profile}
-                  onProfileUpdated={handleProfileUpdate}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </AboutEditDialog>
-              </div>
-              <div className="prose prose-gray max-w-none">
-                {renderAboutContent()}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Skills & Specialization */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-800 mb-1">Skills & Specialization</h2>
-                  <p className="text-sm text-gray-500">Showcase your expertise and experience levels</p>
-                </div>
-                <SkillsEditDialog 
-                  currentProfile={profile}
-                  onProfileUpdated={handleProfileUpdate}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </SkillsEditDialog>
-              </div>
-              {renderSkillsContent()}
-            </CardContent>
-          </Card>
-
-          {/* Professional Experience */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Professional Experience</h2>
-                <ExperienceEditDialog 
-                  currentProfile={profile}
-                  onProfileUpdated={handleProfileUpdate}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </ExperienceEditDialog>
-              </div>
-              <div className="space-y-4">
-                {profile.experiences?.length > 0 ? (
-                  profile.experiences.map((exp: any, index: number) => (
-                    <div key={index} className="flex space-x-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <Briefcase className="h-6 w-6 text-gray-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{exp.title}</h3>
-                        <p className="text-gray-600">{exp.company}</p>
-                        <p className="text-sm text-gray-500">{exp.duration}</p>
-                        {exp.description && (
-                          <p className="text-sm text-gray-700 mt-2">{exp.description}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No experience added yet. Click edit to add your work experience.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Education & Training */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Education & Training</h2>
-                <EducationEditDialog 
-                  currentProfile={profile}
-                  onProfileUpdated={handleProfileUpdate}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </EducationEditDialog>
-              </div>
-              <div className="space-y-4">
-                {profile.education?.length > 0 ? (
-                  profile.education.map((edu: any, index: number) => (
-                    <div key={index} className="flex space-x-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <GraduationCap className="h-6 w-6 text-gray-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{edu.degree}</h3>
-                        <p className="text-gray-600">{edu.institution}</p>
-                        <p className="text-sm text-gray-500">{edu.year}</p>
-                        {edu.description && (
-                          <p className="text-sm text-gray-700 mt-2">{edu.description}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No education added yet. Click edit to add your educational background.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Certifications */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Certifications</h2>
-                <CertificationsEditDialog 
-                  currentProfile={profile}
-                  onProfileUpdated={handleProfileUpdate}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </CertificationsEditDialog>
-              </div>
-              <div className="space-y-4">
-                {profile.certifications?.length > 0 ? (
-                  profile.certifications.map((cert: any, index: number) => (
-                    <div key={index} className="flex space-x-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <Award className="h-6 w-6 text-gray-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{cert.name}</h3>
-                        <p className="text-gray-600">{cert.issuer}</p>
-                        <p className="text-sm text-gray-500">{cert.date}</p>
-                        {cert.credential_id && (
-                          <p className="text-xs text-gray-500">Credential ID: {cert.credential_id}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No certifications added yet. Click edit to add your certifications.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Interests */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Interests</h2>
-                <InterestsEditDialog 
-                  currentProfile={profile}
-                  onProfileUpdated={handleProfileUpdate}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </InterestsEditDialog>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {profile.interests?.length > 0 ? (
-                  profile.interests.map((interest: string, index: number) => (
-                    <Badge key={index} variant="outline">{interest}</Badge>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No interests added yet. Click edit to add your interests.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {activeTab === "activity" && (
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-800">Recent Activity</h2>
-              <span className="text-sm text-gray-500">{userPosts.length} posts</span>
-            </div>
-            {userPosts.length > 0 ? (
-              <div className="space-y-4">
-                {userPosts.map(renderActivityItem)}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">No posts yet</h3>
-                <p className="text-gray-500">
-                  Start sharing your thoughts and experiences with the community
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      <ProfileBanner 
+        profile={profile} 
+        onProfileUpdated={handleProfileUpdate}
+      />
+      <ProfileHeader 
+        profile={profile}
+        uploading={uploading}
+        userPostsCount={userPosts.length}
+        handleAvatarChange={handleAvatarChange}
+        handleAvatarRemove={handleAvatarRemove}
+        handleProfileUpdate={handleProfileUpdate}
+      />
+      <ProfileTabs 
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        postsCount={userPosts.length}
+      />
+      {activeTab === "about" ? (
+        <ProfileAbout 
+          profile={profile}
+          handleProfileUpdate={handleProfileUpdate}
+        />
+      ) : (
+        <ProfileActivity userPosts={userPosts} />
       )}
     </div>
   );
