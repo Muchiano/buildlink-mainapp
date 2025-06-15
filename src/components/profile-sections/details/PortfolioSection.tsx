@@ -5,6 +5,9 @@ import PortfolioGallery from "./PortfolioGallery";
 import PortfolioEditorDialog from "./PortfolioEditorDialog";
 import PortfolioThumbnails from "./PortfolioThumbnails";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Plus, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 type PortfolioItem = {
   id: string;
@@ -19,21 +22,23 @@ interface PortfolioSectionProps {
   handleProfileUpdate: () => void;
 }
 
-const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProfileUpdate }) => {
+const PortfolioSection: React.FC<PortfolioSectionProps> = ({
+  profile,
+  handleProfileUpdate
+}) => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [updating, setUpdating] = useState(false);
-
-  // Local portfolio state for instant UI update
   const [portfolioList, setPortfolioList] = useState<PortfolioItem[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     setPortfolioList(Array.isArray(profile.portfolio) ? profile.portfolio : []);
   }, [profile.portfolio]);
 
-  const canEdit = true; // Assume current user is owner (customize logic here if needed)
+  const canEdit = true;
 
-  // When a new portfolio item is added
+  // Add (with UI feedback)
   const handlePortfolioAdd = async (item: PortfolioItem) => {
     setUpdating(true);
     const newPortfolio = [...portfolioList, item];
@@ -44,9 +49,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
       .eq("id", profile.id);
     setUpdating(false);
     handleProfileUpdate();
+    toast({
+      title: "Portfolio updated",
+      description: "Your new project was added.",
+      variant: "default"
+    });
   };
 
-  // When an item is removed
+  // Remove (with UI feedback)
   const handleRemove = async (id: string) => {
     setUpdating(true);
     const newPortfolio = portfolioList.filter((item) => item.id !== id);
@@ -57,41 +67,73 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
       .eq("id", profile.id);
     setUpdating(false);
     handleProfileUpdate();
+    toast({
+      title: "Removed",
+      description: "The project has been removed.",
+      variant: "default"
+    });
   };
 
   if (!portfolioList) return null;
 
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="px-6 py-4">
+      <CardContent className="px-4 py-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-800">Portfolio</h2>
-          <PortfolioEditorDialog
-            open={editorOpen}
-            setOpen={setEditorOpen}
-            portfolioList={portfolioList}
-            profileId={profile.id}
-            handleProfileUpdate={handleProfileUpdate}
-            onPortfolioAdd={handlePortfolioAdd}
-          />
+          <h2 className="text-base font-semibold text-gray-800">
+            Portfolio
+          </h2>
+          {canEdit && (
+            <PortfolioEditorDialog
+              open={editorOpen}
+              setOpen={setEditorOpen}
+              portfolioList={portfolioList}
+              profileId={profile.id}
+              handleProfileUpdate={handleProfileUpdate}
+              onPortfolioAdd={handlePortfolioAdd}
+              asIconButton={!updating}
+              disabled={updating}
+            />
+          )}
         </div>
         {portfolioList.length === 0 ? (
-          <div className="text-gray-500 italic">No portfolio items yet. Use the edit button to add.</div>
+          <div className="text-center py-10 flex flex-col items-center">
+            <p className="text-gray-500 italic mb-4">No portfolio items yet.</p>
+            <Button
+              variant="default"
+              size="sm"
+              className="gap-1"
+              onClick={() => setEditorOpen(true)}
+              disabled={updating}
+            >
+              <Plus className="w-4 h-4" />
+              Add to Portfolio
+            </Button>
+          </div>
         ) : (
-          <PortfolioThumbnails
-            portfolioList={portfolioList}
-            onMainThumbnailClick={() => setGalleryOpen(true)}
-            onBrowseAllClick={() => setGalleryOpen(true)}
-          />
+          <div>
+            <PortfolioThumbnails
+              portfolioList={portfolioList}
+              onMainThumbnailClick={() => setGalleryOpen(true)}
+              onBrowseAllClick={() => setGalleryOpen(true)}
+              updating={updating}
+            />
+          </div>
         )}
         <PortfolioGallery
           open={galleryOpen}
           setOpen={setGalleryOpen}
           portfolio={portfolioList}
           canEdit={canEdit}
-          onRemove={handleRemove}
+          onRemove={updating ? undefined : handleRemove}
+          updating={updating}
         />
-        {updating && <div className="text-xs text-gray-400 mt-2">Updating...</div>}
+        {updating && (
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-400 mt-4 animate-pulse">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Saving changes...
+          </div>
+        )}
       </CardContent>
     </Card>
   );

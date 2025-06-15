@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@
 import PortfolioThumbnail from "./PortfolioThumbnail";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
+import { Tooltip } from "@/components/ui/tooltip";
 
 interface PortfolioGalleryProps {
   open: boolean;
@@ -17,6 +18,7 @@ interface PortfolioGalleryProps {
   }>;
   canEdit?: boolean;
   onRemove?: (id: string) => void;
+  updating?: boolean;
 }
 
 const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
@@ -25,6 +27,7 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
   portfolio,
   canEdit = false,
   onRemove,
+  updating = false,
 }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -32,24 +35,29 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
         <DialogHeader>
           <DialogTitle>Portfolio Projects</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-2">
           {portfolio.map((item) => (
             <div key={item.id} className="rounded overflow-hidden border shadow relative group">
               <PortfolioThumbnail type={item.type} url={item.url} name={item.name} />
-              <div className="px-2 py-2 border-t bg-muted relative">
+              <div className="px-2 py-2 border-t bg-muted relative min-h-[68px]">
                 <div className="font-medium text-sm text-gray-900 truncate">{item.name}</div>
                 {item.description && (
                   <div className="text-xs text-gray-500">{item.description}</div>
                 )}
                 {canEdit && onRemove && (
-                  <button
-                    className="absolute top-2 right-2 opacity-60 hover:opacity-100 transition"
-                    onClick={() => onRemove(item.id)}
-                    title="Remove this entry"
-                    aria-label="Remove"
-                  >
-                    <Trash className="w-5 h-5 text-red-500" />
-                  </button>
+                  <Tooltip content="Remove" side="top">
+                    <button
+                      className="absolute top-2 right-2 opacity-70 hover:opacity-100 transition"
+                      onClick={() => onRemove(item.id)}
+                      title="Remove this entry"
+                      aria-label="Remove"
+                      disabled={updating}
+                      tabIndex={updating ? -1 : 0}
+                      style={{ pointerEvents: updating ? 'none' : 'auto' }}
+                    >
+                      <Trash className="w-5 h-5 text-red-500" />
+                    </button>
+                  </Tooltip>
                 )}
               </div>
             </div>

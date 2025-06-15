@@ -1,7 +1,8 @@
+
 import React, { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Edit, Link2 } from "lucide-react";
+import { Edit, Link2, Plus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { getType } from "./getPortfolioFileType";
@@ -20,11 +21,20 @@ interface PortfolioEditorDialogProps {
   portfolioList: PortfolioItem[];
   profileId: string;
   handleProfileUpdate: () => void;
-  onPortfolioAdd?: (item: PortfolioItem) => void; // <- NEW
+  onPortfolioAdd?: (item: PortfolioItem) => void;
+  asIconButton?: boolean;
+  disabled?: boolean;
 }
 
 const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
-  open, setOpen, portfolioList, profileId, handleProfileUpdate, onPortfolioAdd
+  open,
+  setOpen,
+  portfolioList,
+  profileId,
+  handleProfileUpdate,
+  onPortfolioAdd,
+  asIconButton = true,
+  disabled = false,
 }) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<number>(0);
@@ -49,7 +59,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
     const ext = file.name.split(".").pop();
     const filename = `${profileId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     setUploading(true);
-    setProgress(50); // Indicate upload started
+    setProgress(50);
 
     const { data, error: uploadError } = await supabase
       .storage
@@ -73,14 +83,13 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
       type: getType(file.name),
       description: desc,
     };
-    // Append to portfolio, update profile
     const newPortfolio = [...portfolioList, item];
     await updatePortfolio(newPortfolio);
     setUploading(false);
-    setProgress(100); // Show completion
+    setProgress(100);
     setOpen(false);
     setDesc("");
-    if (onPortfolioAdd) onPortfolioAdd(item); // update parent's local state
+    if (onPortfolioAdd) onPortfolioAdd(item);
     handleProfileUpdate();
   };
 
@@ -98,22 +107,29 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
     setOpen(false);
     setLinkURL("");
     setDesc("");
-    if (onPortfolioAdd) onPortfolioAdd(item); // update parent's local state
+    if (onPortfolioAdd) onPortfolioAdd(item);
     handleProfileUpdate();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={disabled ? () => {} : setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="px-2">
-          <Edit className="h-4 w-4" />
-        </Button>
+        {asIconButton ? (
+          <Button variant="ghost" size="sm" className="px-2" disabled={disabled} aria-label="Add to Portfolio">
+            <Plus className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button variant="default" size="sm" disabled={disabled} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add to Portfolio
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add to Portfolio</DialogTitle>
           <DialogDescription>
-            Upload a file (project, design, certificate, report...) or add a public link.
+            Upload a file or add a public link.
           </DialogDescription>
         </DialogHeader>
         <div>
@@ -122,11 +138,11 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
             type="file"
             accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,video/*"
             ref={fileInput}
-            disabled={uploading}
+            disabled={uploading || disabled}
             className="block"
             onChange={handleFileUpload}
           />
-          {progress > 0 && progress < 99 && (
+          {(progress > 0 && progress < 99) && (
             <Progress value={progress} className="mt-2" />
           )}
           <div className="text-xs text-gray-500 mt-1 mb-2">
@@ -141,7 +157,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
             onChange={e => setLinkURL(e.target.value)}
             placeholder="https://yourproject.com"
             className="px-2 py-1 border rounded w-full"
-            disabled={uploading}
+            disabled={uploading || disabled}
           />
         </div>
         <div className="mt-2">
@@ -152,17 +168,18 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
             onChange={e => setDesc(e.target.value)}
             placeholder="e.g. Demo video for my landing page"
             className="px-2 py-1 border rounded w-full"
+            disabled={uploading || disabled}
           />
         </div>
         {error && <div className="text-red-500 mt-2">{error}</div>}
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="outline">Cancel</Button>
+            <Button type="button" variant="outline" disabled={uploading || disabled}>Cancel</Button>
           </DialogClose>
           <Button
             onClick={handleAddLink}
             type="button"
-            disabled={!linkURL}
+            disabled={!linkURL || uploading || disabled}
             variant="default"
           >
             <Link2 className="h-4 w-4 mr-2" /> Add Link
