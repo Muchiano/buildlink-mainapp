@@ -182,12 +182,23 @@ const BannerEditDialog = ({ children, currentProfile, onProfileUpdated }: Banner
             />
           ) : (
             <>
-              <div className="h-32 bg-gradient-to-r from-primary to-primary/80 rounded-lg relative">
-                <div className="absolute inset-0 bg-black/20 rounded-lg"></div>
+              <div className="h-32 bg-gradient-to-r from-primary to-primary/80 rounded-lg relative overflow-hidden">
+                {currentProfile && currentProfile.banner ? (
+                  <>
+                    <img
+                      src={currentProfile.banner}
+                      alt="Current Profile Banner"
+                      className="absolute inset-0 w-full h-full object-cover object-center rounded-lg"
+                    />
+                    <div className="absolute inset-0 bg-black/20 rounded-lg"></div>
+                  </>
+                ) : (
+                  <div className="absolute inset-0 bg-black/20 rounded-lg"></div>
+                )}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-white text-center">
                     <Camera className="h-8 w-8 mx-auto mb-2" />
-                    <p className="text-sm">Current Banner</p>
+                    <p className="text-sm">{currentProfile && currentProfile.banner ? "Current Banner" : "No Banner Uploaded"}</p>
                   </div>
                 </div>
               </div>
