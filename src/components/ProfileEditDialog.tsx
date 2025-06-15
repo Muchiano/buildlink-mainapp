@@ -1,13 +1,10 @@
 
-import { useState, useRef } from 'react';
-import { Camera, Upload } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService } from '@/services/dataService';
 import { useToast } from '@/hooks/use-toast';
@@ -21,17 +18,14 @@ interface ProfileEditDialogProps {
 const ProfileEditDialog = ({ children, currentProfile, onProfileUpdated }: ProfileEditDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: currentProfile?.full_name || '',
     profession: currentProfile?.profession || '',
     organization: currentProfile?.organization || '',
     title: currentProfile?.title || '',
     education_level: currentProfile?.education_level || '',
-    avatar: currentProfile?.avatar || ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,56 +63,6 @@ const ProfileEditDialog = ({ children, currentProfile, onProfileUpdated }: Profi
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: 'Error',
-        description: 'Please select an image file',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: 'Error',
-        description: 'File size must be less than 5MB',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const { data, error } = await profileService.uploadAvatar(user.id, file);
-
-      if (error) {
-        throw error;
-      }
-
-      setFormData(prev => ({ ...prev, avatar: data?.avatar || '' }));
-      
-      toast({
-        title: 'Success',
-        description: 'Avatar uploaded successfully!'
-      });
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to upload avatar. Please try again.',
-        variant: 'destructive'
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -131,42 +75,6 @@ const ProfileEditDialog = ({ children, currentProfile, onProfileUpdated }: Profi
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Avatar Upload */}
-          <div className="flex flex-col items-center space-y-4">
-            <div className="relative">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={formData.avatar} />
-                <AvatarFallback>
-                  {formData.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-              >
-                {uploading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                ) : (
-                  <Camera className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <p className="text-xs text-gray-500 text-center">
-              Click the camera icon to upload a new photo
-            </p>
-          </div>
-
           {/* Basic Information */}
           <div className="space-y-2">
             <Label htmlFor="full_name">Full Name</Label>
