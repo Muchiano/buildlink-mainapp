@@ -27,14 +27,35 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Convert legacy string skills to new format
+  // Convert legacy string skills and sanitize malformed skill objects
   const convertSkills = (skills: any[]): Skill[] => {
     if (!skills) return [];
-    return skills.map(skill => 
-      typeof skill === 'string' 
-        ? { name: skill, level: 3 } 
-        : skill
-    );
+    return skills
+      .map(skill => {
+        if (typeof skill === 'string') {
+          return { name: skill, level: 3 };
+        }
+        if (typeof skill === 'object' && skill !== null) {
+          let name = skill.name;
+          let level = skill.level || 3;
+
+          // Check if name is a stringified JSON object
+          if (typeof name === 'string' && name.startsWith('{')) {
+            try {
+              const parsedName = JSON.parse(name);
+              if (parsedName && typeof parsedName === 'object' && parsedName.name) {
+                name = parsedName.name;
+                level = parsedName.level || level;
+              }
+            } catch (e) {
+              // Not a JSON string, do nothing, keep original name
+            }
+          }
+          return { name, level };
+        }
+        return null; // Filter out invalid entries
+      })
+      .filter((skill): skill is Skill => skill !== null && typeof skill.name === 'string');
   };
 
   const [skills, setSkills] = useState<Skill[]>(convertSkills(currentProfile?.skills || []));

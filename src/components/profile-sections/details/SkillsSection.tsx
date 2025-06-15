@@ -23,8 +23,20 @@ const SkillsSection = ({ profile, handleProfileUpdate }: SkillsSectionProps) => 
     return (
       <div className="space-y-4">
         {profile.skills.map((skill: any, index: number) => {
-          const skillName = typeof skill === 'string' ? skill : skill.name;
-          const skillLevel = typeof skill === 'string' ? 3 : (skill.level || 3);
+          let skillName = typeof skill === 'string' ? skill : skill.name;
+          let skillLevel = typeof skill === 'string' ? 3 : (skill.level || 3);
+          
+          if (typeof skillName === 'string' && skillName.startsWith('{')) {
+            try {
+              const parsedName = JSON.parse(skillName);
+              if (parsedName && typeof parsedName === 'object' && parsedName.name) {
+                skillName = parsedName.name;
+                skillLevel = parsedName.level || skillLevel;
+              }
+            } catch (e) {
+              // Not a valid JSON, do nothing
+            }
+          }
           
           return (
             <div key={index} className="flex items-center justify-between space-x-4">
