@@ -3,131 +3,92 @@ import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { MapPin, Building2, Calendar, Users, Award, Camera, Edit, Plus, MessageCircle, Phone, Mail, Heart, MessageSquare, Share2, Repeat2, Globe, Linkedin } from "lucide-react";
-import { useState } from "react";
+import { MapPin, Building2, Calendar, Users, Award, Camera, Edit, Plus, MessageCircle, Phone, Mail, Heart, MessageSquare, Share2, Globe, Linkedin } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { profileService, postsService } from "@/services/dataService";
+import { useToast } from "@/hooks/use-toast";
+import ProfileEditDialog from "../ProfileEditDialog";
 
 const ProfileBoard = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("about");
+  const [profile, setProfile] = useState<any>(null);
+  const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const userProfile = {
-    name: "John Kamau",
-    role: "Senior Civil Engineer",
-    company: "BuildTech Solutions",
-    location: "Nairobi, Kenya",
-    joinedDate: "January 2020",
-    connections: 1234,
-    about: "Experienced Civil Engineer with over 8 years in construction project management. Passionate about sustainable building practices and innovative construction technologies. I specialize in large-scale infrastructure projects and have led teams in delivering complex construction solutions across East Africa.",
-    contactInfo: {
-      email: "john.kamau@buildtech.co.ke",
-      phone: "+254 712 345 678",
-      website: "www.johnkamau.dev",
-      linkedin: "linkedin.com/in/johnkamau"
-    },
-    skills: [
-      "Project Management",
-      "Structural Engineering", 
-      "BIM Technology",
-      "Sustainable Construction",
-      "AutoCAD",
-      "Revit",
-      "STAAD Pro",
-      "Construction Planning"
-    ],
-    education: [
-      {
-        institution: "University of Nairobi",
-        degree: "Bachelor of Civil Engineering",
-        year: "2014-2018",
-        description: "First Class Honours"
-      },
-      {
-        institution: "Kenya Institute of Management",
-        degree: "Project Management Certificate",
-        year: "2020",
-        description: "Advanced Project Management and Leadership"
-      }
-    ],
-    experience: [
-      {
-        title: "Senior Civil Engineer",
-        company: "BuildTech Solutions",
-        duration: "2022 - Present",
-        description: "Leading major infrastructure projects across Kenya"
-      },
-      {
-        title: "Civil Engineer",
-        company: "KenStruct Ltd",
-        duration: "2020 - 2022",
-        description: "Structural design and project coordination"
-      }
-    ],
-    activity: [
-      {
-        id: 1,
-        type: "post",
-        content: "Just completed the seismic analysis for the new Nairobi Metropolitan Hospital. Excited to see this project come to life!",
-        timestamp: "2 hours ago",
-        likes: 45,
-        comments: 12,
-        shares: 8
-      },
-      {
-        id: 2,
-        type: "article",
-        content: "Published an article on 'Sustainable Building Practices in Urban Development'",
-        timestamp: "1 day ago",
-        likes: 78,
-        comments: 23,
-        shares: 15
-      },
-      {
-        id: 3,
-        type: "achievement",
-        content: "Earned certification in Advanced BIM Technologies",
-        timestamp: "3 days ago",
-        likes: 92,
-        comments: 18,
-        shares: 5
-      }
-    ]
+  useEffect(() => {
+    if (user) {
+      loadUserData();
+    }
+  }, [user]);
+
+  const loadUserData = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      
+      // Load profile data
+      const { data: profileData, error: profileError } = await profileService.getProfile(user.id);
+      if (profileError) throw profileError;
+      
+      setProfile(profileData);
+
+      // Load user posts for activity tab
+      const { data: postsData, error: postsError } = await postsService.getPosts();
+      if (postsError) throw postsError;
+      
+      // Filter posts by current user
+      const filteredPosts = postsData?.filter(post => post.author_id === user.id) || [];
+      setUserPosts(filteredPosts);
+      
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load profile data',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const renderActivityItem = (item: any) => {
-    const getActivityIcon = () => {
-      switch (item.type) {
-        case "post":
-          return <Edit className="h-4 w-4" />;
-        case "article":
-          return <MessageSquare className="h-4 w-4" />;
-        case "achievement":
-          return <Award className="h-4 w-4" />;
-        default:
-          return <Edit className="h-4 w-4" />;
-      }
-    };
+  const handleProfileUpdate = () => {
+    loadUserData();
+    toast({
+      title: 'Success',
+      description: 'Profile updated successfully!'
+    });
+  };
 
+  const renderActivityItem = (post: any) => {
     return (
-      <div key={item.id} className="border-b border-gray-100 pb-4 mb-4 last:border-b-0">
+      <div key={post.id} className="border-b border-gray-100 pb-4 mb-4 last:border-b-0">
         <div className="flex items-start space-x-3">
           <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-            {getActivityIcon()}
+            <Edit className="h-4 w-4" />
           </div>
           <div className="flex-1">
-            <p className="text-gray-800 mb-2">{item.content}</p>
+            <p className="text-gray-800 mb-2">{post.content}</p>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">{item.timestamp}</span>
+              <span className="text-sm text-gray-500">
+                {new Date(post.created_at).toLocaleDateString()}
+              </span>
               <div className="flex items-center space-x-4 text-sm text-gray-500">
                 <div className="flex items-center space-x-1">
                   <Heart className="h-4 w-4" />
-                  <span>{item.likes}</span>
+                  <span>{post.likes_count || 0}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <MessageSquare className="h-4 w-4" />
-                  <span>{item.comments}</span>
+                  <span>{post.comments_count || 0}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Share2 className="h-4 w-4" />
-                  <span>{item.shares}</span>
+                  <span>{post.reposts_count || 0}</span>
                 </div>
               </div>
             </div>
@@ -137,9 +98,26 @@ const ProfileBoard = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="text-center py-12">
+        <h3 className="text-lg font-semibold text-gray-600 mb-2">Profile not found</h3>
+        <p className="text-gray-500">Unable to load profile data</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Lean Profile Banner */}
+      {/* Profile Banner */}
       <Card className="border-0 shadow-sm overflow-hidden">
         <div className="h-32 bg-gradient-to-r from-primary to-primary/80 relative">
           <Button 
@@ -162,47 +140,65 @@ const ProfileBoard = () => {
               {/* Profile Picture */}
               <div className="relative">
                 <Avatar className="h-24 w-24 border-2 border-white shadow-md">
-                  <AvatarImage src="/placeholder.svg" />
-                  <AvatarFallback className="text-xl">JK</AvatarFallback>
+                  <AvatarImage src={profile.avatar} />
+                  <AvatarFallback className="text-xl">
+                    {profile.full_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                  </AvatarFallback>
                 </Avatar>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="absolute -bottom-1 -right-1 rounded-full h-6 w-6 p-0"
+                <ProfileEditDialog 
+                  currentProfile={profile}
+                  onProfileUpdated={handleProfileUpdate}
                 >
-                  <Camera className="h-3 w-3" />
-                </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="absolute -bottom-1 -right-1 rounded-full h-6 w-6 p-0"
+                  >
+                    <Camera className="h-3 w-3" />
+                  </Button>
+                </ProfileEditDialog>
               </div>
               
               {/* Basic Info */}
               <div className="flex-1">
-                <h1 className="text-2xl font-bold text-gray-900 mb-1">{userProfile.name}</h1>
-                <p className="text-lg text-gray-700 mb-1">{userProfile.role}</p>
-                <p className="text-gray-600 mb-3">{userProfile.company}</p>
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                  {profile.full_name || 'User'}
+                </h1>
+                <p className="text-lg text-gray-700 mb-1">
+                  {profile.profession || 'No profession specified'}
+                </p>
+                <p className="text-gray-600 mb-3">
+                  {profile.organization || 'No organization specified'}
+                </p>
                 
                 <div className="flex items-center text-sm text-gray-500 space-x-4">
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-1" />
-                    {userProfile.location}
+                    Kenya
                   </div>
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1" />
-                    {userProfile.connections} connections
+                    {userPosts.length} posts
                   </div>
                 </div>
               </div>
             </div>
             
-            {/* Contact Button */}
+            {/* Action Buttons */}
             <div className="flex space-x-2">
               <Button variant="outline">
                 <MessageCircle className="h-4 w-4 mr-1" />
                 Message
               </Button>
-              <Button>
-                <Plus className="h-4 w-4 mr-1" />
-                Connect
-              </Button>
+              <ProfileEditDialog 
+                currentProfile={profile}
+                onProfileUpdated={handleProfileUpdate}
+              >
+                <Button>
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit Profile
+                </Button>
+              </ProfileEditDialog>
             </div>
           </div>
         </CardContent>
@@ -230,17 +226,7 @@ const ProfileBoard = () => {
                   : "text-gray-600 hover:text-gray-800"
               }`}
             >
-              Activity
-            </button>
-            <button
-              onClick={() => setActiveTab("contact")}
-              className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
-                activeTab === "contact"
-                  ? "text-primary border-b-2 border-primary bg-primary/5"
-                  : "text-gray-600 hover:text-gray-800"
-              }`}
-            >
-              Contact Info
+              Activity ({userPosts.length})
             </button>
           </div>
         </CardContent>
@@ -254,83 +240,66 @@ const ProfileBoard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-800">About</h2>
-                <Button variant="ghost" size="sm">
-                  <Edit className="h-4 w-4" />
-                </Button>
+                <ProfileEditDialog 
+                  currentProfile={profile}
+                  onProfileUpdated={handleProfileUpdate}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </ProfileEditDialog>
               </div>
-              <p className="text-gray-700 leading-relaxed">{userProfile.about}</p>
+              <p className="text-gray-700 leading-relaxed">
+                {profile.profession && profile.organization 
+                  ? `${profile.profession} at ${profile.organization}` 
+                  : profile.profession || 'No professional information available yet. Click edit to add your details.'}
+              </p>
             </CardContent>
           </Card>
 
-          {/* Skills & Specialization Section */}
+          {/* Professional Information */}
           <Card className="border-0 shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Skills & Specialization</h2>
-                <Button variant="ghost" size="sm">
-                  <Plus className="h-4 w-4" />
-                </Button>
+                <h2 className="text-lg font-semibold text-gray-800">Professional Information</h2>
+                <ProfileEditDialog 
+                  currentProfile={profile}
+                  onProfileUpdated={handleProfileUpdate}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </ProfileEditDialog>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {userProfile.skills.map((skill, index) => (
-                  <Badge key={index} variant="secondary" className="px-3 py-1">
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Education & Training Section */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Education & Training</h2>
-                <Button variant="ghost" size="sm">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="space-y-6">
-                {userProfile.education.map((edu, index) => (
-                  <div key={index} className="flex space-x-4">
+              <div className="space-y-4">
+                <div className="flex space-x-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <Building2 className="h-6 w-6 text-gray-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-900">
+                      {profile.title || 'Job Title'}
+                    </h3>
+                    <p className="text-gray-600">
+                      {profile.organization || 'No organization specified'}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {profile.profession || 'No profession specified'}
+                    </p>
+                  </div>
+                </div>
+                
+                {profile.education_level && (
+                  <div className="flex space-x-4">
                     <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                       <Award className="h-6 w-6 text-gray-600" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{edu.degree}</h3>
-                      <p className="text-gray-600">{edu.institution}</p>
-                      <p className="text-sm text-gray-500">{edu.year}</p>
-                      <p className="text-sm text-gray-700 mt-2">{edu.description}</p>
+                      <h3 className="font-medium text-gray-900">Education</h3>
+                      <p className="text-gray-600">{profile.education_level}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Experience Section */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Experience</h2>
-                <Button variant="ghost" size="sm">
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="space-y-6">
-                {userProfile.experience.map((exp, index) => (
-                  <div key={index} className="flex space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <Building2 className="h-6 w-6 text-gray-600" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">{exp.title}</h3>
-                      <p className="text-gray-600">{exp.company}</p>
-                      <p className="text-sm text-gray-500">{exp.duration}</p>
-                      <p className="text-sm text-gray-700 mt-2">{exp.description}</p>
-                    </div>
-                  </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
@@ -342,42 +311,21 @@ const ProfileBoard = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-gray-800">Recent Activity</h2>
-              <span className="text-sm text-gray-500">Public content history</span>
+              <span className="text-sm text-gray-500">{userPosts.length} posts</span>
             </div>
-            <div className="space-y-4">
-              {userProfile.activity.map(renderActivityItem)}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {activeTab === "contact" && (
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-800">Contact Information</h2>
-              <Button variant="ghost" size="sm">
-                <Edit className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-gray-500" />
-                <span className="text-gray-700">{userProfile.contactInfo.email}</span>
+            {userPosts.length > 0 ? (
+              <div className="space-y-4">
+                {userPosts.map(renderActivityItem)}
               </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-gray-500" />
-                <span className="text-gray-700">{userProfile.contactInfo.phone}</span>
+            ) : (
+              <div className="text-center py-8">
+                <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">No posts yet</h3>
+                <p className="text-gray-500">
+                  Start sharing your thoughts and experiences with the community
+                </p>
               </div>
-              <div className="flex items-center space-x-3">
-                <Globe className="h-5 w-5 text-gray-500" />
-                <span className="text-gray-700">{userProfile.contactInfo.website}</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Linkedin className="h-5 w-5 text-gray-500" />
-                <span className="text-gray-700">{userProfile.contactInfo.linkedin}</span>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       )}
