@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import PortfolioThumbnail from "./PortfolioThumbnail";
@@ -36,10 +35,8 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to active item when opening or activeIndex changes
   useEffect(() => {
     if (!open) return;
-    // brief delay to allow render
     setTimeout(() => {
       if (scrollRef.current) {
         const items = scrollRef.current.querySelectorAll(".portfolio-gallery-item");
@@ -60,7 +57,7 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
           {portfolio.map((item, i) => (
             <div
               key={item.id}
-              className={`portfolio-gallery-item rounded-xl overflow-hidden border-2 ${i === activeIndex ? "border-primary ring-2 ring-primary" : "border-muted-foreground"} shadow-md relative group bg-white hover-scale transition`}
+              className={`portfolio-gallery-item rounded-xl overflow-hidden border-2 ${i === activeIndex ? "border-primary ring-2 ring-primary" : "border-muted-foreground"} shadow-md relative group bg-white hover:scale-105 transition`}
               onClick={() => setActiveIndex && setActiveIndex(i)}
               tabIndex={0}
               style={{ cursor: "pointer" }}
@@ -76,7 +73,7 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
                 {item.description && (
                   <div className="text-xs text-gray-500 mt-1 line-clamp-2">{item.description}</div>
                 )}
-                {canEdit && onRemove && (
+                {canEdit && typeof onRemove === "function" && (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
