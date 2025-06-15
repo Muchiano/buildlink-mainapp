@@ -21,7 +21,7 @@ const MentorSearchForm = ({
   handleBecomeMentor,
 }: MentorSearchFormProps) => {
   return (
-    <Card className="border-0 shadow-sm">
+    <Card className="border-0 shadow-sm w-full max-w-full">
       <CardHeader>
         <CardTitle className="text-lg text-primary">Find Your Perfect Mentor</CardTitle>
       </CardHeader>
@@ -54,9 +54,10 @@ const MentorSearchForm = ({
             <option value="1-3 years">1-3 years</option>
             <option value="3-5 years">3-5 years</option>
           </select>
-          <div className="flex space-x-3">
+          {/* Buttons: equally wide, symmetrical even on mobile */}
+          <div className="flex flex-row gap-3 w-full">
             <Button
-              className="flex-1 bg-primary hover:bg-primary-800"
+              className="flex-1 w-full min-w-0 bg-primary hover:bg-primary-800"
               onClick={handleFindMentors}
             >
               <Search className="h-4 w-4 mr-2" />
@@ -64,7 +65,7 @@ const MentorSearchForm = ({
             </Button>
             <Button
               variant="outline"
-              className="flex-1 border-primary text-primary hover:bg-primary/10"
+              className="flex-1 w-full min-w-0 border-primary text-primary hover:bg-primary/10"
               onClick={handleBecomeMentor}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -78,3 +79,4 @@ const MentorSearchForm = ({
 };
 
 export default MentorSearchForm;
+
