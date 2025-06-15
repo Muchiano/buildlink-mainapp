@@ -9,6 +9,7 @@ import BecomeMentorForm from "./mentorship/BecomeMentorForm";
 import MentorList from "./mentorship/MentorList";
 import FeaturedMentors from "./mentorship/FeaturedMentors";
 import { Mentor } from "./mentorship/MentorItem";
+import PostCreate from "./PostCreate";
 
 const MentorshipHub = () => {
   const [selectedField, setSelectedField] = useState("");
@@ -76,6 +77,7 @@ const MentorshipHub = () => {
 
   return (
     <div className="space-y-6">
+      <PostCreate />
       <MentorshipStats />
 
       <MentorSearchForm 

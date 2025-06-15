@@ -9,6 +9,7 @@ import WebinarItem from "./skillup/WebinarItem";
 import ArticleItem from "./skillup/ArticleItem";
 import CertificationItem from "./skillup/CertificationItem";
 import ProfessionalBodiesCard from "./skillup/ProfessionalBodiesCard";
+import PostCreate from "./PostCreate";
 
 interface SkillUpFeedProps {
   activeFilter: string;
@@ -59,6 +60,7 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
 
   return (
     <div className="space-y-6">
+      <PostCreate />
       <SkillUpHeader />
 
       <div className="space-y-4">
