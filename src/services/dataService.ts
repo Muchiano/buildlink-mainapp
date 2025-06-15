@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Posts Service
@@ -245,6 +244,14 @@ export const profileService = {
     title?: string;
     avatar?: string;
     education_level?: string;
+    bio?: string;
+    skills?: string[];
+    languages?: any[];
+    experiences?: any[];
+    education?: any[];
+    certifications?: any[];
+    interests?: string[];
+    banner?: string;
   }) {
     const { data, error } = await supabase
       .from('profiles')

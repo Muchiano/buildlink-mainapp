@@ -538,36 +538,60 @@ export type Database = {
       profiles: {
         Row: {
           avatar: string | null
+          banner: string | null
+          bio: string | null
+          certifications: Json | null
           created_at: string | null
+          education: Json | null
           education_level: string | null
+          experiences: Json | null
           full_name: string
           id: string
+          interests: string[] | null
+          languages: Json | null
           organization: string | null
           profession: string | null
+          skills: string[] | null
           title: string | null
           updated_at: string | null
           user_type: string
         }
         Insert: {
           avatar?: string | null
+          banner?: string | null
+          bio?: string | null
+          certifications?: Json | null
           created_at?: string | null
+          education?: Json | null
           education_level?: string | null
+          experiences?: Json | null
           full_name: string
           id: string
+          interests?: string[] | null
+          languages?: Json | null
           organization?: string | null
           profession?: string | null
+          skills?: string[] | null
           title?: string | null
           updated_at?: string | null
           user_type: string
         }
         Update: {
           avatar?: string | null
+          banner?: string | null
+          bio?: string | null
+          certifications?: Json | null
           created_at?: string | null
+          education?: Json | null
           education_level?: string | null
+          experiences?: Json | null
           full_name?: string
           id?: string
+          interests?: string[] | null
+          languages?: Json | null
           organization?: string | null
           profession?: string | null
+          skills?: string[] | null
           title?: string | null
           updated_at?: string | null
           user_type?: string
