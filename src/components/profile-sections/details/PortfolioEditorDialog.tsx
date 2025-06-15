@@ -5,6 +5,7 @@ import { Edit, Link2, Plus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { getType } from "./getPortfolioFileType";
+import { BadgePlus } from "@/components/ui/badge";
 
 type PortfolioItem = {
   id: string;
@@ -33,7 +34,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
   profileId,
   handleProfileUpdate,
   onPortfolioAdd,
-  asIconButton = true,
+  asIconButton = false,
   disabled = false,
 }) => {
   const [uploading, setUploading] = useState(false);
@@ -176,29 +177,26 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
           <Button variant="ghost" size="sm" className="px-2" disabled={disabled} aria-label="Add to Portfolio">
             <Plus className="h-4 w-4" />
           </Button>
-        ) : (
-          <Button variant="default" size="sm" disabled={disabled} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add to Portfolio
-          </Button>
-        )}
+        ) : null}
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add to Portfolio</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <BadgePlus className="h-5 w-5 text-primary" />
+            Add New Portfolio Project
+          </DialogTitle>
           <DialogDescription>
-            Upload a file or add a public link.
+            Share your best work—upload files or add live project/web links. You can set a custom thumbnail that will show in your gallery.
           </DialogDescription>
         </DialogHeader>
-        <div>
-          {/* File/project upload */}
-          <label className="block font-medium mb-2">Attach file</label>
+        <div className="mt-2">
+          <label className="block font-semibold mb-1">Attach a File</label>
           <input
             type="file"
             accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,video/*"
             ref={fileInput}
             disabled={uploading || disabled}
-            className="block"
+            className="block disabled:opacity-50"
             onChange={handleFileUpload}
           />
           {(progress > 0 && progress < 99) && (
@@ -209,7 +207,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
           </div>
         </div>
         <div className="mt-4">
-          <label className="block font-medium mb-2">Or link to a project (GitHub, website, Figma...)</label>
+          <label className="block font-semibold mb-1">Or link a project</label>
           <input
             type="url"
             value={linkURL}
@@ -219,8 +217,8 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
             disabled={uploading || disabled}
           />
         </div>
-        <div className="mt-2">
-          <label className="block font-medium mb-2">Short description</label>
+        <div className="mt-3">
+          <label className="block font-semibold mb-1">Short description</label>
           <input
             type="text"
             value={desc}
@@ -231,8 +229,8 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
           />
         </div>
         {/* Thumbnail selection */}
-        <div className="mt-4 border-t pt-4">
-          <label className="block font-medium mb-2">Thumbnail (for preview in gallery)</label>
+        <div className="mt-6 border-t pt-4">
+          <label className="block font-semibold mb-2">Project Thumbnail</label>
           <div className="flex gap-4 items-center mb-2">
             <label className="flex gap-1 items-center">
               <input type="radio" value="auto" checked={thumbnailOption==="auto"} onChange={()=>setThumbnailOption("auto")} />
@@ -268,7 +266,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
                   key={url}
                   type="button"
                   onClick={()=>{setThumbnailUrl(url);}}
-                  className={`border rounded shadow hover:ring-2 focus:ring-2 ${thumbnailUrl===url ? 'ring-2 ring-blue-400 border-blue-400' : ''}`}
+                  className={`border rounded shadow hover:ring-2 focus:ring-2 ${thumbnailUrl===url ? 'ring-2 ring-primary border-primary' : ''}`}
                   style={{padding:2, background:"white", outline:"none"}}
                   tabIndex={0}
                 >
@@ -279,12 +277,12 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
           )}
           {thumbnailOption==="auto" && (
             <div className="text-xs italic text-gray-500">
-              Will use cover image (if uploading an image) or a default preset.
+              Uses the cover image (if uploading an image) or will choose a default preset.
             </div>
           )}
         </div>
         {error && <div className="text-red-500 mt-2">{error}</div>}
-        <DialogFooter>
+        <DialogFooter className="mt-1">
           <DialogClose asChild>
             <Button type="button" variant="outline" disabled={uploading || disabled}>Cancel</Button>
           </DialogClose>

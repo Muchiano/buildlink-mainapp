@@ -32,29 +32,29 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl shadow-lg rounded-xl">
         <DialogHeader>
-          <DialogTitle>Portfolio Projects</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">Portfolio Projects</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-7 my-3">
           {portfolio.map((item) => (
-            <div key={item.id} className="rounded overflow-hidden border shadow relative group">
+            <div key={item.id} className="rounded-xl overflow-hidden border-2 border-muted-foreground shadow-md relative group bg-white hover-scale transition">
               <PortfolioThumbnail
                 type={item.type}
                 url={item.url}
                 name={item.name}
                 thumbnailUrl={item.thumbnailUrl}
               />
-              <div className="px-2 py-2 border-t bg-muted relative min-h-[68px]">
-                <div className="font-medium text-sm text-gray-900 truncate">{item.name}</div>
+              <div className="px-3 py-3 border-t bg-muted/40 relative min-h-[68px]">
+                <div className="font-semibold text-sm text-gray-900 truncate">{item.name}</div>
                 {item.description && (
-                  <div className="text-xs text-gray-500">{item.description}</div>
+                  <div className="text-xs text-gray-500 mt-1 line-clamp-2">{item.description}</div>
                 )}
                 {canEdit && onRemove && (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
-                        className="absolute top-2 right-2 opacity-70 hover:opacity-100 transition"
+                        className="absolute top-2 right-2 opacity-70 hover:opacity-100 transition bg-white/80 rounded-full p-1 hover:bg-white shadow"
                         onClick={() => onRemove(item.id)}
                         title="Remove this entry"
                         aria-label="Remove"
@@ -75,7 +75,9 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
           ))}
         </div>
         <DialogClose asChild>
-          <Button variant="outline" className="w-full">Close</Button>
+          <Button variant="outline" size="lg" className="w-full mt-3 font-semibold">
+            Close
+          </Button>
         </DialogClose>
       </DialogContent>
     </Dialog>
@@ -83,4 +85,3 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
 };
 
 export default PortfolioGallery;
-

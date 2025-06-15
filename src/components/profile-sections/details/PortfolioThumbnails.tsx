@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import PortfolioThumbnail from "./PortfolioThumbnail";
@@ -32,9 +33,9 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
       <div className="flex gap-4 flex-col sm:flex-row">
         {/* Main Thumbnail */}
         {mainItem && (
-          <div className="flex flex-col items-center w-full sm:w-28 min-w-20">
+          <div className="flex flex-col items-center w-full sm:w-32 min-w-20">
             <div
-              className="w-full sm:w-28 h-40 relative rounded-lg overflow-hidden border shadow cursor-pointer group hover-scale transition"
+              className="w-full sm:w-32 h-44 relative rounded-xl shadow-lg overflow-hidden border-2 border-muted-foreground bg-white hover-scale transition cursor-pointer group"
               onClick={onMainThumbnailClick}
               tabIndex={updating ? -1 : 0}
               aria-label="Open main project gallery"
@@ -46,7 +47,7 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
                 name={mainItem.name}
                 thumbnailUrl={mainItem.thumbnailUrl}
               />
-              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/50 to-transparent px-2 py-1">
+              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent px-2 py-1">
                 <span className="text-xs text-white font-semibold">{mainItem.name}</span>
               </div>
             </div>
@@ -57,7 +58,7 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
           {miniItems.map(item => (
             <div
               key={item.id}
-              className="w-20 h-20 rounded-lg overflow-hidden border shadow relative cursor-pointer group hover-scale transition"
+              className="w-20 h-20 rounded-lg overflow-hidden border shadow-md bg-white relative cursor-pointer group hover-scale transition"
               onClick={onMainThumbnailClick}
               tabIndex={updating ? -1 : 0}
               style={{ pointerEvents: updating ? 'none' : 'auto' }}
@@ -69,8 +70,8 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
                 name={item.name}
                 thumbnailUrl={item.thumbnailUrl}
               />
-              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/55 to-transparent px-1 py-0.5">
-                <span className="text-xs text-white">{item.name}</span>
+              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5">
+                <span className="text-xs text-white truncate">{item.name}</span>
               </div>
             </div>
           ))}
@@ -78,10 +79,11 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
       </div>
       {/* Browse All Button */}
       {portfolioList.length > 0 && (
-        <div className="mt-4 text-center">
+        <div className="mt-6 text-center">
           <Button 
             variant="outline" 
-            size="sm" 
+            size="lg" 
+            className="font-semibold border-primary hover:bg-primary/10"
             onClick={onBrowseAllClick}
             disabled={updating}
           >

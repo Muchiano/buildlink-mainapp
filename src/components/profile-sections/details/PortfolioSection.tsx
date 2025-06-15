@@ -6,7 +6,7 @@ import PortfolioEditorDialog from "./PortfolioEditorDialog";
 import PortfolioThumbnails from "./PortfolioThumbnails";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, BadgePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type PortfolioItem = {
@@ -15,6 +15,7 @@ type PortfolioItem = {
   url: string;
   type: string;
   description?: string;
+  thumbnailUrl?: string;
 };
 
 interface PortfolioSectionProps {
@@ -24,7 +25,7 @@ interface PortfolioSectionProps {
 
 const PortfolioSection: React.FC<PortfolioSectionProps> = ({
   profile,
-  handleProfileUpdate
+  handleProfileUpdate,
 }) => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -52,7 +53,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
     toast({
       title: "Portfolio updated",
       description: "Your new project was added.",
-      variant: "default"
+      variant: "default",
     });
   };
 
@@ -70,7 +71,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
     toast({
       title: "Removed",
       description: "The project has been removed.",
-      variant: "default"
+      variant: "default",
     });
   };
 
@@ -78,36 +79,44 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
 
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="px-4 py-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-800">
+      <CardContent className="px-4 py-8 sm:px-8 sm:py-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
             Portfolio
+            <span className="ml-2 text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-500 font-semibold">
+              {portfolioList.length} {portfolioList.length === 1 ? 'project' : 'projects'}
+            </span>
           </h2>
           {canEdit && (
-            <PortfolioEditorDialog
-              open={editorOpen}
-              setOpen={setEditorOpen}
-              portfolioList={portfolioList}
-              profileId={profile.id}
-              handleProfileUpdate={handleProfileUpdate}
-              onPortfolioAdd={handlePortfolioAdd}
-              asIconButton={!updating}
-              disabled={updating}
-            />
+            <div>
+              <Button
+                variant="default"
+                size="sm"
+                className="gap-2 shadow hover-scale"
+                onClick={() => setEditorOpen(true)}
+                disabled={updating}
+                aria-label="Add to Portfolio"
+              >
+                <BadgePlus className="h-4 w-4" />
+                Add New Project
+              </Button>
+            </div>
           )}
         </div>
         {portfolioList.length === 0 ? (
-          <div className="text-center py-10 flex flex-col items-center">
-            <p className="text-gray-500 italic mb-4">No portfolio items yet.</p>
+          <div className="text-center py-12 flex flex-col items-center bg-muted rounded-lg">
+            <p className="text-gray-500 italic text-lg mb-2">No portfolio items yet</p>
+            <p className="text-gray-400 mb-4 text-sm">Showcase your work, websites, or downloadable files here!</p>
             <Button
-              variant="default"
-              size="sm"
-              className="gap-1"
+              variant="primary"
+              size="lg"
+              className="gap-2 w-full max-w-xs shadow hover-scale"
               onClick={() => setEditorOpen(true)}
               disabled={updating}
+              aria-label="Add to Portfolio"
             >
-              <Plus className="w-4 h-4" />
-              Add to Portfolio
+              <Plus className="h-5 w-5" />
+              Add your first project
             </Button>
           </div>
         ) : (
@@ -128,10 +137,22 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
           onRemove={updating ? undefined : handleRemove}
           updating={updating}
         />
+        <PortfolioEditorDialog
+          open={editorOpen}
+          setOpen={setEditorOpen}
+          portfolioList={portfolioList}
+          profileId={profile.id}
+          handleProfileUpdate={handleProfileUpdate}
+          onPortfolioAdd={handlePortfolioAdd}
+          asIconButton={false}
+          disabled={updating}
+        />
         {updating && (
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-400 mt-4 animate-pulse">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Saving changes...
+          <div className="fixed inset-0 bg-black/20 z-40 flex items-center justify-center">
+            <div className="flex items-center gap-2 text-sm text-gray-400 bg-white p-4 rounded-lg shadow-lg animate-fade-in">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Saving changes...
+            </div>
           </div>
         )}
       </CardContent>
