@@ -1,6 +1,6 @@
 
 import AboutSection from "../profile-sections/details/AboutSection";
-import PortfolioSection from "../profile-sections/details/PortfolioSection";
+// Removed PortfolioSection import
 import ExperienceSection from "../profile-sections/details/ExperienceSection";
 import EducationSection from "../profile-sections/details/EducationSection";
 import CertificationsSection from "../profile-sections/details/CertificationsSection";
@@ -16,7 +16,7 @@ const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
   return (
     <div className="space-y-6">
       <AboutSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      <PortfolioSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
+      {/* PortfolioSection removed */}
       <ExperienceSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <EducationSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <CompactSkillsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
