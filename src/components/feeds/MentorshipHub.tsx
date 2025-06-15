@@ -4,6 +4,9 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Star, Clock, Users, Search, Plus } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { mentorshipService } from "@/services/dataService";
+import { Skeleton } from "../ui/skeleton";
 
 const MentorshipHub = () => {
   const [selectedField, setSelectedField] = useState("");
@@ -11,66 +14,26 @@ const MentorshipHub = () => {
   const [showMentors, setShowMentors] = useState(false);
   const [showBecomeMentor, setShowBecomeMentor] = useState(false);
 
-  const mentors = [
-    {
-      id: 1,
-      name: "Eng. Mary Njoki",
-      title: "Senior Structural Engineer",
-      company: "Kenya Railways",
-      rating: 4.9,
-      sessions: 127,
-      specialties: ["Structural Design", "Project Management", "Code Compliance"],
-      bio: "15+ years in infrastructure development. Passionate about mentoring young engineers.",
-      price: "KSh 3,000/session",
-      expertise: "Civil Engineering",
-      experience: "15+ years"
-    },
-    {
-      id: 2,
-      name: "Arch. Peter Mwangi",
-      title: "Principal Architect",
-      company: "Mwangi & Associates",
-      rating: 4.8,
-      sessions: 89,
-      specialties: ["Sustainable Design", "Urban Planning", "BIM"],
-      bio: "Award-winning architect specializing in eco-friendly commercial buildings.",
-      price: "KSh 2,500/session",
-      expertise: "Architecture",
-      experience: "12+ years"
-    },
-    {
-      id: 3,
-      name: "QS. Sarah Wanjiku",
-      title: "Senior Quantity Surveyor",
-      company: "Cost Consultants Ltd",
-      rating: 4.7,
-      sessions: 65,
-      specialties: ["Cost Estimation", "Contract Administration", "Risk Management"],
-      bio: "Expert in construction economics with focus on residential and commercial projects.",
-      price: "KSh 2,800/session",
-      expertise: "Quantity Surveying",
-      experience: "10+ years"
-    }
-  ];
+  const { data: mentorsData, isLoading, error } = useQuery({
+    queryKey: ['mentors'],
+    queryFn: mentorshipService.getMentors
+  });
 
-  const mentees = [
-    {
-      id: 1,
-      name: "Grace Akinyi",
-      field: "Architecture Student",
-      university: "University of Nairobi",
-      seeking: "Portfolio Review & Career Guidance",
-      year: "Final Year"
-    },
-    {
-      id: 2,
-      name: "David Kimani",
-      field: "Junior Engineer",
-      company: "Fresh Graduate",
-      seeking: "Industry Transition Support",
-      year: "New Graduate"
-    }
-  ];
+  const mentors = (mentorsData?.data || []).map(mentor => ({
+    id: mentor.user_id,
+    name: mentor.profiles?.full_name || 'No name',
+    title: mentor.profiles?.title || mentor.profiles?.profession,
+    company: mentor.profiles?.organization,
+    rating: mentor.rating,
+    sessions: mentor.reviews_count || 0,
+    specialties: mentor.mentor_expertise.map((e: any) => e.skill),
+    bio: mentor.bio,
+    price: mentor.hourly_rate ? `KSh ${mentor.hourly_rate}/session` : 'Not specified',
+    expertise: mentor.profiles?.profession,
+    experience: mentor.years_of_experience ? `${mentor.years_of_experience}+ years` : ''
+  }));
+
+  const mentees: any[] = [];
 
   const handleFindMentors = () => {
     setShowMentors(true);
@@ -88,6 +51,30 @@ const MentorshipHub = () => {
     );
     return fieldMatch;
   });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-3 gap-4">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+          <Skeleton className="h-20" />
+        </div>
+        <Skeleton className="h-48" />
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-red-500 text-center">Could not load mentors. Please try again later.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -125,12 +112,16 @@ const MentorshipHub = () => {
               value={selectedField}
               onChange={(e) => setSelectedField(e.target.value)}
             >
-              <option value="">Select your field</option>
-              <option value="Architecture">Architecture</option>
-              <option value="Civil Engineering">Civil Engineering</option>
-              <option value="Structural Engineering">Structural Engineering</option>
-              <option value="Quantity Surveying">Quantity Surveying</option>
+              <option value="">Select your field of interest</option>
+              <option value="Structural Design">Structural Design</option>
               <option value="Project Management">Project Management</option>
+              <option value="Code Compliance">Code Compliance</option>
+              <option value="Sustainable Design">Sustainable Design</option>
+              <option value="Urban Planning">Urban Planning</option>
+              <option value="BIM">BIM</option>
+              <option value="Cost Estimation">Cost Estimation</option>
+              <option value="Contract Administration">Contract Administration</option>
+              <option value="Risk Management">Risk Management</option>
             </select>
             <select 
               className="w-full p-3 border rounded-lg"
@@ -222,7 +213,7 @@ const MentorshipHub = () => {
                   <div className="flex items-start space-x-4">
                     <Avatar className="w-16 h-16">
                       <AvatarFallback className="bg-primary text-white">
-                        {mentor.name.split(' ').map(n => n[0]).join('')}
+                        {mentor.name?.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
@@ -277,7 +268,7 @@ const MentorshipHub = () => {
                   <div className="flex items-start space-x-4">
                     <Avatar className="w-16 h-16">
                       <AvatarFallback className="bg-primary text-white">
-                        {mentor.name.split(' ').map(n => n[0]).join('')}
+                        {mentor.name?.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
@@ -322,6 +313,7 @@ const MentorshipHub = () => {
       )}
 
       {/* Mentees Looking for Mentors */}
+      {mentees.length > 0 && (
       <div>
         <h2 className="text-lg font-semibold mb-3 text-gray-800">Mentees Seeking Guidance</h2>
         <div className="space-y-3">
@@ -331,7 +323,7 @@ const MentorshipHub = () => {
                 <div className="flex items-center space-x-3">
                   <Avatar>
                     <AvatarFallback className="bg-gray-200">
-                      {mentee.name.split(' ').map(n => n[0]).join('')}
+                      {mentee.name.split(' ').map((n: string) => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -348,6 +340,7 @@ const MentorshipHub = () => {
           ))}
         </div>
       </div>
+      )}
     </div>
   );
 };

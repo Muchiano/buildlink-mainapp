@@ -393,13 +393,25 @@ export const mentorshipService = {
 
 // Skills/Courses Service
 export const skillsService = {
-  async getCourses(category?: string, difficulty?: string) {
-    const { data, error } = await supabase
+  async getSkillResources(options: { type?: string; category?: string; difficulty?: string } = {}) {
+    let query = supabase
       .from('skill_resources')
-      .select('*')
-      .eq('type', 'course')
-      .order('created_at', { ascending: false });
+      .select('*');
+
+    if (options.type && options.type !== 'all' && options.type !== 'latest') {
+      const singularType = options.type.endsWith('s') ? options.type.slice(0, -1) : options.type;
+      query = query.eq('type', singularType);
+    }
+    if (options.category) {
+      query = query.eq('category', options.category);
+    }
+    if (options.difficulty) {
+      query = query.eq('difficulty_level', options.difficulty);
+    }
     
+    query = query.order('created_at', { ascending: false });
+    
+    const { data, error } = await query;
     return { data, error };
-  }
+  },
 };

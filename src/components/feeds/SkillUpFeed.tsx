@@ -1,18 +1,25 @@
-
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { skillsService } from "@/services/dataService";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Play, Clock, Users, Award, BookOpen, Download, Star } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 interface SkillUpFeedProps {
   activeFilter: string;
 }
 
 const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
-  const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]);
+  const [enrolledCourses, setEnrolledCourses] = useState<string[]>([]);
 
-  const handleEnroll = (courseId: number) => {
+  const { data: resourcesData, isLoading, error } = useQuery({
+    queryKey: ['skillResources'],
+    queryFn: () => skillsService.getSkillResources(),
+  });
+
+  const handleEnroll = (courseId: string) => {
     setEnrolledCourses(prev => [...prev, courseId]);
     // Here you would typically make an API call to enroll the user
     console.log(`Enrolled in course ${courseId}`);
@@ -25,103 +32,34 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
     { name: "Kenya Institute of Planners (KIP)", verified: true }
   ];
 
-  const courses = [
-    {
-      id: 1,
-      title: "Digital Construction Management",
-      provider: "Institution of Engineers of Kenya (IEK)",
-      instructor: "Eng. Michael Ochieng",
-      duration: "4 weeks",
-      cpdPoints: 20,
-      rating: 4.8,
-      students: 1247,
-      price: "KSh 15,000",
-      thumbnail: "/placeholder.svg",
-      category: "Project Management",
-      level: "Intermediate",
-      description: "Learn modern digital tools and methodologies for effective construction project management.",
-      modules: ["BIM Integration", "Project Scheduling", "Digital Documentation", "Risk Management"],
-      type: "courses"
-    },
-    {
-      id: 2,
-      title: "Sustainable Architecture Principles",
-      provider: "Architectural Association of Kenya (AAK)",
-      instructor: "Arch. Grace Wanjiru",
-      duration: "6 weeks",
-      cpdPoints: 30,
-      rating: 4.9,
-      students: 892,
-      price: "KSh 18,000",
-      thumbnail: "/placeholder.svg",
-      category: "Design",
-      level: "Advanced",
-      description: "Master sustainable design principles and green building certifications for modern architecture.",
-      modules: ["Green Building Standards", "Energy Efficiency", "Material Selection", "Environmental Impact"],
-      type: "courses"
-    }
-  ];
+  const allResources = resourcesData?.data || [];
 
-  const webinars = [
-    {
-      id: 3,
-      title: "Future of Construction Technology in Kenya",
-      date: "Dec 15, 2024",
-      time: "2:00 PM EAT",
-      speaker: "Dr. Jane Muthoni",
-      organization: "Kenya Building Research Centre",
-      attendees: 234,
-      type: "webinars"
-    },
-    {
-      id: 4,
-      title: "Compliance and Building Codes Update",
-      date: "Dec 18, 2024",
-      time: "10:00 AM EAT",
-      speaker: "Eng. Samuel Kiprotich",
-      organization: "National Construction Authority",
-      attendees: 456,
-      type: "webinars"
-    }
-  ];
+  const courses = allResources.filter(r => r.type === 'course');
+  const webinars = allResources.filter(r => r.type === 'webinar');
+  const articles = allResources.filter(r => r.type === 'article');
+  const certifications = allResources.filter(r => r.type === 'certification');
 
-  const articles = [
-    {
-      id: 5,
-      title: "Modern Construction Techniques in East Africa",
-      author: "Prof. Mary Kimani",
-      readTime: "8 min read",
-      category: "Technology",
-      type: "articles"
-    },
-    {
-      id: 6,
-      title: "Sustainable Building Materials: A Kenyan Perspective",
-      author: "Dr. Peter Wachira",
-      readTime: "12 min read",
-      category: "Sustainability",
-      type: "articles"
-    }
-  ];
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-40 w-full rounded-xl" />
+        <div className="space-y-4">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full" />
+        </div>
+      </div>
+    );
+  }
 
-  const certifications = [
-    {
-      id: 7,
-      title: "LEED Green Associate Certification",
-      provider: "Green Building Council",
-      duration: "3 months",
-      price: "KSh 25,000",
-      type: "certifications"
-    },
-    {
-      id: 8,
-      title: "Project Management Professional (PMP)",
-      provider: "Project Management Institute",
-      duration: "6 months",
-      price: "KSh 45,000",
-      type: "certifications"
-    }
-  ];
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-red-500 text-center">Could not load resources. Please try again later.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Filter content based on active filter
   const getFilteredContent = () => {
@@ -163,7 +101,7 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
 
       {/* Content based on filter */}
       <div className="space-y-4">
-        {activeFilter === "courses" || activeFilter === "latest" ? (
+        {(activeFilter === "courses" || activeFilter === "latest") && courses.length > 0 ? (
           courses.map((course) => (
             <Card key={course.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
@@ -176,14 +114,13 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
                       <div>
                         <h3 className="font-semibold text-gray-800 mb-1">{course.title}</h3>
                         <p className="text-sm text-gray-600">{course.provider}</p>
-                        <p className="text-xs text-gray-500">by {course.instructor}</p>
                       </div>
-                      <Badge variant="outline" className={`text-xs ${
-                        course.level === 'Beginner' ? 'border-green-300 text-green-700' :
-                        course.level === 'Intermediate' ? 'border-yellow-300 text-yellow-700' :
+                      <Badge variant="outline" className={`text-xs capitalize ${
+                        course.difficulty_level === 'beginner' ? 'border-green-300 text-green-700' :
+                        course.difficulty_level === 'intermediate' ? 'border-yellow-300 text-yellow-700' :
                         'border-red-300 text-red-700'
                       }`}>
-                        {course.level}
+                        {course.difficulty_level}
                       </Badge>
                     </div>
                     
@@ -196,7 +133,7 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
                       </div>
                       <div className="flex items-center">
                         <Award className="h-3 w-3 mr-1" />
-                        {course.cpdPoints} CPD Points
+                        {course.reviews_count || 0} CPD Points
                       </div>
                       <div className="flex items-center">
                         <Star className="h-3 w-3 mr-1 text-yellow-500" />
@@ -204,25 +141,25 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
                       </div>
                       <div className="flex items-center">
                         <Users className="h-3 w-3 mr-1" />
-                        {course.students} students
+                        {course.reviews_count || 0} students
                       </div>
                     </div>
                     
                     <div className="flex flex-wrap gap-1 mb-4">
-                      {course.modules.slice(0, 3).map((module, index) => (
+                      {(course.syllabus || []).slice(0, 3).map((module: string, index: number) => (
                         <Badge key={index} variant="secondary" className="text-xs">
                           {module}
                         </Badge>
                       ))}
-                      {course.modules.length > 3 && (
+                      {(course.syllabus || []).length > 3 && (
                         <Badge variant="secondary" className="text-xs">
-                          +{course.modules.length - 3} more
+                          +{(course.syllabus || []).length - 3} more
                         </Badge>
                       )}
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">{course.price}</span>
+                      <span className="text-lg font-bold text-primary">{course.price ? `KSh ${course.price}`: 'Free'}</span>
                       <div className="flex space-x-2">
                         <Button variant="outline" size="sm">
                           <Download className="h-4 w-4 mr-1" />
@@ -245,7 +182,7 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
           ))
         ) : null}
 
-        {(activeFilter === "webinars" || activeFilter === "latest") && (
+        {(activeFilter === "webinars" || activeFilter === "latest") && webinars.length > 0 && (
           <div>
             <h2 className="text-lg font-semibold mb-4 text-gray-800">Upcoming Webinars</h2>
             <div className="space-y-3">
@@ -255,12 +192,7 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <h3 className="font-medium text-gray-800 mb-1">{webinar.title}</h3>
-                        <p className="text-sm text-gray-600">{webinar.speaker} • {webinar.organization}</p>
-                        <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                          <span>{webinar.date}</span>
-                          <span>{webinar.time}</span>
-                          <span>{webinar.attendees} registered</span>
-                        </div>
+                        <p className="text-sm text-gray-600">{webinar.provider}</p>
                       </div>
                       <Button size="sm" variant="outline">
                         Register Free
@@ -273,7 +205,7 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
           </div>
         )}
 
-        {(activeFilter === "articles" || activeFilter === "latest") && (
+        {(activeFilter === "articles" || activeFilter === "latest") && articles.length > 0 && (
           <div>
             <h2 className="text-lg font-semibold mb-4 text-gray-800">Featured Articles</h2>
             <div className="space-y-3">
@@ -295,7 +227,7 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
           </div>
         )}
 
-        {(activeFilter === "certifications" || activeFilter === "latest") && (
+        {(activeFilter === "certifications" || activeFilter === "latest") && certifications.length > 0 && (
           <div>
             <h2 className="text-lg font-semibold mb-4 text-gray-800">Professional Certifications</h2>
             <div className="space-y-3">
@@ -309,7 +241,7 @@ const SkillUpFeed = ({ activeFilter }: SkillUpFeedProps) => {
                         <p className="text-xs text-gray-500">Duration: {cert.duration}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-lg font-bold text-primary mb-2">{cert.price}</div>
+                        <div className="text-lg font-bold text-primary mb-2">{cert.price ? `KSh ${cert.price}`: 'Free'}</div>
                         <Button size="sm">Apply Now</Button>
                       </div>
                     </div>
