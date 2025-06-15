@@ -4,6 +4,7 @@ import ExperienceSection from "../profile-sections/details/ExperienceSection";
 import EducationSection from "../profile-sections/details/EducationSection";
 import CertificationsSection from "../profile-sections/details/CertificationsSection";
 import InterestsSection from "../profile-sections/details/InterestsSection";
+import CompactSkillsSection from "../profile-sections/details/CompactSkillsSection";
 
 interface ProfileAboutProps {
   profile: any;
@@ -13,6 +14,7 @@ interface ProfileAboutProps {
 const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
   return (
     <div className="space-y-6">
+      <CompactSkillsSection profile={profile} />
       <AboutSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <ExperienceSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <EducationSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
