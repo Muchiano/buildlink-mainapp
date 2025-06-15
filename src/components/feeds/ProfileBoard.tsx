@@ -15,6 +15,7 @@ import ExperienceEditDialog from "../profile-sections/ExperienceEditDialog";
 import EducationEditDialog from "../profile-sections/EducationEditDialog";
 import CertificationsEditDialog from "../profile-sections/CertificationsEditDialog";
 import InterestsEditDialog from "../profile-sections/InterestsEditDialog";
+import AvatarUploader from "../profile-sections/AvatarUploader";
 
 const ProfileBoard = () => {
   const { user } = useAuth();
@@ -24,6 +25,7 @@ const ProfileBoard = () => {
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -33,24 +35,19 @@ const ProfileBoard = () => {
 
   const loadUserData = async () => {
     if (!user) return;
-    
     try {
       setLoading(true);
-      
       // Load profile data
       const { data: profileData, error: profileError } = await profileService.getProfile(user.id);
       if (profileError) throw profileError;
-      
       setProfile(profileData);
 
       // Load user posts for activity tab
       const { data: postsData, error: postsError } = await postsService.getPosts();
       if (postsError) throw postsError;
-      
       // Filter posts by current user
       const filteredPosts = postsData?.filter(post => post.author_id === user.id) || [];
       setUserPosts(filteredPosts);
-      
     } catch (error) {
       console.error('Error loading user data:', error);
       toast({
@@ -69,6 +66,58 @@ const ProfileBoard = () => {
       title: 'Success',
       description: 'Profile updated successfully!'
     });
+  };
+
+  // Avatar update logic (moved from ProfileEditForm, now handled here)
+  const handleAvatarChange = async (croppedFile: File) => {
+    if (!user) return;
+    setUploading(true);
+    try {
+      const { data, error } = await profileService.uploadAvatar(user.id, croppedFile);
+      if (error) throw error;
+      if (data) {
+        setProfile(prev => ({ ...prev, avatar: data.avatar || "" }));
+        toast({
+          title: "Success",
+          description: "Avatar uploaded successfully!",
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      toast({
+        title: "Error",
+        description: "Failed to upload avatar",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Avatar remove logic
+  const handleAvatarRemove = async () => {
+    if (!user) return;
+    setUploading(true);
+    try {
+      // Remove avatar by setting it to empty string in backend
+      const updatedProfile = { ...profile, avatar: "" };
+      const { error } = await profileService.updateProfile(user.id, updatedProfile);
+      if (error) throw error;
+      setProfile(updatedProfile);
+      toast({
+        title: "Photo removed",
+        description: "Your profile photo has been removed.",
+      });
+    } catch (error) {
+      console.error("Error removing avatar:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove profile photo",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const renderActivityItem = (post: any) => {
@@ -213,13 +262,24 @@ const ProfileBoard = () => {
         </div>
       </Card>
 
+      {/* Profile Photo Uploader at the top */}
+      <div className="flex flex-col items-center -mt-16 mb-1">
+        <AvatarUploader
+          avatarUrl={profile.avatar || ""}
+          fullName={profile.full_name}
+          uploading={uploading}
+          onAvatarChange={handleAvatarChange}
+          onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
+        />
+      </div>
+
       {/* Profile Header */}
       <Card className="border-0 shadow-sm">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
             {/* Profile Info */}
             <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
-              {/* Profile Picture */}
+              {/* Profile Picture (no longer editable here) */}
               <div className="relative">
                 <Avatar className="h-24 w-24 border-2 border-white shadow-md">
                   <AvatarImage src={profile.avatar} />
@@ -227,18 +287,6 @@ const ProfileBoard = () => {
                     {profile.full_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <ProfileEditDialog 
-                  currentProfile={profile}
-                  onProfileUpdated={handleProfileUpdate}
-                >
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="absolute -bottom-1 -right-1 rounded-full h-6 w-6 p-0"
-                  >
-                    <Camera className="h-3 w-3" />
-                  </Button>
-                </ProfileEditDialog>
               </div>
               
               {/* Basic Info */}

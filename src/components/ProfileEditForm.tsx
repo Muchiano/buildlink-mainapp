@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService } from '@/services/dataService';
 import { useToast } from '@/hooks/use-toast';
-import AvatarUploader from "./profile-sections/AvatarUploader";
 import ProfileFormFields from "./profile-sections/ProfileFormFields";
 
 interface ProfileEditFormProps {
@@ -59,58 +57,6 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
-  // Replace avatar logic with in-AvatarUploader logic
-  const handleAvatarChange = async (croppedFile: File) => {
-    if (!user) return;
-    setUploading(true);
-    try {
-      const { data, error } = await profileService.uploadAvatar(user.id, croppedFile);
-      if (error) throw error;
-      if (data) {
-        setProfile(prev => ({ ...prev, avatar: data.avatar || "" }));
-        toast({
-          title: "Success",
-          description: "Avatar uploaded successfully!",
-        });
-      }
-    } catch (error) {
-      console.error("Error uploading avatar:", error);
-      toast({
-        title: "Error",
-        description: "Failed to upload avatar",
-        variant: "destructive",
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // Handle profile photo removal
-  const handleAvatarRemove = async () => {
-    if (!user) return;
-    setUploading(true);
-    try {
-      // Remove avatar by setting it to empty string in backend
-      const updatedProfile = { ...profile, avatar: "" };
-      const { error } = await profileService.updateProfile(user.id, updatedProfile);
-      if (error) throw error;
-      setProfile(updatedProfile);
-      toast({
-        title: "Photo removed",
-        description: "Your profile photo has been removed.",
-      });
-    } catch (error) {
-      console.error("Error removing avatar:", error);
-      toast({
-        title: "Error",
-        description: "Failed to remove profile photo",
-        variant: "destructive",
-      });
-    } finally {
-      setUploading(false);
-    }
-  };
-
   const handleSave = async () => {
     if (!user) return;
     setLoading(true);
@@ -144,15 +90,6 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Avatar Upload */}
-            <AvatarUploader
-              avatarUrl={profile.avatar}
-              fullName={profile.full_name}
-              uploading={uploading}
-              onAvatarChange={handleAvatarChange}
-              onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
-            />
-
             {/* Form Fields */}
             <ProfileFormFields
               profile={profile}
