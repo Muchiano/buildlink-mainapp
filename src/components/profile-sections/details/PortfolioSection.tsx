@@ -1,0 +1,242 @@
+
+import React, { useRef, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Edit, Upload, Link2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/integrations/supabase/client";
+
+type PortfolioItem = {
+  id: string;
+  name: string;
+  url: string;
+  type: string; // e.g. 'image', 'pdf', 'doc', 'video', 'link'
+  description?: string;
+};
+
+interface PortfolioSectionProps {
+  profile: any;
+  handleProfileUpdate: () => void;
+}
+
+/**
+ * Detect basic file type from extension
+ */
+function getType(url: string): string {
+  const ext = url.split(".").pop()?.toLowerCase();
+  if (!ext) return "file";
+  if (["jpeg","jpg","png","gif","webp"].includes(ext)) return "image";
+  if (["mp4","webm","mov"].includes(ext)) return "video";
+  if (["pdf"].includes(ext)) return "pdf";
+  if (["doc","docx"].includes(ext)) return "doc";
+  if (["ppt","pptx"].includes(ext)) return "ppt";
+  if (["xls","xlsx"].includes(ext)) return "sheet";
+  return "file";
+}
+
+const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProfileUpdate }) => {
+  const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [linkURL, setLinkURL] = useState("");
+  const [desc, setDesc] = useState("");
+  const [progress, setProgress] = useState<number>(0);
+  const fileInput = useRef<HTMLInputElement | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const portfolioList: PortfolioItem[] = Array.isArray(profile.portfolio) ? profile.portfolio : [];
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    setError(null);
+
+    const file = files[0];
+    const ext = file.name.split(".").pop();
+    const filename = `${profile.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    setUploading(true);
+    setProgress(18);
+
+    const { data, error: uploadError } = await supabase
+      .storage
+      .from("portfolio")
+      .upload(filename, file, {
+        upsert: false,
+        onUploadProgress: (evt) => setProgress(Math.round((evt.loaded / evt.total) * 90)),
+      });
+    if (uploadError) {
+      setError("Upload failed");
+      setUploading(false);
+      return;
+    }
+
+    const { data: publicUrlData } = supabase.storage.from("portfolio").getPublicUrl(filename);
+    const url = publicUrlData.publicUrl;
+    const item: PortfolioItem = {
+      id: Math.random().toString(36).substring(2),
+      name: file.name,
+      url,
+      type: getType(file.name),
+      description: desc,
+    };
+    // Append to portfolio, update profile
+    const newPortfolio = [...portfolioList, item];
+    await updatePortfolio(newPortfolio);
+    setUploading(false);
+    setProgress(100);
+    setOpen(false);
+    setDesc("");
+    handleProfileUpdate();
+  };
+
+  const handleAddLink = async () => {
+    if (!linkURL) return;
+    const item: PortfolioItem = {
+      id: Math.random().toString(36).substring(2),
+      name: linkURL,
+      url: linkURL,
+      type: "link",
+      description: desc,
+    };
+    const newPortfolio = [...portfolioList, item];
+    await updatePortfolio(newPortfolio);
+    setOpen(false);
+    setLinkURL("");
+    setDesc("");
+    handleProfileUpdate();
+  };
+
+  // Remove item
+  const handleRemove = async (id: string) => {
+    const newPortfolio = portfolioList.filter(p => p.id !== id);
+    await updatePortfolio(newPortfolio);
+    handleProfileUpdate();
+  };
+
+  // Save portfolio array to Supabase
+  const updatePortfolio = async (newPortfolio: PortfolioItem[]) => {
+    await supabase
+      .from("profiles")
+      .update({ portfolio: newPortfolio })
+      .eq("id", profile.id);
+  };
+
+  // Main renderer
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardContent className="px-6 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-semibold text-gray-800">Portfolio / Projects</h2>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="px-2">
+                <Edit className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Add to Portfolio</DialogTitle>
+                <DialogDescription>
+                  Upload a file (project, design, certificate, report...) or add a public link.
+                </DialogDescription>
+              </DialogHeader>
+              <div>
+                <label className="block font-medium mb-2">Attach file</label>
+                <input
+                  type="file"
+                  accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,video/*"
+                  ref={fileInput}
+                  disabled={uploading}
+                  className="block"
+                  onChange={handleFileUpload}
+                />
+                {progress > 0 && progress < 99 && <Progress value={progress} className="mt-2" />}
+                <div className="text-xs text-gray-500 mt-1 mb-2">Max 50MB. Supported: images, video, PDF, DOCX, PPT, XLS files.</div>
+              </div>
+              <div className="mt-4">
+                <label className="block font-medium mb-2">Or link to a project (GitHub, website, Figma...)</label>
+                <input
+                  type="url"
+                  value={linkURL}
+                  onChange={e => setLinkURL(e.target.value)}
+                  placeholder="https://yourproject.com"
+                  className="px-2 py-1 border rounded w-full"
+                  disabled={uploading}
+                />
+              </div>
+              <div className="mt-2">
+                <label className="block font-medium mb-2">Short description</label>
+                <input
+                  type="text"
+                  value={desc}
+                  onChange={e => setDesc(e.target.value)}
+                  placeholder="e.g. Demo video for my landing page"
+                  className="px-2 py-1 border rounded w-full"
+                />
+              </div>
+              {error && <div className="text-red-500 mt-2">{error}</div>}
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button
+                  onClick={handleAddLink}
+                  type="button"
+                  disabled={!linkURL}
+                  variant="default"
+                >
+                  <Link2 className="h-4 w-4 mr-2" /> Add Link
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+        <div className="space-y-4">
+          {portfolioList.length === 0 ? (
+            <div className="text-gray-500 italic">No portfolio items yet. Use the edit button to add.</div>
+          ) : (
+            portfolioList.map(item => (
+              <div key={item.id} className="flex items-center space-x-3 py-2 border-b last:border-b-0 animate-fade-in">
+                <div className="min-w-[56px] max-w-[56px]">
+                  {item.type === "image" ? (
+                    <img src={item.url} alt={item.name} className="w-14 h-14 object-cover rounded-md border" />
+                  ) : item.type === "pdf" ? (
+                    <a href={item.url} target="_blank" rel="noopener noreferrer">
+                      <Badge className="bg-red-100 text-red-600">PDF</Badge>
+                    </a>
+                  ) : item.type === "doc" || item.type === "sheet" || item.type === "ppt" ? (
+                    <a href={item.url} target="_blank" rel="noopener noreferrer">
+                      <Badge variant="secondary">{item.type.toUpperCase()}</Badge>
+                    </a>
+                  ) : item.type === "video" ? (
+                    <video src={item.url} controls className="w-14 h-14 rounded border" />
+                  ) : item.type === "link" ? (
+                    <a href={item.url} target="_blank" rel="noopener noreferrer">
+                      <Link2 className="h-8 w-8 text-blue-500" />
+                    </a>
+                  ) : (
+                    <a href={item.url} target="_blank" rel="noopener noreferrer">
+                      <Badge variant="default">File</Badge>
+                    </a>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-gray-900 truncate">{item.name}</div>
+                  {item.description && (
+                    <div className="text-xs text-gray-600 truncate">{item.description}</div>
+                  )}
+                </div>
+                <Button size="icon" variant="ghost" onClick={() => handleRemove(item.id)} title="Remove">
+                  ✕
+                </Button>
+              </div>
+            ))
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default PortfolioSection;

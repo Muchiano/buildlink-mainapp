@@ -550,6 +550,7 @@ export type Database = {
           interests: string[] | null
           languages: Json | null
           organization: string | null
+          portfolio: Json | null
           profession: string | null
           skills: string[] | null
           title: string | null
@@ -570,6 +571,7 @@ export type Database = {
           interests?: string[] | null
           languages?: Json | null
           organization?: string | null
+          portfolio?: Json | null
           profession?: string | null
           skills?: string[] | null
           title?: string | null
@@ -590,6 +592,7 @@ export type Database = {
           interests?: string[] | null
           languages?: Json | null
           organization?: string | null
+          portfolio?: Json | null
           profession?: string | null
           skills?: string[] | null
           title?: string | null
