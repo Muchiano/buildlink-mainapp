@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@
 import PortfolioThumbnail from "./PortfolioThumbnail";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface PortfolioGalleryProps {
   open: boolean;
@@ -45,18 +45,23 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
                   <div className="text-xs text-gray-500">{item.description}</div>
                 )}
                 {canEdit && onRemove && (
-                  <Tooltip content="Remove" side="top">
-                    <button
-                      className="absolute top-2 right-2 opacity-70 hover:opacity-100 transition"
-                      onClick={() => onRemove(item.id)}
-                      title="Remove this entry"
-                      aria-label="Remove"
-                      disabled={updating}
-                      tabIndex={updating ? -1 : 0}
-                      style={{ pointerEvents: updating ? 'none' : 'auto' }}
-                    >
-                      <Trash className="w-5 h-5 text-red-500" />
-                    </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        className="absolute top-2 right-2 opacity-70 hover:opacity-100 transition"
+                        onClick={() => onRemove(item.id)}
+                        title="Remove this entry"
+                        aria-label="Remove"
+                        disabled={updating}
+                        tabIndex={updating ? -1 : 0}
+                        style={{ pointerEvents: updating ? 'none' : 'auto' }}
+                      >
+                        <Trash className="w-5 h-5 text-red-500" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      Remove
+                    </TooltipContent>
                   </Tooltip>
                 )}
               </div>
@@ -72,3 +77,4 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
 };
 
 export default PortfolioGallery;
+
