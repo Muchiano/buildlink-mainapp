@@ -1,7 +1,7 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { profileService, postsService } from "@/services/dataService";
+import { profileService } from "@/services/profileService";
+import { postsService } from "@/services/postsService";
 import { useToast } from "@/hooks/use-toast";
 
 export const useProfile = () => {

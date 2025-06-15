@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Plus, Star } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { profileService } from '@/services/dataService';
+import { profileService } from '@/services/profileService';
 import { useToast } from '@/hooks/use-toast';
 import { Skill, convertAndSanitizeSkills, getLevelText } from '@/lib/skillUtils';
 

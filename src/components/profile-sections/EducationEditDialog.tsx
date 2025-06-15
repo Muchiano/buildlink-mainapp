@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { X, Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { profileService } from '@/services/dataService';
+import { profileService } from '@/services/profileService';
 import { useToast } from '@/hooks/use-toast';
 import EducationFormFields from "./EducationFormFields";
 import EducationList from "./EducationList";

@@ -1,10 +1,9 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { MapPin, Building2, Calendar, Users, MessageCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { profileService } from "@/services/dataService";
+import { profileService } from '@/services/profileService';
 import { useState, useEffect } from "react";
 
 interface UserProfileProps {

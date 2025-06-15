@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { X, Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { profileService } from '@/services/dataService';
+import { profileService } from '@/services/profileService';
 import { useToast } from '@/hooks/use-toast';
 
 interface Language {

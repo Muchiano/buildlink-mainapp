@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { profileService } from '@/services/dataService';
+import { profileService } from '@/services/profileService';
 import { useToast } from '@/hooks/use-toast';
 import ProfileFormFields from "./profile-sections/ProfileFormFields";
 

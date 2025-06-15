@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Image, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { postsService } from '@/services/dataService';
+import { postsService } from '@/services/postsService';
 import { useToast } from '@/hooks/use-toast';
 
 interface CreatePostDialogProps {

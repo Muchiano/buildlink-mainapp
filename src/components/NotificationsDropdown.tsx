@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Bell, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import { notificationsService } from '@/services/dataService';
+import { notificationsService } from '@/services/notificationsService';
 import { useToast } from '@/hooks/use-toast';
 
 const NotificationsDropdown = () => {

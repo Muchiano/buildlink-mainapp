@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
-import { mentorshipService } from '@/services/dataService';
+import { mentorshipService } from '@/services/mentorshipService';
 import { useToast } from '@/hooks/use-toast';
 import { Mentor } from '@/types/database';
 import { cn } from '@/lib/utils';

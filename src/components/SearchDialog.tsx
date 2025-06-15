@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search, X, User, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { searchService } from '@/services/dataService';
+import { searchService } from '@/services/searchService';
 import { useToast } from '@/hooks/use-toast';
 
 interface SearchDialogProps {

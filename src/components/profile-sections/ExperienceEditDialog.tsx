@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { profileService } from "@/services/dataService";
+import { profileService } from "@/services/profileService";
 import { useToast } from "@/hooks/use-toast";
 import ExperienceFormFields from "./ExperienceFormFields";
 import ExperienceList from "./ExperienceList";

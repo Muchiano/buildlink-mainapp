@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
@@ -6,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Camera, FileText, Briefcase, Users, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { postsService } from "@/services/dataService";
+import { postsService } from '@/services/postsService';
 import { useToast } from "@/hooks/use-toast";
 
 const PostCreate = () => {

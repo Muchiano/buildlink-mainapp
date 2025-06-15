@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Bell, Check, CheckCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { notificationsService } from '@/services/dataService';
+import { notificationsService } from '@/services/notificationsService';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 

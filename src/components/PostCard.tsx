@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -8,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { Post } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
-import { postsService } from '@/services/dataService';
+import { postsService } from '@/services/postsService';
 import { useToast } from '@/hooks/use-toast';
 
 interface PostCardProps {

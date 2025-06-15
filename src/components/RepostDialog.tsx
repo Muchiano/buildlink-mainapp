@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Repeat2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { postsService } from '@/services/dataService';
+import { postsService } from '@/services/postsService';
 import { useToast } from '@/hooks/use-toast';
 
 interface RepostDialogProps {
