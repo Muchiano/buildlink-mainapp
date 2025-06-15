@@ -1,6 +1,7 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import ResourceReviewForm from "./ResourceReviewForm";
+import ResourceReviewsList from "./ResourceReviewsList";
 
 interface Article {
     id: string;
@@ -25,6 +26,10 @@ const ArticleItem = ({ article }: ArticleItemProps) => {
             <Badge variant="outline" className="text-xs">{article.category}</Badge>
             <span>{article.readTime}</span>
           </div>
+        </div>
+        <div className="mt-3">
+          <ResourceReviewForm resourceId={article.id} />
+          <ResourceReviewsList resourceId={article.id} />
         </div>
       </CardContent>
     </Card>

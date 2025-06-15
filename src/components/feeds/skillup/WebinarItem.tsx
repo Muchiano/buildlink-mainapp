@@ -1,6 +1,7 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ResourceReviewForm from "./ResourceReviewForm";
+import ResourceReviewsList from "./ResourceReviewsList";
 
 interface Webinar {
     id: string;
@@ -24,6 +25,10 @@ const WebinarItem = ({ webinar }: WebinarItemProps) => {
           <Button size="sm" variant="outline">
             Register Free
           </Button>
+        </div>
+        <div className="mt-3">
+          <ResourceReviewForm resourceId={webinar.id} />
+          <ResourceReviewsList resourceId={webinar.id} />
         </div>
       </CardContent>
     </Card>

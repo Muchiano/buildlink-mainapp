@@ -1,6 +1,7 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import ResourceReviewForm from "./ResourceReviewForm";
+import ResourceReviewsList from "./ResourceReviewsList";
 
 interface Certification {
     id: string;
@@ -28,6 +29,10 @@ const CertificationItem = ({ certification }: CertificationItemProps) => {
             <div className="text-lg font-bold text-primary mb-2">{certification.price ? `KSh ${certification.price}`: 'Free'}</div>
             <Button size="sm">Apply Now</Button>
           </div>
+        </div>
+        <div className="mt-3">
+          <ResourceReviewForm resourceId={certification.id} />
+          <ResourceReviewsList resourceId={certification.id} />
         </div>
       </CardContent>
     </Card>

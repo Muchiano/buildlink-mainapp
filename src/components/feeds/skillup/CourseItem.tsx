@@ -1,8 +1,9 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, Clock, Users, Award, Download, Star } from "lucide-react";
+import ResourceReviewForm from "./ResourceReviewForm";
+import ResourceReviewsList from "./ResourceReviewsList";
 
 interface Course {
   id: string;
@@ -96,6 +97,11 @@ const CourseItem = ({ course, enrolledCourses, handleEnroll }: CourseItemProps) 
                   {enrolledCourses.includes(course.id) ? "Enrolled" : "Enroll Now"}
                 </Button>
               </div>
+            </div>
+            {/* Show resource reviews */}
+            <div className="mt-4">
+              <ResourceReviewForm resourceId={course.id} />
+              <ResourceReviewsList resourceId={course.id} />
             </div>
           </div>
         </div>
