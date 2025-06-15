@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,8 @@ import { X, Plus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService } from '@/services/dataService';
 import { useToast } from '@/hooks/use-toast';
+import EducationFormFields from "./EducationFormFields";
+import EducationList from "./EducationList";
 
 interface Education {
   degree: string;
@@ -35,6 +36,10 @@ const EducationEditDialog = ({ children, currentProfile, onProfileUpdated }: Edu
     year: '',
     description: ''
   });
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  // Prepare editing state for individual education
+  const [editEducation, setEditEducation] = useState<Education | null>(null);
 
   const addEducation = () => {
     if (newEducation.degree.trim() && newEducation.institution.trim() && newEducation.year.trim()) {
@@ -43,8 +48,33 @@ const EducationEditDialog = ({ children, currentProfile, onProfileUpdated }: Edu
     }
   };
 
+  const startEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditEducation(education[index]);
+  };
+
+  const handleEditChange = (edu: Education) => {
+    setEditEducation(edu);
+  };
+
+  const saveEdit = () => {
+    if (editingIndex !== null && editEducation) {
+      const updated = [...education];
+      updated[editingIndex] = { ...editEducation };
+      setEducation(updated);
+      setEditingIndex(null);
+      setEditEducation(null);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditEducation(null);
+  };
+
   const removeEducation = (index: number) => {
     setEducation(education.filter((_, i) => i !== index));
+    if (editingIndex === index) cancelEdit();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,54 +111,18 @@ const EducationEditDialog = ({ children, currentProfile, onProfileUpdated }: Edu
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Education & Training</DialogTitle>
         </DialogHeader>
-        
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4 p-4 border rounded-md">
             <Label className="text-base font-semibold">Add New Education</Label>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="degree">Degree/Certification</Label>
-                <Input
-                  id="degree"
-                  value={newEducation.degree}
-                  onChange={(e) => setNewEducation({ ...newEducation, degree: e.target.value })}
-                  placeholder="e.g., Bachelor of Civil Engineering"
-                />
-              </div>
-              <div>
-                <Label htmlFor="institution">Institution</Label>
-                <Input
-                  id="institution"
-                  value={newEducation.institution}
-                  onChange={(e) => setNewEducation({ ...newEducation, institution: e.target.value })}
-                  placeholder="e.g., University of Nairobi"
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="year">Year/Duration</Label>
-              <Input
-                id="year"
-                value={newEducation.year}
-                onChange={(e) => setNewEducation({ ...newEducation, year: e.target.value })}
-                placeholder="e.g., 2015-2019 or 2020"
-              />
-            </div>
-            <div>
-              <Label htmlFor="edu-description">Description (Optional)</Label>
-              <Textarea
-                id="edu-description"
-                value={newEducation.description}
-                onChange={(e) => setNewEducation({ ...newEducation, description: e.target.value })}
-                placeholder="Relevant coursework, achievements, or specializations..."
-                rows={3}
-              />
-            </div>
+            <EducationFormFields
+              education={newEducation}
+              onChange={setNewEducation}
+              idPrefix="new"
+            />
             <Button 
               type="button" 
               onClick={addEducation} 
@@ -140,39 +134,36 @@ const EducationEditDialog = ({ children, currentProfile, onProfileUpdated }: Edu
               Add Education
             </Button>
           </div>
-
-          <div className="space-y-3">
+          <div>
             <Label className="text-base font-semibold">Your Education</Label>
-            <div className="space-y-3 min-h-[100px]">
-              {education.length > 0 ? (
-                education.map((edu, index) => (
-                  <div key={index} className="p-3 border rounded-md">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{edu.degree}</h4>
-                        <p className="text-gray-600">{edu.institution}</p>
-                        <p className="text-sm text-gray-500">{edu.year}</p>
-                        {edu.description && (
-                          <p className="text-sm text-gray-700 mt-2">{edu.description}</p>
-                        )}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeEducation(index)}
-                      >
-                        <X className="h-4 w-4" />
+            <EducationList
+              education={education}
+              editingIndex={editingIndex}
+              onEdit={startEdit}
+              onDelete={removeEducation}
+              renderEditing={(index) =>
+                editEducation &&
+                editingIndex === index && (
+                  <div>
+                    <EducationFormFields
+                      education={editEducation}
+                      onChange={handleEditChange}
+                      idPrefix={`edit-${index}`}
+                      showLabels={false}
+                    />
+                    <div className="flex justify-end space-x-2 mt-2">
+                      <Button type="button" onClick={cancelEdit} variant="outline" size="sm">
+                        Cancel
+                      </Button>
+                      <Button type="button" onClick={saveEdit} size="sm">
+                        Save
                       </Button>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm p-3 border rounded-md">No education added yet. Add some education above.</p>
-              )}
-            </div>
+                )
+              }
+            />
           </div>
-
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
