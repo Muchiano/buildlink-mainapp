@@ -54,22 +54,40 @@ const MentorSearchForm = ({
             <option value="1-3 years">1-3 years</option>
             <option value="3-5 years">3-5 years</option>
           </select>
-          {/* Buttons: equally wide, symmetrical even on mobile */}
+          {/* Responsive, condensed buttons */}
           <div className="flex flex-row gap-3 w-full">
             <Button
-              className="flex-1 w-full min-w-0 bg-primary hover:bg-primary-800"
+              className="
+                flex-1 w-full min-w-0 
+                bg-primary hover:bg-primary-800
+                flex items-center justify-center
+                px-2 py-2
+                sm:px-4 sm:py-2
+                text-xs sm:text-sm
+                font-medium
+                space-x-1
+              "
               onClick={handleFindMentors}
             >
-              <Search className="h-4 w-4 mr-2" />
-              Find Mentors
+              <Search className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
+              <span className="truncate">Find a Mentor</span>
             </Button>
             <Button
               variant="outline"
-              className="flex-1 w-full min-w-0 border-primary text-primary hover:bg-primary/10"
+              className="
+                flex-1 w-full min-w-0 
+                border-primary text-primary hover:bg-primary/10 
+                flex items-center justify-center
+                px-2 py-2 
+                sm:px-4 sm:py-2
+                text-xs sm:text-sm
+                font-medium
+                space-x-1
+              "
               onClick={handleBecomeMentor}
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Become a Mentor
+              <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1" />
+              <span className="truncate">Become a Mentor</span>
             </Button>
           </div>
         </div>
