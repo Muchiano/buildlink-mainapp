@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import PortfolioThumbnail from "./PortfolioThumbnail";
@@ -9,6 +8,7 @@ type PortfolioItem = {
   url: string;
   type: string;
   description?: string;
+  thumbnailUrl?: string;
 };
 
 interface PortfolioThumbnailsProps {
@@ -44,6 +44,7 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
                 type={mainItem.type}
                 url={mainItem.url}
                 name={mainItem.name}
+                thumbnailUrl={mainItem.thumbnailUrl}
               />
               <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/50 to-transparent px-2 py-1">
                 <span className="text-xs text-white font-semibold">{mainItem.name}</span>
@@ -66,6 +67,7 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
                 type={item.type}
                 url={item.url}
                 name={item.name}
+                thumbnailUrl={item.thumbnailUrl}
               />
               <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/55 to-transparent px-1 py-0.5">
                 <span className="text-xs text-white">{item.name}</span>

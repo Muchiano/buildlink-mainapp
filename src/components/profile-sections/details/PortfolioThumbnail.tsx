@@ -6,9 +6,20 @@ interface PortfolioThumbnailProps {
   type: string;
   url: string;
   name: string;
+  thumbnailUrl?: string;
 }
 
-const PortfolioThumbnail: React.FC<PortfolioThumbnailProps> = ({ type, url, name }) => {
+const PortfolioThumbnail: React.FC<PortfolioThumbnailProps> = ({ type, url, name, thumbnailUrl }) => {
+  if (thumbnailUrl) {
+    return (
+      <img
+        src={thumbnailUrl}
+        alt={name}
+        className="w-full h-full object-cover rounded-md border"
+        loading="lazy"
+      />
+    );
+  }
   switch (type) {
     case "image":
     case "gif":

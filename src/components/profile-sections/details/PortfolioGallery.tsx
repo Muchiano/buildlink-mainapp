@@ -15,6 +15,7 @@ interface PortfolioGalleryProps {
     url: string;
     type: string;
     description?: string;
+    thumbnailUrl?: string;
   }>;
   canEdit?: boolean;
   onRemove?: (id: string) => void;
@@ -38,7 +39,12 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-2">
           {portfolio.map((item) => (
             <div key={item.id} className="rounded overflow-hidden border shadow relative group">
-              <PortfolioThumbnail type={item.type} url={item.url} name={item.name} />
+              <PortfolioThumbnail
+                type={item.type}
+                url={item.url}
+                name={item.name}
+                thumbnailUrl={item.thumbnailUrl}
+              />
               <div className="px-2 py-2 border-t bg-muted relative min-h-[68px]">
                 <div className="font-medium text-sm text-gray-900 truncate">{item.name}</div>
                 {item.description && (
