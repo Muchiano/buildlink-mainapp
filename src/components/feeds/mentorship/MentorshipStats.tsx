@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { mentorshipService } from "@/services/mentorshipService";
@@ -18,7 +19,7 @@ const MentorshipStats = () => {
   };
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 gap-4">
       <Card className="text-center border-0 shadow-sm">
         <CardContent className="p-4">
           <div className="text-2xl font-bold text-primary">
@@ -33,12 +34,6 @@ const MentorshipStats = () => {
             {isLoading ? <Skeleton className="h-8 w-16 mx-auto" /> : formatMenteesMatched(statsData?.data?.menteesMatchedCount)}
           </div>
           <div className="text-xs text-gray-600">Mentees Matched</div>
-        </CardContent>
-      </Card>
-      <Card className="text-center border-0 shadow-sm">
-        <CardContent className="p-4">
-          <div className="text-2xl font-bold text-primary">95%</div>
-          <div className="text-xs text-gray-600">Success Rate</div>
         </CardContent>
       </Card>
     </div>
