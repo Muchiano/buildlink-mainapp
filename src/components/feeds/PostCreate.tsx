@@ -76,7 +76,24 @@ const PostCreate = () => {
           setIsLoading(false);
           return;
         }
-        image_url = `${supabase.storageUrl}/object/public/post-media/${filePath}`;
+
+        // <-- FIX: get public URL the right way
+        const { data: publicUrlData, error: publicUrlError } = supabase
+          .storage
+          .from('post-media')
+          .getPublicUrl(filePath);
+        if (publicUrlError) {
+          console.error('GetPublicUrl error:', publicUrlError);
+          toast({
+            title: "Image URL Error",
+            description: "Could not get image URL. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        image_url = publicUrlData?.publicUrl;
+        // End FIX
       }
 
       const { error } = await postsService.createPost({
