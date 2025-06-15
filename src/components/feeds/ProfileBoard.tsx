@@ -140,6 +140,74 @@ const ProfileBoard = () => {
     );
   };
 
+  const renderSkillsContent = () => {
+    if (!profile.skills || profile.skills.length === 0) {
+      return (
+        <div className="text-gray-500 italic py-4">
+          No skills added yet. Click edit to showcase your expertise and specializations.
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3">
+        {profile.skills.map((skill: any, index: number) => {
+          // Handle both string skills (legacy) and object skills (new format)
+          const skillName = typeof skill === 'string' ? skill : skill.name;
+          const skillLevel = typeof skill === 'string' ? 3 : (skill.level || 3); // Default to intermediate
+          
+          const getLevelText = (level: number) => {
+            switch(level) {
+              case 1: return 'Beginner';
+              case 2: return 'Intermediate';
+              case 3: return 'Advanced';
+              case 4: return 'Expert';
+              case 5: return 'Master';
+              default: return 'Intermediate';
+            }
+          };
+
+          const getLevelColor = (level: number) => {
+            switch(level) {
+              case 1: return 'bg-gray-200';
+              case 2: return 'bg-blue-200';
+              case 3: return 'bg-green-200';
+              case 4: return 'bg-orange-200';
+              case 5: return 'bg-red-200';
+              default: return 'bg-green-200';
+            }
+          };
+
+          return (
+            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
+              <div className="flex-1">
+                <h4 className="font-medium text-gray-900 mb-1">{skillName}</h4>
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <div
+                        key={star}
+                        className={`w-3 h-3 rounded-full ${
+                          star <= skillLevel ? getLevelColor(skillLevel) : 'bg-gray-200'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">
+                    {getLevelText(skillLevel)}
+                  </span>
+                </div>
+              </div>
+              <Badge variant="outline" className="ml-4">
+                {skillLevel}/5
+              </Badge>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -305,8 +373,11 @@ const ProfileBoard = () => {
           {/* Skills & Specialization */}
           <Card className="border-0 shadow-sm">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Skills & Specialization</h2>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800 mb-1">Skills & Specialization</h2>
+                  <p className="text-sm text-gray-500">Showcase your expertise and experience levels</p>
+                </div>
                 <SkillsEditDialog 
                   currentProfile={profile}
                   onProfileUpdated={handleProfileUpdate}
@@ -316,15 +387,7 @@ const ProfileBoard = () => {
                   </Button>
                 </SkillsEditDialog>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {profile.skills?.length > 0 ? (
-                  profile.skills.map((skill: string, index: number) => (
-                    <Badge key={index} variant="secondary">{skill}</Badge>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No skills added yet. Click edit to add your skills.</p>
-                )}
-              </div>
+              {renderSkillsContent()}
             </CardContent>
           </Card>
 
