@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService } from '@/services/dataService';
 import { useToast } from '@/hooks/use-toast';
@@ -37,6 +37,13 @@ const ExperienceEditDialog = ({ children, currentProfile, onProfileUpdated }: Ex
     duration: '',
     description: ''
   });
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingExperience, setEditingExperience] = useState<Experience>({
+    title: '',
+    company: '',
+    duration: '',
+    description: ''
+  });
 
   // Update experiences when dialog opens or currentProfile changes
   React.useEffect(() => {
@@ -54,6 +61,26 @@ const ExperienceEditDialog = ({ children, currentProfile, onProfileUpdated }: Ex
 
   const removeExperience = (index: number) => {
     setExperiences(experiences.filter((_, i) => i !== index));
+  };
+
+  const startEditingExperience = (index: number) => {
+    setEditingIndex(index);
+    setEditingExperience({ ...experiences[index] });
+  };
+
+  const saveEditingExperience = () => {
+    if (editingIndex !== null && editingExperience.title.trim() && editingExperience.company.trim() && editingExperience.duration.trim()) {
+      const updatedExperiences = [...experiences];
+      updatedExperiences[editingIndex] = { ...editingExperience };
+      setExperiences(updatedExperiences);
+      setEditingIndex(null);
+      setEditingExperience({ title: '', company: '', duration: '', description: '' });
+    }
+  };
+
+  const cancelEditingExperience = () => {
+    setEditingIndex(null);
+    setEditingExperience({ title: '', company: '', duration: '', description: '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,24 +187,96 @@ const ExperienceEditDialog = ({ children, currentProfile, onProfileUpdated }: Ex
               {experiences.length > 0 ? (
                 experiences.map((exp, index) => (
                   <div key={index} className="p-3 border rounded-md">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{exp.title}</h4>
-                        <p className="text-gray-600">{exp.company}</p>
-                        <p className="text-sm text-gray-500">{exp.duration}</p>
-                        {exp.description && (
-                          <p className="text-sm text-gray-700 mt-2">{exp.description}</p>
-                        )}
+                    {editingIndex === index ? (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label htmlFor={`edit-title-${index}`}>Job Title</Label>
+                            <Input
+                              id={`edit-title-${index}`}
+                              value={editingExperience.title}
+                              onChange={(e) => setEditingExperience({ ...editingExperience, title: e.target.value })}
+                              placeholder="e.g., Senior Civil Engineer"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`edit-company-${index}`}>Company</Label>
+                            <Input
+                              id={`edit-company-${index}`}
+                              value={editingExperience.company}
+                              onChange={(e) => setEditingExperience({ ...editingExperience, company: e.target.value })}
+                              placeholder="e.g., ABC Construction Ltd"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor={`edit-duration-${index}`}>Duration</Label>
+                          <Input
+                            id={`edit-duration-${index}`}
+                            value={editingExperience.duration}
+                            onChange={(e) => setEditingExperience({ ...editingExperience, duration: e.target.value })}
+                            placeholder="e.g., Jan 2020 - Present"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`edit-description-${index}`}>Description (Optional)</Label>
+                          <Textarea
+                            id={`edit-description-${index}`}
+                            value={editingExperience.description}
+                            onChange={(e) => setEditingExperience({ ...editingExperience, description: e.target.value })}
+                            placeholder="Describe your key responsibilities and achievements..."
+                            rows={3}
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={cancelEditingExperience}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={saveEditingExperience}
+                            disabled={!editingExperience.title.trim() || !editingExperience.company.trim() || !editingExperience.duration.trim()}
+                          >
+                            Save
+                          </Button>
+                        </div>
                       </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeExperience(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    ) : (
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h4 className="font-medium">{exp.title}</h4>
+                          <p className="text-gray-600">{exp.company}</p>
+                          <p className="text-sm text-gray-500">{exp.duration}</p>
+                          {exp.description && (
+                            <p className="text-sm text-gray-700 mt-2">{exp.description}</p>
+                          )}
+                        </div>
+                        <div className="flex space-x-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => startEditingExperience(index)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeExperience(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
