@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { skillsService } from "@/services/dataService";
+import { skillsService } from "@/services/skillsService";
 import { Card, CardContent } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import SkillUpHeader from "./skillup/SkillUpHeader";

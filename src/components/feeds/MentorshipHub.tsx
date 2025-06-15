@@ -1,8 +1,7 @@
-
 import { Card, CardContent } from "../ui/card";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { mentorshipService } from "@/services/dataService";
+import { mentorshipService } from "@/services/mentorshipService";
 import { Skeleton } from "../ui/skeleton";
 import MentorshipStats from "./mentorship/MentorshipStats";
 import MentorSearchForm from "./mentorship/MentorSearchForm";

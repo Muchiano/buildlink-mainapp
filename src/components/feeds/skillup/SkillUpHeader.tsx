@@ -1,7 +1,6 @@
-
 import { Award, BookOpen } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { skillsService } from "@/services/dataService";
+import { skillsService } from "@/services/skillsService";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SkillUpHeader = () => {

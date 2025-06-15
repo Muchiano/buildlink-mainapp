@@ -1,7 +1,6 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import { mentorshipService } from "@/services/dataService";
+import { mentorshipService } from "@/services/mentorshipService";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const MentorshipStats = () => {
