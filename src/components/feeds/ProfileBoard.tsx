@@ -262,31 +262,21 @@ const ProfileBoard = () => {
         </div>
       </Card>
 
-      {/* Profile Photo Uploader at the top */}
-      <div className="flex flex-col items-center -mt-16 mb-1">
-        <AvatarUploader
-          avatarUrl={profile.avatar || ""}
-          fullName={profile.full_name}
-          uploading={uploading}
-          onAvatarChange={handleAvatarChange}
-          onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
-        />
-      </div>
-
-      {/* Profile Header */}
+      {/* Profile Header (AvatarUploader is now integrated here) */}
       <Card className="border-0 shadow-sm">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
             {/* Profile Info */}
             <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
-              {/* Profile Picture (no longer editable here) */}
+              {/* Profile Photo with AvatarUploader */}
               <div className="relative">
-                <Avatar className="h-24 w-24 border-2 border-white shadow-md">
-                  <AvatarImage src={profile.avatar} />
-                  <AvatarFallback className="text-xl">
-                    {profile.full_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
-                  </AvatarFallback>
-                </Avatar>
+                <AvatarUploader
+                  avatarUrl={profile.avatar || ""}
+                  fullName={profile.full_name}
+                  uploading={uploading}
+                  onAvatarChange={handleAvatarChange}
+                  onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
+                />
               </div>
               
               {/* Basic Info */}
