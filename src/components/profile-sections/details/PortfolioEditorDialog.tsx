@@ -1,11 +1,11 @@
 import React, { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Edit, Link2, Plus } from "lucide-react";
+import { Edit, Link2, Plus, BadgePlus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { getType } from "./getPortfolioFileType";
-import { BadgePlus } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 
 type PortfolioItem = {
   id: string;

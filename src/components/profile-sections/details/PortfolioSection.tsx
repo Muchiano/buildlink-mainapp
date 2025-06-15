@@ -108,7 +108,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
             <p className="text-gray-500 italic text-lg mb-2">No portfolio items yet</p>
             <p className="text-gray-400 mb-4 text-sm">Showcase your work, websites, or downloadable files here!</p>
             <Button
-              variant="primary"
+              variant="default"
               size="lg"
               className="gap-2 w-full max-w-xs shadow hover-scale"
               onClick={() => setEditorOpen(true)}
