@@ -9,16 +9,12 @@ import { X, Plus, Star } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService } from '@/services/dataService';
 import { useToast } from '@/hooks/use-toast';
+import { Skill, convertAndSanitizeSkills, getLevelText } from '@/lib/skillUtils';
 
 interface SkillsEditDialogProps {
   children: React.ReactNode;
   currentProfile?: any;
   onProfileUpdated?: () => void;
-}
-
-interface Skill {
-  name: string;
-  level: number;
 }
 
 const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: SkillsEditDialogProps) => {
@@ -28,37 +24,7 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
   const [isLoading, setIsLoading] = useState(false);
   
   // Convert legacy string skills and sanitize malformed skill objects
-  const convertSkills = (skills: any[]): Skill[] => {
-    if (!skills) return [];
-    return skills
-      .map(skill => {
-        if (typeof skill === 'string') {
-          return { name: skill, level: 3 };
-        }
-        if (typeof skill === 'object' && skill !== null) {
-          let name = skill.name;
-          let level = skill.level || 3;
-
-          // Check if name is a stringified JSON object
-          if (typeof name === 'string' && name.startsWith('{')) {
-            try {
-              const parsedName = JSON.parse(name);
-              if (parsedName && typeof parsedName === 'object' && parsedName.name) {
-                name = parsedName.name;
-                level = parsedName.level || level;
-              }
-            } catch (e) {
-              // Not a JSON string, do nothing, keep original name
-            }
-          }
-          return { name, level };
-        }
-        return null; // Filter out invalid entries
-      })
-      .filter((skill): skill is Skill => skill !== null && typeof skill.name === 'string');
-  };
-
-  const [skills, setSkills] = useState<Skill[]>(convertSkills(currentProfile?.skills || []));
+  const [skills, setSkills] = useState<Skill[]>(convertAndSanitizeSkills(currentProfile?.skills || []));
   const [newSkill, setNewSkill] = useState('');
   const [newSkillLevel, setNewSkillLevel] = useState<number>(3);
 
@@ -78,17 +44,6 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
     setSkills(skills.map(skill => 
       skill.name === skillName ? { ...skill, level: newLevel } : skill
     ));
-  };
-
-  const getLevelText = (level: number) => {
-    switch(level) {
-      case 1: return 'Beginner';
-      case 2: return 'Intermediate';
-      case 3: return 'Advanced';
-      case 4: return 'Expert';
-      case 5: return 'Master';
-      default: return 'Intermediate';
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,7 +79,12 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if(isOpen) {
+        setSkills(convertAndSanitizeSkills(currentProfile?.skills || []));
+      }
+      setOpen(isOpen);
+    }}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
@@ -171,7 +131,7 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
             <div className="space-y-3 max-h-80 overflow-y-auto">
               {skills.length > 0 ? (
                 skills.map((skill, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border animate-fade-in">
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-gray-900">{skill.name}</span>

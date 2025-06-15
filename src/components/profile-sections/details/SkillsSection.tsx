@@ -1,9 +1,9 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Edit } from "lucide-react";
 import SkillsEditDialog from "@/components/profile-sections/SkillsEditDialog";
+import { convertAndSanitizeSkills, getLevelText } from "@/lib/skillUtils";
 
 interface SkillsSectionProps {
   profile: any;
@@ -20,28 +20,24 @@ const SkillsSection = ({ profile, handleProfileUpdate }: SkillsSectionProps) => 
       );
     }
 
+    const sanitizedSkills = convertAndSanitizeSkills(profile.skills);
+
     return (
       <div className="space-y-4">
-        {profile.skills.map((skill: any, index: number) => {
-          let skillName = typeof skill === 'string' ? skill : skill.name;
-          let skillLevel = typeof skill === 'string' ? 3 : (skill.level || 3);
-          
-          if (typeof skillName === 'string' && skillName.startsWith('{')) {
-            try {
-              const parsedName = JSON.parse(skillName);
-              if (parsedName && typeof parsedName === 'object' && parsedName.name) {
-                skillName = parsedName.name;
-                skillLevel = parsedName.level || skillLevel;
-              }
-            } catch (e) {
-              // Not a valid JSON, do nothing
-            }
-          }
-          
+        {sanitizedSkills.map((skill, index) => {
           return (
-            <div key={index} className="flex items-center justify-between space-x-4">
-              <span className="text-gray-900 font-medium flex-1 truncate">{skillName}</span>
-              <Progress value={(skillLevel / 5) * 100} className="w-1/3 h-2" />
+            <div key={index} className="flex items-center justify-between space-x-4 animate-fade-in">
+              <span className="text-gray-900 font-medium flex-1 truncate">{skill.name}</span>
+              <div className="flex items-center space-x-1.5" title={`${skill.level}/5 - ${getLevelText(skill.level)}`}>
+                {[1, 2, 3, 4, 5].map((level) => (
+                  <div
+                    key={level}
+                    className={`w-3 h-3 rounded-full ${
+                      level <= skill.level ? 'bg-primary' : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           );
         })}
