@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,7 +76,10 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
 
     setIsLoading(true);
     try {
-      const { error } = await profileService.updateProfile(user.id, { skills });
+      // Convert skills to the format expected by the database (mixed array support)
+      const skillsData = skills as any[];
+      
+      const { error } = await profileService.updateProfile(user.id, { skills: skillsData });
 
       if (error) throw error;
 
