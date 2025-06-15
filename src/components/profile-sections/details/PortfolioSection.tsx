@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import PortfolioGallery from "./PortfolioGallery";
 import PortfolioEditorDialog from "./PortfolioEditorDialog";
@@ -23,14 +24,20 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [updating, setUpdating] = useState(false);
 
-  const portfolioList: PortfolioItem[] = Array.isArray(profile.portfolio) ? profile.portfolio : [];
+  // Local portfolio state for instant UI update
+  const [portfolioList, setPortfolioList] = useState<PortfolioItem[]>([]);
+
+  useEffect(() => {
+    setPortfolioList(Array.isArray(profile.portfolio) ? profile.portfolio : []);
+  }, [profile.portfolio]);
 
   const canEdit = true; // Assume current user is owner (customize logic here if needed)
 
-  const handleRemove = async (id: string) => {
+  // When a new portfolio item is added
+  const handlePortfolioAdd = async (item: PortfolioItem) => {
     setUpdating(true);
-    const newPortfolio = portfolioList.filter((item) => item.id !== id);
-    // Update Supabase
+    const newPortfolio = [...portfolioList, item];
+    setPortfolioList(newPortfolio);
     await supabase
       .from("profiles")
       .update({ portfolio: newPortfolio })
@@ -38,6 +45,21 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
     setUpdating(false);
     handleProfileUpdate();
   };
+
+  // When an item is removed
+  const handleRemove = async (id: string) => {
+    setUpdating(true);
+    const newPortfolio = portfolioList.filter((item) => item.id !== id);
+    setPortfolioList(newPortfolio);
+    await supabase
+      .from("profiles")
+      .update({ portfolio: newPortfolio })
+      .eq("id", profile.id);
+    setUpdating(false);
+    handleProfileUpdate();
+  };
+
+  if (!portfolioList) return null;
 
   return (
     <Card className="border-0 shadow-sm">
@@ -50,6 +72,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
             portfolioList={portfolioList}
             profileId={profile.id}
             handleProfileUpdate={handleProfileUpdate}
+            onPortfolioAdd={handlePortfolioAdd}
           />
         </div>
         {portfolioList.length === 0 ? (

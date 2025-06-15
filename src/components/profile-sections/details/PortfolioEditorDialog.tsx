@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -21,10 +20,11 @@ interface PortfolioEditorDialogProps {
   portfolioList: PortfolioItem[];
   profileId: string;
   handleProfileUpdate: () => void;
+  onPortfolioAdd?: (item: PortfolioItem) => void; // <- NEW
 }
 
 const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
-  open, setOpen, portfolioList, profileId, handleProfileUpdate
+  open, setOpen, portfolioList, profileId, handleProfileUpdate, onPortfolioAdd
 }) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState<number>(0);
@@ -80,6 +80,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
     setProgress(100); // Show completion
     setOpen(false);
     setDesc("");
+    if (onPortfolioAdd) onPortfolioAdd(item); // update parent's local state
     handleProfileUpdate();
   };
 
@@ -97,6 +98,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
     setOpen(false);
     setLinkURL("");
     setDesc("");
+    if (onPortfolioAdd) onPortfolioAdd(item); // update parent's local state
     handleProfileUpdate();
   };
 
