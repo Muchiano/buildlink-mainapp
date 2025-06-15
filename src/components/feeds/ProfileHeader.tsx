@@ -9,8 +9,8 @@ interface ProfileHeaderProps {
   profile: any;
   uploading: boolean;
   userPostsCount: number;
-  handleAvatarChange: (file: File) => void;
-  handleAvatarRemove: () => void;
+  handleAvatarChange: (file: File) => Promise<void>;
+  handleAvatarRemove: () => Promise<void>;
   handleProfileUpdate: () => void;
 }
 
