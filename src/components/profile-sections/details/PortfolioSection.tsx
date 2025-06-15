@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,18 +55,18 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
     const ext = file.name.split(".").pop();
     const filename = `${profile.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     setUploading(true);
-    setProgress(18);
+    setProgress(50); // Indicate upload started
 
     const { data, error: uploadError } = await supabase
       .storage
       .from("portfolio")
       .upload(filename, file, {
         upsert: false,
-        onUploadProgress: (evt) => setProgress(Math.round((evt.loaded / evt.total) * 90)),
       });
     if (uploadError) {
       setError("Upload failed");
       setUploading(false);
+      setProgress(0);
       return;
     }
 
@@ -84,7 +83,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
     const newPortfolio = [...portfolioList, item];
     await updatePortfolio(newPortfolio);
     setUploading(false);
-    setProgress(100);
+    setProgress(100); // Show completion
     setOpen(false);
     setDesc("");
     handleProfileUpdate();
