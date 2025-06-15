@@ -9,7 +9,8 @@ import { Upload, Camera } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService } from '@/services/dataService';
 import { useToast } from '@/hooks/use-toast';
-import AvatarCropDialog from "./profile-sections/AvatarCropDialog";
+import AvatarUploader from "./profile-sections/AvatarUploader";
+import ProfileFormFields from "./profile-sections/ProfileFormFields";
 
 interface ProfileEditFormProps {
   isOpen: boolean;
@@ -65,20 +66,8 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleAvatarFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    // Open crop dialog with preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setSelectedAvatarImage(reader.result as string);
-      setAvatarCropDialogOpen(true);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Callback from AvatarCropDialog after user crops & saves
-  const handleAvatarCropped = async (croppedFile: File) => {
+  // Replace avatar logic with in-AvatarUploader logic
+  const handleAvatarChange = async (croppedFile: File) => {
     if (!user) return;
     setUploading(true);
     try {
@@ -101,14 +90,7 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
       });
     } finally {
       setUploading(false);
-      setAvatarCropDialogOpen(false);
-      setSelectedAvatarImage(null);
     }
-  };
-
-  const handleAvatarCropCancel = () => {
-    setAvatarCropDialogOpen(false);
-    setSelectedAvatarImage(null);
   };
 
   const handleSave = async () => {
@@ -148,80 +130,18 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
 
           <div className="space-y-4">
             {/* Avatar Upload */}
-            <div className="flex flex-col items-center space-y-2">
-              <div className="relative">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={profile.avatar} />
-                  <AvatarFallback>
-                    {profile.full_name?.charAt(0) || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <label className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 cursor-pointer hover:bg-primary/90">
-                  <Camera className="h-3 w-3" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarFileSelected}
-                    className="hidden"
-                    disabled={uploading}
-                  />
-                </label>
-              </div>
-              {uploading && <p className="text-sm text-gray-500">Uploading...</p>}
-            </div>
+            <AvatarUploader
+              avatarUrl={profile.avatar}
+              fullName={profile.full_name}
+              uploading={uploading}
+              onAvatarChange={handleAvatarChange}
+            />
 
             {/* Form Fields */}
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  value={profile.full_name}
-                  onChange={(e) => handleInputChange('full_name', e.target.value)}
-                  placeholder="Enter your full name"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="profession">Profession</Label>
-                <Input
-                  id="profession"
-                  value={profile.profession}
-                  onChange={(e) => handleInputChange('profession', e.target.value)}
-                  placeholder="e.g., Civil Engineer, Architect"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="title">Job Title</Label>
-                <Input
-                  id="title"
-                  value={profile.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
-                  placeholder="e.g., Senior Engineer, Project Manager"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="organization">Organization</Label>
-                <Input
-                  id="organization"
-                  value={profile.organization}
-                  onChange={(e) => handleInputChange('organization', e.target.value)}
-                  placeholder="Company or organization name"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="education_level">Education Level</Label>
-                <Input
-                  id="education_level"
-                  value={profile.education_level}
-                  onChange={(e) => handleInputChange('education_level', e.target.value)}
-                  placeholder="e.g., Bachelor's, Master's, PhD"
-                />
-              </div>
-            </div>
+            <ProfileFormFields
+              profile={profile}
+              onChange={handleInputChange}
+            />
 
             {/* Action Buttons */}
             <div className="flex justify-end space-x-2 pt-4">
@@ -235,13 +155,6 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
           </div>
         </DialogContent>
       </Dialog>
-      <AvatarCropDialog
-        open={avatarCropDialogOpen}
-        imageSrc={selectedAvatarImage}
-        onCancel={handleAvatarCropCancel}
-        onCropSave={handleAvatarCropped}
-        loading={uploading}
-      />
     </>
   );
 };
