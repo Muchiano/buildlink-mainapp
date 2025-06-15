@@ -6,6 +6,7 @@ import { Edit, Upload, Link2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
+import PortfolioThumbnail from "./PortfolioThumbnail";
 
 type PortfolioItem = {
   id: string;
@@ -196,29 +197,12 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
             <div className="text-gray-500 italic">No portfolio items yet. Use the edit button to add.</div>
           ) : (
             portfolioList.map(item => (
-              <div key={item.id} className="flex items-center space-x-3 py-2 border-b last:border-b-0 animate-fade-in">
+              <div
+                key={item.id}
+                className="flex items-center space-x-3 py-2 border-b last:border-b-0 animate-fade-in"
+              >
                 <div className="min-w-[56px] max-w-[56px]">
-                  {item.type === "image" ? (
-                    <img src={item.url} alt={item.name} className="w-14 h-14 object-cover rounded-md border" />
-                  ) : item.type === "pdf" ? (
-                    <a href={item.url} target="_blank" rel="noopener noreferrer">
-                      <Badge className="bg-red-100 text-red-600">PDF</Badge>
-                    </a>
-                  ) : item.type === "doc" || item.type === "sheet" || item.type === "ppt" ? (
-                    <a href={item.url} target="_blank" rel="noopener noreferrer">
-                      <Badge variant="secondary">{item.type.toUpperCase()}</Badge>
-                    </a>
-                  ) : item.type === "video" ? (
-                    <video src={item.url} controls className="w-14 h-14 rounded border" />
-                  ) : item.type === "link" ? (
-                    <a href={item.url} target="_blank" rel="noopener noreferrer">
-                      <Link2 className="h-8 w-8 text-blue-500" />
-                    </a>
-                  ) : (
-                    <a href={item.url} target="_blank" rel="noopener noreferrer">
-                      <Badge variant="default">File</Badge>
-                    </a>
-                  )}
+                  <PortfolioThumbnail type={item.type} url={item.url} name={item.name} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-gray-900 truncate">{item.name}</div>
