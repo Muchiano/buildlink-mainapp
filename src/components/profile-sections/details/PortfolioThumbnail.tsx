@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Image, Images, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +11,7 @@ interface PortfolioThumbnailProps {
 const PortfolioThumbnail: React.FC<PortfolioThumbnailProps> = ({ type, url, name }) => {
   switch (type) {
     case "image":
+    case "gif":
       return (
         <a href={url} target="_blank" rel="noopener noreferrer">
           <img
@@ -19,19 +19,6 @@ const PortfolioThumbnail: React.FC<PortfolioThumbnailProps> = ({ type, url, name
             alt={name}
             className="w-14 h-14 object-cover rounded-md border"
             loading="lazy"
-          />
-        </a>
-      );
-    case "video":
-      return (
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          <video
-            src={url}
-            className="w-14 h-14 rounded border object-cover"
-            style={{ background: "#f3f4f6" }}
-            muted
-            playsInline
-            preload="metadata"
           />
         </a>
       );
