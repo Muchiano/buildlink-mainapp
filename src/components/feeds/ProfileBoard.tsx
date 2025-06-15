@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -151,7 +150,7 @@ const ProfileBoard = () => {
     }
 
     return (
-      <div className="space-y-1">
+      <div className="space-y-2">
         {profile.skills.map((skill: any, index: number) => {
           // Handle both string skills (legacy) and object skills (new format)
           const skillName = typeof skill === 'string' ? skill : skill.name;
@@ -169,9 +168,9 @@ const ProfileBoard = () => {
           };
 
           return (
-            <div key={index} className="flex items-center justify-between py-1.5 px-3 bg-gray-50 rounded border border-gray-100 hover:border-gray-200 transition-colors">
+            <div key={index} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
               <span className="text-gray-900">{skillName}</span>
-              <div className="flex items-center space-x-1">
+              <div className="flex space-x-1">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <div
                     key={level}
