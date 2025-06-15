@@ -14,10 +14,10 @@ interface ProfileAboutProps {
 const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
   return (
     <div className="space-y-6">
-      <CompactSkillsSection profile={profile} />
       <AboutSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <ExperienceSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <EducationSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
+      <CompactSkillsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <CertificationsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <InterestsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
     </div>
@@ -25,3 +25,4 @@ const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
 };
 
 export default ProfileAbout;
+
