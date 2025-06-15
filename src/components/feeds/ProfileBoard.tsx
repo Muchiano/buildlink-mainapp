@@ -3,12 +3,20 @@ import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { MapPin, Building2, Calendar, Users, Award, Camera, Edit, Plus, MessageCircle, Phone, Mail, Heart, MessageSquare, Share2, Globe, Linkedin } from "lucide-react";
+import { MapPin, Building2, Calendar, Users, Award, Camera, Edit, Plus, MessageCircle, Phone, Mail, Heart, MessageSquare, Share2, Globe, Linkedin, Briefcase, GraduationCap, Languages, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { profileService, postsService } from "@/services/dataService";
 import { useToast } from "@/hooks/use-toast";
 import ProfileEditDialog from "../ProfileEditDialog";
+import BannerEditDialog from "../profile-sections/BannerEditDialog";
+import AboutEditDialog from "../profile-sections/AboutEditDialog";
+import SkillsEditDialog from "../profile-sections/SkillsEditDialog";
+import LanguagesEditDialog from "../profile-sections/LanguagesEditDialog";
+import ExperienceEditDialog from "../profile-sections/ExperienceEditDialog";
+import EducationEditDialog from "../profile-sections/EducationEditDialog";
+import CertificationsEditDialog from "../profile-sections/CertificationsEditDialog";
+import InterestsEditDialog from "../profile-sections/InterestsEditDialog";
 
 const ProfileBoard = () => {
   const { user } = useAuth();
@@ -120,14 +128,19 @@ const ProfileBoard = () => {
       {/* Profile Banner */}
       <Card className="border-0 shadow-sm overflow-hidden">
         <div className="h-32 bg-gradient-to-r from-primary to-primary/80 relative">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm"
+          <BannerEditDialog 
+            currentProfile={profile}
+            onProfileUpdated={handleProfileUpdate}
           >
-            <Camera className="h-4 w-4 mr-1" />
-            Edit Cover
-          </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm"
+            >
+              <Camera className="h-4 w-4 mr-1" />
+              Edit Cover
+            </Button>
+          </BannerEditDialog>
         </div>
       </Card>
 
@@ -240,65 +253,212 @@ const ProfileBoard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-800">About</h2>
-                <ProfileEditDialog 
+                <AboutEditDialog 
                   currentProfile={profile}
                   onProfileUpdated={handleProfileUpdate}
                 >
                   <Button variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
-                </ProfileEditDialog>
+                </AboutEditDialog>
               </div>
               <p className="text-gray-700 leading-relaxed">
-                {profile.profession && profile.organization 
-                  ? `${profile.profession} at ${profile.organization}` 
-                  : profile.profession || 'No professional information available yet. Click edit to add your details.'}
+                {profile.bio || 'No bio available yet. Click edit to add your professional summary.'}
               </p>
             </CardContent>
           </Card>
 
-          {/* Professional Information */}
+          {/* Skills & Specialization */}
           <Card className="border-0 shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Professional Information</h2>
-                <ProfileEditDialog 
+                <h2 className="text-lg font-semibold text-gray-800">Skills & Specialization</h2>
+                <SkillsEditDialog 
                   currentProfile={profile}
                   onProfileUpdated={handleProfileUpdate}
                 >
                   <Button variant="ghost" size="sm">
                     <Edit className="h-4 w-4" />
                   </Button>
-                </ProfileEditDialog>
+                </SkillsEditDialog>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {profile.skills?.length > 0 ? (
+                  profile.skills.map((skill: string, index: number) => (
+                    <Badge key={index} variant="secondary">{skill}</Badge>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No skills added yet. Click edit to add your skills.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Languages */}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">Languages</h2>
+                <LanguagesEditDialog 
+                  currentProfile={profile}
+                  onProfileUpdated={handleProfileUpdate}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </LanguagesEditDialog>
+              </div>
+              <div className="space-y-2">
+                {profile.languages?.length > 0 ? (
+                  profile.languages.map((lang: any, index: number) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <Languages className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium">{lang.name}</span>
+                      <Badge variant="outline">{lang.proficiency}</Badge>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No languages added yet. Click edit to add languages you speak.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Professional Experience */}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">Professional Experience</h2>
+                <ExperienceEditDialog 
+                  currentProfile={profile}
+                  onProfileUpdated={handleProfileUpdate}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </ExperienceEditDialog>
               </div>
               <div className="space-y-4">
-                <div className="flex space-x-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Building2 className="h-6 w-6 text-gray-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900">
-                      {profile.title || 'Job Title'}
-                    </h3>
-                    <p className="text-gray-600">
-                      {profile.organization || 'No organization specified'}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {profile.profession || 'No profession specified'}
-                    </p>
-                  </div>
-                </div>
-                
-                {profile.education_level && (
-                  <div className="flex space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <Award className="h-6 w-6 text-gray-600" />
+                {profile.experiences?.length > 0 ? (
+                  profile.experiences.map((exp: any, index: number) => (
+                    <div key={index} className="flex space-x-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <Briefcase className="h-6 w-6 text-gray-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900">{exp.title}</h3>
+                        <p className="text-gray-600">{exp.company}</p>
+                        <p className="text-sm text-gray-500">{exp.duration}</p>
+                        {exp.description && (
+                          <p className="text-sm text-gray-700 mt-2">{exp.description}</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900">Education</h3>
-                      <p className="text-gray-600">{profile.education_level}</p>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No experience added yet. Click edit to add your work experience.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Education & Training */}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">Education & Training</h2>
+                <EducationEditDialog 
+                  currentProfile={profile}
+                  onProfileUpdated={handleProfileUpdate}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </EducationEditDialog>
+              </div>
+              <div className="space-y-4">
+                {profile.education?.length > 0 ? (
+                  profile.education.map((edu: any, index: number) => (
+                    <div key={index} className="flex space-x-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <GraduationCap className="h-6 w-6 text-gray-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900">{edu.degree}</h3>
+                        <p className="text-gray-600">{edu.institution}</p>
+                        <p className="text-sm text-gray-500">{edu.year}</p>
+                        {edu.description && (
+                          <p className="text-sm text-gray-700 mt-2">{edu.description}</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No education added yet. Click edit to add your educational background.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Certifications */}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">Certifications</h2>
+                <CertificationsEditDialog 
+                  currentProfile={profile}
+                  onProfileUpdated={handleProfileUpdate}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </CertificationsEditDialog>
+              </div>
+              <div className="space-y-4">
+                {profile.certifications?.length > 0 ? (
+                  profile.certifications.map((cert: any, index: number) => (
+                    <div key={index} className="flex space-x-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <Award className="h-6 w-6 text-gray-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900">{cert.name}</h3>
+                        <p className="text-gray-600">{cert.issuer}</p>
+                        <p className="text-sm text-gray-500">{cert.date}</p>
+                        {cert.credential_id && (
+                          <p className="text-xs text-gray-500">Credential ID: {cert.credential_id}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No certifications added yet. Click edit to add your certifications.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Interests */}
+          <Card className="border-0 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800">Interests</h2>
+                <InterestsEditDialog 
+                  currentProfile={profile}
+                  onProfileUpdated={handleProfileUpdate}
+                >
+                  <Button variant="ghost" size="sm">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </InterestsEditDialog>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {profile.interests?.length > 0 ? (
+                  profile.interests.map((interest: string, index: number) => (
+                    <Badge key={index} variant="outline">{interest}</Badge>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No interests added yet. Click edit to add your interests.</p>
                 )}
               </div>
             </CardContent>
