@@ -2,7 +2,7 @@ import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { MapPin, Building2, Calendar, Users, Award, Camera, Edit, Plus, MessageCircle, Phone, Mail, Heart, MessageSquare, Share2, Globe, Linkedin, Briefcase, GraduationCap, Languages, BookOpen } from "lucide-react";
+import { MapPin, Building2, Calendar, Users, Award, Camera, Edit, Plus, MessageCircle, Phone, Mail, Heart, MessageSquare, Share2, Globe, Linkedin, Briefcase, GraduationCap, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { profileService, postsService } from "@/services/dataService";
@@ -11,7 +11,6 @@ import ProfileEditDialog from "../ProfileEditDialog";
 import BannerEditDialog from "../profile-sections/BannerEditDialog";
 import AboutEditDialog from "../profile-sections/AboutEditDialog";
 import SkillsEditDialog from "../profile-sections/SkillsEditDialog";
-import LanguagesEditDialog from "../profile-sections/LanguagesEditDialog";
 import ExperienceEditDialog from "../profile-sections/ExperienceEditDialog";
 import EducationEditDialog from "../profile-sections/EducationEditDialog";
 import CertificationsEditDialog from "../profile-sections/CertificationsEditDialog";
@@ -356,36 +355,6 @@ const ProfileBoard = () => {
                 </SkillsEditDialog>
               </div>
               {renderSkillsContent()}
-            </CardContent>
-          </Card>
-
-          {/* Languages */}
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Languages</h2>
-                <LanguagesEditDialog 
-                  currentProfile={profile}
-                  onProfileUpdated={handleProfileUpdate}
-                >
-                  <Button variant="ghost" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </LanguagesEditDialog>
-              </div>
-              <div className="space-y-2">
-                {profile.languages?.length > 0 ? (
-                  profile.languages.map((lang: any, index: number) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <Languages className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">{lang.name}</span>
-                      <Badge variant="outline">{lang.proficiency}</Badge>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No languages added yet. Click edit to add languages you speak.</p>
-                )}
-              </div>
             </CardContent>
           </Card>
 
