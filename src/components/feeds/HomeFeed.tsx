@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Heart, MessageCircle, Share, Repeat2, Bookmark, MoreHorizontal, Search, Edit3, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,7 @@ interface HomeFeedProps {
 const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [postInteractions, setPostInteractions] = useState<{[key: string]: {liked: boolean, bookmarked: boolean, reposted: boolean}}>({});
@@ -187,8 +186,8 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
     }
   };
 
-  const handleUserClick = (user: any) => {
-    setSelectedUser(user);
+  const handleUserClick = (userProfile: any) => {
+    setSelectedUserId(userProfile?.id);
   };
 
   const handleCreatePost = () => {
@@ -407,10 +406,10 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       </div>
 
       {/* Dialogs */}
-      {selectedUser && (
+      {selectedUserId && (
         <UserProfile 
-          user={selectedUser} 
-          onClose={() => setSelectedUser(null)} 
+          userId={selectedUserId} 
+          onClose={() => setSelectedUserId(null)} 
         />
       )}
 
