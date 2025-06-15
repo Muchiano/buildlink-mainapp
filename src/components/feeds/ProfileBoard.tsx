@@ -160,23 +160,12 @@ const ProfileBoard = () => {
             return `${(level / 5) * 100}%`;
           };
 
-          const getProgressColor = (level: number) => {
-            switch(level) {
-              case 1: return 'bg-gray-400';
-              case 2: return 'bg-blue-400';
-              case 3: return 'bg-green-400';
-              case 4: return 'bg-orange-400';
-              case 5: return 'bg-red-400';
-              default: return 'bg-green-400';
-            }
-          };
-
           return (
             <div key={index} className="space-y-2">
               <span className="text-gray-900 font-medium">{skillName}</span>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(skillLevel)}`}
+                  className="h-2 rounded-full transition-all duration-300 bg-primary"
                   style={{ width: getProgressWidth(skillLevel) }}
                 />
               </div>
