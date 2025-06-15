@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -10,6 +9,7 @@ import EducationEditDialog from "../profile-sections/EducationEditDialog";
 import CertificationsEditDialog from "../profile-sections/CertificationsEditDialog";
 import InterestsEditDialog from "../profile-sections/InterestsEditDialog";
 import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
 
 interface ProfileAboutProps {
   profile: any;
@@ -63,22 +63,15 @@ const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
     }
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-4">
         {profile.skills.map((skill: any, index: number) => {
           const skillName = typeof skill === 'string' ? skill : skill.name;
           const skillLevel = typeof skill === 'string' ? 3 : (skill.level || 3);
-          const getProgressWidth = (level: number) => {
-            return `${(level / 5) * 100}%`;
-          };
+          
           return (
-            <div key={index} className="space-y-2">
-              <span className="text-gray-900 font-medium">{skillName}</span>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="h-2 rounded-full transition-all duration-300 bg-primary"
-                  style={{ width: getProgressWidth(skillLevel) }}
-                />
-              </div>
+            <div key={index} className="flex items-center justify-between space-x-4">
+              <span className="text-gray-900 font-medium flex-1 truncate">{skillName}</span>
+              <Progress value={(skillLevel / 5) * 100} className="w-1/3 h-2" />
             </div>
           );
         })}
