@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -28,13 +28,22 @@ const ExperienceEditDialog = ({ children, currentProfile, onProfileUpdated }: Ex
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [experiences, setExperiences] = useState<Experience[]>(currentProfile?.experiences || []);
+  
+  // Initialize experiences from currentProfile
+  const [experiences, setExperiences] = useState<Experience[]>([]);
   const [newExperience, setNewExperience] = useState<Experience>({
     title: '',
     company: '',
     duration: '',
     description: ''
   });
+
+  // Update experiences when dialog opens or currentProfile changes
+  React.useEffect(() => {
+    if (open && currentProfile?.experiences) {
+      setExperiences(currentProfile.experiences || []);
+    }
+  }, [open, currentProfile]);
 
   const addExperience = () => {
     if (newExperience.title.trim() && newExperience.company.trim() && newExperience.duration.trim()) {
@@ -53,7 +62,11 @@ const ExperienceEditDialog = ({ children, currentProfile, onProfileUpdated }: Ex
 
     setIsLoading(true);
     try {
-      const { error } = await profileService.updateProfile(user.id, { experiences });
+      console.log('Updating experiences:', experiences);
+      
+      const { error } = await profileService.updateProfile(user.id, { 
+        experiences: experiences 
+      });
 
       if (error) throw error;
 
