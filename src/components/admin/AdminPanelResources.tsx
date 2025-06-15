@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -223,7 +222,7 @@ const AdminPanelResources = () => {
                   Cancel
                 </Button>
               )}
-              <Button type="submit" loading={upsertMutation.isPending}>
+              <Button type="submit">
                 {isNew ? "Create Resource" : "Update Resource"}
               </Button>
             </div>
