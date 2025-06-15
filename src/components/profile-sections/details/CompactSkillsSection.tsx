@@ -23,7 +23,6 @@ const CompactSkillsSection = ({
   handleProfileUpdate,
 }: CompactSkillsSectionProps) => {
   const skills = convertAndSanitizeSkills(profile?.skills || []);
-  const [open, setOpen] = React.useState(false);
 
   return (
     <Card className="border-0 shadow-sm">
@@ -32,12 +31,7 @@ const CompactSkillsSection = ({
           <h2 className="text-base font-semibold text-gray-800">Skills</h2>
           <SkillsEditDialog
             currentProfile={profile}
-            onProfileUpdated={() => {
-              setOpen(false);
-              handleProfileUpdate?.();
-            }}
-            open={open}
-            onOpenChange={setOpen}
+            onProfileUpdated={handleProfileUpdate}
           >
             <Button
               variant="ghost"
