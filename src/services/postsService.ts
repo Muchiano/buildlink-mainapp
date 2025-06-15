@@ -40,19 +40,22 @@ export const postsService = {
     image_url?: string;
     user_id: string;
   }) {
+    const insertObj: any = {
+      author_id: post.user_id,
+      content: post.content,
+      location: post.category,
+      likes_count: 0,
+      comments_count: 0,
+      reposts_count: 0,
+    };
+    if (post.image_url) {
+      insertObj.image_url = post.image_url;
+    }
     const { data, error } = await supabase
       .from('posts')
-      .insert({
-        author_id: post.user_id,
-        content: post.content,
-        location: post.category,
-        likes_count: 0,
-        comments_count: 0,
-        reposts_count: 0
-      })
+      .insert(insertObj)
       .select()
       .single();
-    
     console.log('Create post result:', { data, error });
     return { data, error };
   },

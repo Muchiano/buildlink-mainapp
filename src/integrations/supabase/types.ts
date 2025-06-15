@@ -100,6 +100,36 @@ export type Database = {
           },
         ]
       }
+      direct_messages: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          read: boolean | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          read?: boolean | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          read?: boolean | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       mentor_expertise: {
         Row: {
           created_at: string | null

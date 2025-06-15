@@ -1,19 +1,26 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Camera, FileText, Briefcase, Users, MapPin } from "lucide-react";
-import { useState } from "react";
+import { Camera, FileText, Briefcase, Users, MapPin, X } from "lucide-react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { postsService } from '@/services/postsService';
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+// Add support for uploading a single image per post for MVP
 
 const PostCreate = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [postType, setPostType] = useState("update");
   const [content, setContent] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const postTypes = [
     { id: "update", label: "Share Update", icon: FileText, description: "Share project milestones, insights, or industry thoughts" },
@@ -21,6 +28,20 @@ const PostCreate = () => {
     { id: "project", label: "Showcase Project", icon: Camera, description: "Display your latest work and achievements" },
     { id: "collaboration", label: "Seek Collaboration", icon: Users, description: "Find partners for projects or business ventures" }
   ];
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = async () => {
     if (!user || !content.trim()) {
@@ -33,11 +54,36 @@ const PostCreate = () => {
     }
 
     setIsLoading(true);
+
     try {
+      let image_url: string | undefined;
+      if (imageFile) {
+        // upload image to Supabase Storage
+        const fileExt = imageFile.name.split('.').pop();
+        const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage
+          .from('post-media')
+          .upload(filePath, imageFile, { upsert: false });
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          toast({
+            title: "Upload Failed",
+            description: "Could not upload image. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        image_url = `${supabase.storageUrl}/object/public/post-media/${filePath}`;
+      }
+
       const { error } = await postsService.createPost({
         content,
         category: postType,
-        user_id: user.id
+        user_id: user.id,
+        image_url,
       });
 
       if (error) {
@@ -51,6 +97,9 @@ const PostCreate = () => {
 
       setContent("");
       setPostType("update");
+      setImageFile(null);
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
       console.error('Error creating post:', error);
       toast({
@@ -146,20 +195,51 @@ const PostCreate = () => {
             onChange={(e) => setContent(e.target.value)}
             className="min-h-[120px] resize-none border-0 text-base p-0"
           />
+          {/* Image Preview */}
+          {imagePreview && (
+            <div className="relative my-4 w-full max-w-xs">
+              <img src={imagePreview} className="w-full h-40 rounded-md object-cover border" alt="Preview" />
+              <button
+                type="button"
+                aria-label="Remove image"
+                className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-100"
+                onClick={handleRemoveImage}
+              >
+                <X className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+          )}
 
           {/* Media Upload Options */}
           <div className="flex items-center space-x-4 mt-4 pt-4 border-t">
-            <Button variant="ghost" size="sm" className="text-gray-600">
-              <Camera className="h-4 w-4 mr-2" />
-              Add Photos
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-600"
+              asChild
+              onClick={() => {
+                if (fileInputRef.current) fileInputRef.current.click();
+              }}
+            >
+              <span>
+                <Camera className="h-4 w-4 mr-2" />
+                Add Photos
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </span>
             </Button>
-            <Button variant="ghost" size="sm" className="text-gray-600">
+            <Button variant="ghost" size="sm" className="text-gray-600" disabled>
               <FileText className="h-4 w-4 mr-2" />
-              Add Document
+              Add Document (soon)
             </Button>
-            <Button variant="ghost" size="sm" className="text-gray-600">
+            <Button variant="ghost" size="sm" className="text-gray-600" disabled>
               <MapPin className="h-4 w-4 mr-2" />
-              Add Location
+              Add Location (soon)
             </Button>
           </div>
 
@@ -223,3 +303,4 @@ const PostCreate = () => {
 };
 
 export default PostCreate;
+
