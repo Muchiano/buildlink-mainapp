@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AdminResourcesPage from "@/pages/AdminResources";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +29,8 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            {/* Admin Panel route (only accessible if isAdmin) */}
+            <Route path="/admin-resources" element={<AdminResourcesPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
