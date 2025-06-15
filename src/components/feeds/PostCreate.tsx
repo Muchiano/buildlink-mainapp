@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
@@ -77,13 +76,12 @@ const PostCreate = () => {
           return;
         }
 
-        // <-- FIX: get public URL the right way
-        const { data: publicUrlData, error: publicUrlError } = supabase
+        // <-- FIX: use getPublicUrl correctly (it does not return an error property)
+        const { data: publicUrlData } = supabase
           .storage
           .from('post-media')
           .getPublicUrl(filePath);
-        if (publicUrlError) {
-          console.error('GetPublicUrl error:', publicUrlError);
+        if (!publicUrlData?.publicUrl) {
           toast({
             title: "Image URL Error",
             description: "Could not get image URL. Please try again.",
@@ -92,7 +90,7 @@ const PostCreate = () => {
           setIsLoading(false);
           return;
         }
-        image_url = publicUrlData?.publicUrl;
+        image_url = publicUrlData.publicUrl;
         // End FIX
       }
 
@@ -320,4 +318,3 @@ const PostCreate = () => {
 };
 
 export default PostCreate;
-
