@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Camera } from "lucide-react";
+import { Camera, X } from "lucide-react";
 import AvatarCropDialog from "./AvatarCropDialog";
 
 interface AvatarUploaderProps {
@@ -9,6 +9,7 @@ interface AvatarUploaderProps {
   fullName: string;
   uploading: boolean;
   onAvatarChange: (file: File) => Promise<void>;
+  onAvatarRemove?: () => Promise<void>;
 }
 
 const AvatarUploader: React.FC<AvatarUploaderProps> = ({
@@ -16,6 +17,7 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
   fullName,
   uploading,
   onAvatarChange,
+  onAvatarRemove,
 }) => {
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -42,6 +44,12 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
     setSelectedImage(null);
   };
 
+  const handleRemovePhoto = async () => {
+    if (onAvatarRemove) {
+      await onAvatarRemove();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center space-y-2">
       <div className="relative">
@@ -59,6 +67,20 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
             disabled={uploading}
           />
         </label>
+        {/* Remove Photo button */}
+        {avatarUrl && onAvatarRemove && (
+          <button
+            type="button"
+            className="absolute top-0 right-0 bg-destructive text-white rounded-full p-1 hover:bg-destructive/80 transition"
+            style={{ transform: 'translate(50%,-50%)' }}
+            onClick={handleRemovePhoto}
+            disabled={uploading}
+            aria-label="Remove profile photo"
+            title="Remove profile photo"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        )}
       </div>
       {uploading && <p className="text-sm text-gray-500">Uploading...</p>}
       <AvatarCropDialog

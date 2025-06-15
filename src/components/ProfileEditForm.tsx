@@ -1,11 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Upload, Camera } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { profileService } from '@/services/dataService';
 import { useToast } from '@/hooks/use-toast';
@@ -31,22 +27,19 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
     education_level: '',
     avatar: ''
   });
-  const [avatarCropDialogOpen, setAvatarCropDialogOpen] = useState(false);
-  const [selectedAvatarImage, setSelectedAvatarImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && user) {
       loadProfile();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, user]);
 
   const loadProfile = async () => {
     if (!user) return;
-    
     try {
       const { data, error } = await profileService.getProfile(user.id);
       if (error) throw error;
-      
       if (data) {
         setProfile({
           full_name: data.full_name || '',
@@ -73,7 +66,6 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
     try {
       const { data, error } = await profileService.uploadAvatar(user.id, croppedFile);
       if (error) throw error;
-
       if (data) {
         setProfile(prev => ({ ...prev, avatar: data.avatar || "" }));
         toast({
@@ -93,19 +85,42 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
     }
   };
 
+  // Handle profile photo removal
+  const handleAvatarRemove = async () => {
+    if (!user) return;
+    setUploading(true);
+    try {
+      // Remove avatar by setting it to empty string in backend
+      const updatedProfile = { ...profile, avatar: "" };
+      const { error } = await profileService.updateProfile(user.id, updatedProfile);
+      if (error) throw error;
+      setProfile(updatedProfile);
+      toast({
+        title: "Photo removed",
+        description: "Your profile photo has been removed.",
+      });
+    } catch (error) {
+      console.error("Error removing avatar:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove profile photo",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!user) return;
-    
     setLoading(true);
     try {
       const { error } = await profileService.updateProfile(user.id, profile);
       if (error) throw error;
-      
       toast({
         title: 'Success',
         description: 'Profile updated successfully!'
       });
-      
       onSave();
       onClose();
     } catch (error) {
@@ -135,6 +150,7 @@ const ProfileEditForm = ({ isOpen, onClose, onSave }: ProfileEditFormProps) => {
               fullName={profile.full_name}
               uploading={uploading}
               onAvatarChange={handleAvatarChange}
+              onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
             />
 
             {/* Form Fields */}
