@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { postsService } from "@/services/dataService";
+import { postsService, profileService } from "@/services/dataService";
 import { useToast } from "@/hooks/use-toast";
 import UserProfile from "@/components/UserProfile";
 import CreatePostDialog from "@/components/CreatePostDialog";
@@ -14,6 +14,8 @@ import EnhancedSearchDialog from "@/components/EnhancedSearchDialog";
 import ProfileEditForm from "@/components/ProfileEditForm";
 import NotificationsList from "@/components/NotificationsList";
 import EmptyState from "@/components/EmptyStates";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "../ui/skeleton";
 
 interface HomeFeedProps {
   activeFilter: string;
@@ -31,6 +33,11 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
   const [searchDialog, setSearchDialog] = useState(false);
   const [profileEditDialog, setProfileEditDialog] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const { data: statsData, isLoading: isLoadingStats } = useQuery({
+    queryKey: ['profileStats'],
+    queryFn: profileService.getStats
+  });
 
   const stats = [
     { label: "Professionals", value: "12,547" },
@@ -207,12 +214,18 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
             Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
           </p>
           <div className="grid grid-cols-2 gap-4">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <div className="text-sm text-primary-foreground/80">{stat.label}</div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                {isLoadingStats ? <Skeleton className="h-8 w-24 mx-auto bg-white/20" /> : statsData?.data?.professionalsCount ?? '0'}
               </div>
-            ))}
+              <div className="text-sm text-primary-foreground/80">Professionals</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">
+                {isLoadingStats ? <Skeleton className="h-8 w-24 mx-auto bg-white/20" /> : statsData?.data?.companiesCount ?? '0'}
+              </div>
+              <div className="text-sm text-primary-foreground/80">Companies</div>
+            </div>
           </div>
         </div>
         
@@ -264,12 +277,18 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
           )}
         </div>
         <div className="grid grid-cols-2 gap-4">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center">
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <div className="text-sm text-primary-foreground/80">{stat.label}</div>
+           <div className="text-center">
+            <div className="text-2xl font-bold">
+              {isLoadingStats ? <Skeleton className="h-8 w-24 mx-auto bg-white/20" /> : statsData?.data?.professionalsCount ?? '0'}
             </div>
-          ))}
+            <div className="text-sm text-primary-foreground/80">Professionals</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold">
+              {isLoadingStats ? <Skeleton className="h-8 w-24 mx-auto bg-white/20" /> : statsData?.data?.companiesCount ?? '0'}
+            </div>
+            <div className="text-sm text-primary-foreground/80">Companies</div>
+          </div>
         </div>
       </div>
 

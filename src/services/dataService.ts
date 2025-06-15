@@ -289,6 +289,25 @@ export const profileService = {
     });
 
     return { data, error };
+  },
+
+  async getStats() {
+    const { count: professionalsCount, error: professionalsError } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
+
+    const { data: companies, error: companiesError } = await supabase
+      .from('profiles')
+      .select('organization');
+
+    if (professionalsError || companiesError) {
+        return { data: null, error: professionalsError || companiesError };
+    }
+
+    const uniqueCompanies = new Set(companies.map(p => p.organization).filter(Boolean));
+    const companiesCount = uniqueCompanies.size;
+    
+    return { data: { professionalsCount, companiesCount }, error: null };
   }
 };
 
@@ -388,6 +407,22 @@ export const mentorshipService = {
       .single();
     
     return { data, error };
+  },
+
+  async getStats() {
+    const { count: mentorsCount, error: mentorsError } = await supabase
+      .from('mentor_profiles')
+      .select('*', { count: 'exact', head: true });
+    
+    const { count: menteesMatchedCount, error: menteesError } = await supabase
+      .from('mentorship_sessions')
+      .select('*', { count: 'exact', head: true });
+
+    if (mentorsError || menteesError) {
+      return { data: null, error: mentorsError || menteesError };
+    }
+    
+    return { data: { mentorsCount, menteesMatchedCount }, error: null };
   }
 };
 
@@ -413,5 +448,18 @@ export const skillsService = {
     
     const { data, error } = await query;
     return { data, error };
+  },
+
+  async getStats() {
+    const { count: coursesCount, error: coursesError } = await supabase
+      .from('skill_resources')
+      .select('*', { count: 'exact', head: true })
+      .eq('type', 'course');
+    
+    if (coursesError) {
+      return { data: null, error: coursesError };
+    }
+
+    return { data: { coursesCount }, error: null };
   },
 };
