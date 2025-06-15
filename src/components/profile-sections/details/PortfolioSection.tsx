@@ -1,9 +1,9 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import PortfolioGallery from "./PortfolioGallery";
 import PortfolioEditorDialog from "./PortfolioEditorDialog";
 import PortfolioThumbnails from "./PortfolioThumbnails";
+import { supabase } from "@/integrations/supabase/client";
 
 type PortfolioItem = {
   id: string;
@@ -21,8 +21,23 @@ interface PortfolioSectionProps {
 const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProfileUpdate }) => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
   const portfolioList: PortfolioItem[] = Array.isArray(profile.portfolio) ? profile.portfolio : [];
+
+  const canEdit = true; // Assume current user is owner (customize logic here if needed)
+
+  const handleRemove = async (id: string) => {
+    setUpdating(true);
+    const newPortfolio = portfolioList.filter((item) => item.id !== id);
+    // Update Supabase
+    await supabase
+      .from("profiles")
+      .update({ portfolio: newPortfolio })
+      .eq("id", profile.id);
+    setUpdating(false);
+    handleProfileUpdate();
+  };
 
   return (
     <Card className="border-0 shadow-sm">
@@ -50,7 +65,10 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
           open={galleryOpen}
           setOpen={setGalleryOpen}
           portfolio={portfolioList}
+          canEdit={canEdit}
+          onRemove={handleRemove}
         />
+        {updating && <div className="text-xs text-gray-400 mt-2">Updating...</div>}
       </CardContent>
     </Card>
   );
