@@ -1,0 +1,18 @@
+
+{
+  "short_name": "BuildLink KE",
+  "name": "BuildLink Kenya - Professional Network",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#B91C1C",
+  "theme_color": "#B91C1C",
+  "orientation": "portrait"
+}

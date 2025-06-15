@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminResourcesPage from "@/pages/AdminResources";
+import AdminAnalyticsPage from "@/pages/AdminAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             />
             {/* Admin Panel route (only accessible if isAdmin) */}
             <Route path="/admin-resources" element={<AdminResourcesPage />} />
+            <Route path="/admin-analytics" element={<AdminAnalyticsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

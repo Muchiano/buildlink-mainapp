@@ -86,7 +86,12 @@ const Index = () => {
         </div>
       </SidebarProvider>
       {isAdmin && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50 flex gap-2">
+          <a href="/admin-analytics">
+            <button className="bg-secondary text-primary px-4 py-2 rounded shadow-md hover:bg-secondary/80 transition">
+              Analytics
+            </button>
+          </a>
           <a href="/admin-resources">
             <button className="bg-primary text-white px-4 py-2 rounded shadow-md hover:bg-primary/80 transition">
               Admin Panel
