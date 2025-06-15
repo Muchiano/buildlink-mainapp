@@ -31,6 +31,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [portfolioList, setPortfolioList] = useState<PortfolioItem[]>([]);
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -123,8 +124,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
           <div>
             <PortfolioThumbnails
               portfolioList={portfolioList}
-              onMainThumbnailClick={() => setGalleryOpen(true)}
-              onBrowseAllClick={() => setGalleryOpen(true)}
+              onThumbnailClick={(index) => {
+                setActiveGalleryIndex(index);
+                setGalleryOpen(true);
+              }}
+              onBrowseAllClick={() => {
+                setActiveGalleryIndex(0);
+                setGalleryOpen(true);
+              }}
               updating={updating}
             />
           </div>
@@ -133,8 +140,10 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
           open={galleryOpen}
           setOpen={setGalleryOpen}
           portfolio={portfolioList}
+          activeIndex={activeGalleryIndex}
+          setActiveIndex={setActiveGalleryIndex}
           canEdit={canEdit}
-          onRemove={updating ? undefined : handleRemove}
+          onRemove={handleRemove}
           updating={updating}
         />
         <PortfolioEditorDialog
