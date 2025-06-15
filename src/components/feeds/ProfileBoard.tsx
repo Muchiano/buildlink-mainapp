@@ -150,13 +150,17 @@ const ProfileBoard = () => {
     }
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-3">
         {profile.skills.map((skill: any, index: number) => {
           // Handle both string skills (legacy) and object skills (new format)
           const skillName = typeof skill === 'string' ? skill : skill.name;
-          const skillLevel = typeof skill === 'string' ? 3 : (skill.level || 3); // Default to intermediate
+          const skillLevel = typeof skill === 'string' ? 3 : (skill.level || 3);
           
-          const getLevelColor = (level: number) => {
+          const getProgressWidth = (level: number) => {
+            return `${(level / 5) * 100}%`;
+          };
+
+          const getProgressColor = (level: number) => {
             switch(level) {
               case 1: return 'bg-gray-400';
               case 2: return 'bg-blue-400';
@@ -168,17 +172,13 @@ const ProfileBoard = () => {
           };
 
           return (
-            <div key={index} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
-              <span className="text-gray-900">{skillName}</span>
-              <div className="flex space-x-1">
-                {[1, 2, 3, 4, 5].map((level) => (
-                  <div
-                    key={level}
-                    className={`w-2 h-2 rounded-full ${
-                      level <= skillLevel ? getLevelColor(skillLevel) : 'bg-gray-200'
-                    }`}
-                  />
-                ))}
+            <div key={index} className="space-y-2">
+              <span className="text-gray-900 font-medium">{skillName}</span>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(skillLevel)}`}
+                  style={{ width: getProgressWidth(skillLevel) }}
+                />
               </div>
             </div>
           );
