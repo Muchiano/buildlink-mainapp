@@ -1,18 +1,18 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit, Upload, Link2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import PortfolioThumbnail from "./PortfolioThumbnail";
+import PortfolioGallery from "./PortfolioGallery";
 
 type PortfolioItem = {
   id: string;
   name: string;
   url: string;
-  type: string; // e.g. 'image', 'pdf', 'doc', 'video', 'link'
+  type: string;
   description?: string;
 };
 
@@ -42,10 +42,16 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
   const [linkURL, setLinkURL] = useState("");
   const [desc, setDesc] = useState("");
   const [progress, setProgress] = useState<number>(0);
-  const fileInput = useRef<HTMLInputElement | null>(null);
+  const fileInput = React.useRef<HTMLInputElement | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const portfolioList: PortfolioItem[] =
+    Array.isArray(profile.portfolio) ? profile.portfolio : [];
 
-  const portfolioList: PortfolioItem[] = Array.isArray(profile.portfolio) ? profile.portfolio : [];
+  // Grouped for main + two mini thumbnails
+  const mainItem = portfolioList[0];
+  const miniItems = portfolioList.slice(1, 3);
+  const remainingItems = portfolioList.slice(3);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -122,12 +128,11 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
       .eq("id", profile.id);
   };
 
-  // Main renderer
   return (
     <Card className="border-0 shadow-sm">
       <CardContent className="px-6 py-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-800">Portfolio / Projects</h2>
+          <h2 className="text-base font-semibold text-gray-800">Portfolio</h2>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="px-2">
@@ -192,31 +197,66 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({ profile, handleProf
             </DialogContent>
           </Dialog>
         </div>
-        <div className="space-y-4">
-          {portfolioList.length === 0 ? (
-            <div className="text-gray-500 italic">No portfolio items yet. Use the edit button to add.</div>
-          ) : (
-            portfolioList.map(item => (
-              <div
-                key={item.id}
-                className="flex items-center space-x-3 py-2 border-b last:border-b-0 animate-fade-in"
-              >
-                <div className="min-w-[56px] max-w-[56px]">
-                  <PortfolioThumbnail type={item.type} url={item.url} name={item.name} />
+
+        {portfolioList.length === 0 ? (
+          <div className="text-gray-500 italic">No portfolio items yet. Use the edit button to add.</div>
+        ) : (
+          <div>
+            <div className="flex gap-4">
+              {/* Main Thumbnail */}
+              {mainItem && (
+                <div className="flex flex-col items-center w-32">
+                  <div className="w-32 h-40 relative rounded-lg overflow-hidden border shadow cursor-pointer group"
+                    onClick={() => setGalleryOpen(true)}
+                  >
+                    <PortfolioThumbnail
+                      type={mainItem.type}
+                      url={mainItem.url}
+                      name={mainItem.name}
+                    />
+                    {/* Caption over image */}
+                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/50 to-transparent px-2 py-1">
+                      <span className="text-xs text-white font-semibold">{mainItem.name}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-900 truncate">{item.name}</div>
-                  {item.description && (
-                    <div className="text-xs text-gray-600 truncate">{item.description}</div>
-                  )}
-                </div>
-                <Button size="icon" variant="ghost" onClick={() => handleRemove(item.id)} title="Remove">
-                  ✕
-                </Button>
+              )}
+              {/* Two Mini Thumbnails stacked */}
+              <div className="flex flex-col gap-3">
+                {miniItems.map(item => (
+                  <div
+                    key={item.id}
+                    className="w-32 h-19 rounded-lg overflow-hidden border shadow relative cursor-pointer group"
+                    style={{ height: "84px", width: "84px" }}
+                    onClick={() => setGalleryOpen(true)}
+                  >
+                    <PortfolioThumbnail
+                      type={item.type}
+                      url={item.url}
+                      name={item.name}
+                    />
+                    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/55 to-transparent px-1 py-0.5">
+                      <span className="text-xs text-white">{item.name}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))
-          )}
-        </div>
+            </div>
+
+            {/* Browse All Button */}
+            <div className="mt-4">
+              <Button variant="outline" size="sm" onClick={() => setGalleryOpen(true)}>
+                Browse All Projects
+              </Button>
+            </div>
+          </div>
+        )}
+        {/* The gallery modal itself */}
+        <PortfolioGallery
+          open={galleryOpen}
+          setOpen={setGalleryOpen}
+          portfolio={portfolioList}
+        />
       </CardContent>
     </Card>
   );

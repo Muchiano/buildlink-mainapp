@@ -1,4 +1,6 @@
 
+import ProfileBanner from "./ProfileBanner";
+import ProfileHeader from "./ProfileHeader";
 import AboutSection from "../profile-sections/details/AboutSection";
 import PortfolioSection from "../profile-sections/details/PortfolioSection";
 import ExperienceSection from "../profile-sections/details/ExperienceSection";
@@ -15,11 +17,20 @@ interface ProfileAboutProps {
 const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
   return (
     <div className="space-y-6">
+      <ProfileBanner profile={profile} onProfileUpdated={handleProfileUpdate} />
+      <ProfileHeader 
+        profile={profile}
+        uploading={false}
+        userPostsCount={0}
+        handleAvatarChange={() => Promise.resolve()}
+        handleAvatarRemove={() => Promise.resolve()}
+        handleProfileUpdate={handleProfileUpdate}
+      />
       <AboutSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <PortfolioSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
+      <ExperienceSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <EducationSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <CompactSkillsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      <ExperienceSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <CertificationsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <InterestsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
     </div>
