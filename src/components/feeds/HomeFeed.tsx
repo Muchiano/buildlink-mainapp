@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { Heart, MessageCircle, Share, Repeat2, Bookmark, MoreHorizontal } from "lucide-react";
+import { Heart, MessageCircle, Share, Repeat2, Bookmark, MoreHorizontal, Search, Edit3, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,10 @@ import UserProfile from "@/components/UserProfile";
 import CreatePostDialog from "@/components/CreatePostDialog";
 import CommentsDialog from "@/components/CommentsDialog";
 import RepostDialog from "@/components/RepostDialog";
+import EnhancedSearchDialog from "@/components/EnhancedSearchDialog";
+import ProfileEditForm from "@/components/ProfileEditForm";
+import NotificationsList from "@/components/NotificationsList";
+import EmptyState from "@/components/EmptyStates";
 
 interface HomeFeedProps {
   activeFilter: string;
@@ -24,6 +29,9 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
   const [postInteractions, setPostInteractions] = useState<{[key: string]: {liked: boolean, bookmarked: boolean, reposted: boolean}}>({});
   const [commentsDialog, setCommentsDialog] = useState<{isOpen: boolean, postId: string}>({isOpen: false, postId: ''});
   const [repostDialog, setRepostDialog] = useState<{isOpen: boolean, post: any}>({isOpen: false, post: null});
+  const [searchDialog, setSearchDialog] = useState(false);
+  const [profileEditDialog, setProfileEditDialog] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const stats = [
     { label: "Professionals", value: "12,547" },
@@ -32,7 +40,10 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
 
   useEffect(() => {
     loadPosts();
-  }, [activeFilter]);
+    if (user) {
+      loadUserInteractions();
+    }
+  }, [activeFilter, user]);
 
   const loadPosts = async () => {
     try {
@@ -55,6 +66,29 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadUserInteractions = async () => {
+    if (!user || posts.length === 0) return;
+
+    const interactions: {[key: string]: {liked: boolean, bookmarked: boolean, reposted: boolean}} = {};
+    
+    for (const post of posts) {
+      try {
+        const { data } = await postsService.getUserInteractions(post.id, user.id);
+        const userInteractions = data || [];
+        
+        interactions[post.id] = {
+          liked: userInteractions.some(i => i.type === 'like'),
+          bookmarked: userInteractions.some(i => i.type === 'bookmark'),
+          reposted: userInteractions.some(i => i.type === 'repost')
+        };
+      } catch (error) {
+        console.error('Error loading interactions for post', post.id, error);
+      }
+    }
+    
+    setPostInteractions(interactions);
   };
 
   const handleLike = async (postId: string) => {
@@ -86,6 +120,18 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
           liked: action === 'liked'
         }
       }));
+
+      // Update post count in the posts array
+      setPosts(prev => prev.map(post => 
+        post.id === postId 
+          ? { 
+              ...post, 
+              likes_count: action === 'liked' 
+                ? (post.likes_count || 0) + 1 
+                : Math.max(0, (post.likes_count || 0) - 1)
+            }
+          : post
+      ));
 
       toast({
         title: "Success",
@@ -145,6 +191,14 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
     setSelectedUser(user);
   };
 
+  const handleCreatePost = () => {
+    loadPosts();
+  };
+
+  const handleRepostComplete = () => {
+    loadPosts();
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -174,10 +228,42 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
     <div className="space-y-6">
       {/* Stats Banner */}
       <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-6 text-white">
-        <h2 className="text-2xl font-bold mb-4">Welcome to BuildLink Kenya</h2>
-        <p className="text-primary-foreground/90 mb-6">
-          Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
-        </p>
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Welcome to BuildLink Kenya</h2>
+            <p className="text-primary-foreground/90">
+              Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
+            </p>
+          </div>
+          {user && (
+            <div className="flex space-x-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setSearchDialog(true)}
+                className="text-white hover:bg-white/20"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="text-white hover:bg-white/20"
+              >
+                <Bell className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setProfileEditDialog(true)}
+                className="text-white hover:bg-white/20"
+              >
+                <Edit3 className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
         <div className="grid grid-cols-2 gap-4">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
@@ -188,10 +274,17 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
         </div>
       </div>
 
+      {/* Notifications Panel */}
+      {showNotifications && user && (
+        <div className="bg-white rounded-lg border p-6">
+          <NotificationsList />
+        </div>
+      )}
+
       {/* Create Post Section */}
       {user && (
         <div className="bg-white rounded-lg border p-4">
-          <CreatePostDialog onPostCreated={loadPosts} />
+          <CreatePostDialog onPostCreated={handleCreatePost} />
         </div>
       )}
 
@@ -272,7 +365,7 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
                       className={`flex items-center space-x-2 ${interactions.liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-500`}
                     >
                       <Heart className={`h-5 w-5 ${interactions.liked ? 'fill-current' : ''}`} />
-                      <span>Like</span>
+                      <span>{post.likes_count || 0}</span>
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -281,7 +374,7 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
                       className="flex items-center space-x-2 text-gray-500 hover:text-primary"
                     >
                       <MessageCircle className="h-5 w-5" />
-                      <span>Comment</span>
+                      <span>{post.comments_count || 0}</span>
                     </Button>
                     <Button 
                       variant="ghost" 
@@ -290,7 +383,7 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
                       className={`flex items-center space-x-2 ${interactions.reposted ? 'text-green-500' : 'text-gray-500'} hover:text-green-500`}
                     >
                       <Repeat2 className="h-5 w-5" />
-                      <span>Repost</span>
+                      <span>{post.reposts_count || 0}</span>
                     </Button>
                   </div>
                   <Button 
@@ -306,15 +399,14 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
             );
           })
         ) : (
-          <div className="bg-white rounded-lg border p-8 text-center">
-            <p className="text-gray-500">
-              {user ? "No posts found. Be the first to share something!" : "Sign in to see posts from the community."}
-            </p>
-          </div>
+          <EmptyState 
+            type="posts" 
+            onAction={user ? handleCreatePost : undefined}
+          />
         )}
       </div>
 
-      {/* User Profile Modal */}
+      {/* Dialogs */}
       {selectedUser && (
         <UserProfile 
           user={selectedUser} 
@@ -322,19 +414,34 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
         />
       )}
 
-      {/* Comments Dialog */}
       <CommentsDialog
         isOpen={commentsDialog.isOpen}
         onClose={() => setCommentsDialog({isOpen: false, postId: ''})}
         postId={commentsDialog.postId}
       />
 
-      {/* Repost Dialog */}
       <RepostDialog
         isOpen={repostDialog.isOpen}
         onClose={() => setRepostDialog({isOpen: false, post: null})}
         post={repostDialog.post}
-        onRepost={loadPosts}
+        onRepost={handleRepostComplete}
+      />
+
+      <EnhancedSearchDialog
+        isOpen={searchDialog}
+        onClose={() => setSearchDialog(false)}
+      />
+
+      <ProfileEditForm
+        isOpen={profileEditDialog}
+        onClose={() => setProfileEditDialog(false)}
+        onSave={() => {
+          // Refresh user data if needed
+          toast({
+            title: 'Profile Updated',
+            description: 'Your profile has been successfully updated!'
+          });
+        }}
       />
     </div>
   );

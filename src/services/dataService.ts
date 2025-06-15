@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 // Posts Service
@@ -8,8 +9,9 @@ export const postsService = {
       .select(`
         *,
         profiles!posts_author_id_fkey(*),
-        comments(count),
-        reposts(count)
+        likes_count,
+        comments_count,
+        reposts_count
       `);
     
     if (category && category !== 'all' && category !== 'latest') {
@@ -26,7 +28,7 @@ export const postsService = {
     if (sortBy === 'latest') {
       query = query.order('created_at', { ascending: false });
     } else if (sortBy === 'popular') {
-      query = query.order('created_at', { ascending: false }); // Fallback to latest for now
+      query = query.order('likes_count', { ascending: false });
     }
     
     const { data, error } = await query;
@@ -46,7 +48,10 @@ export const postsService = {
       .insert({
         author_id: post.user_id,
         content: post.content,
-        location: post.category
+        location: post.category,
+        likes_count: 0,
+        comments_count: 0,
+        reposts_count: 0
       })
       .select()
       .single();
@@ -83,6 +88,16 @@ export const postsService = {
         .single();
       return { data, error, action: 'liked' };
     }
+  },
+
+  async getUserInteractions(postId: string, userId: string) {
+    const { data, error } = await supabase
+      .from('post_interactions')
+      .select('type')
+      .eq('post_id', postId)
+      .eq('user_id', userId);
+    
+    return { data, error };
   },
 
   async getComments(postId: string) {
@@ -189,7 +204,10 @@ export const searchService = {
       .from('posts')
       .select(`
         *,
-        profiles!posts_author_id_fkey(*)
+        profiles!posts_author_id_fkey(*),
+        likes_count,
+        comments_count,
+        reposts_count
       `)
       .ilike('content', `%${query}%`)
       .order('created_at', { ascending: false });

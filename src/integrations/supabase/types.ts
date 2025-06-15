@@ -491,28 +491,37 @@ export type Database = {
       posts: {
         Row: {
           author_id: string
+          comments_count: number | null
           content: string
           created_at: string | null
           id: string
+          likes_count: number | null
           location: string | null
+          reposts_count: number | null
           updated_at: string | null
           visibility: string
         }
         Insert: {
           author_id: string
+          comments_count?: number | null
           content: string
           created_at?: string | null
           id?: string
+          likes_count?: number | null
           location?: string | null
+          reposts_count?: number | null
           updated_at?: string | null
           visibility?: string
         }
         Update: {
           author_id?: string
+          comments_count?: number | null
           content?: string
           created_at?: string | null
           id?: string
+          likes_count?: number | null
           location?: string | null
+          reposts_count?: number | null
           updated_at?: string | null
           visibility?: string
         }
