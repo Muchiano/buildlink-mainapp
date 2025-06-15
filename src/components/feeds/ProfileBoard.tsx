@@ -150,57 +150,36 @@ const ProfileBoard = () => {
     }
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {profile.skills.map((skill: any, index: number) => {
           // Handle both string skills (legacy) and object skills (new format)
           const skillName = typeof skill === 'string' ? skill : skill.name;
           const skillLevel = typeof skill === 'string' ? 3 : (skill.level || 3); // Default to intermediate
           
-          const getLevelText = (level: number) => {
-            switch(level) {
-              case 1: return 'Beginner';
-              case 2: return 'Intermediate';
-              case 3: return 'Advanced';
-              case 4: return 'Expert';
-              case 5: return 'Master';
-              default: return 'Intermediate';
-            }
-          };
-
           const getLevelColor = (level: number) => {
             switch(level) {
-              case 1: return 'bg-gray-200';
-              case 2: return 'bg-blue-200';
-              case 3: return 'bg-green-200';
-              case 4: return 'bg-orange-200';
-              case 5: return 'bg-red-200';
-              default: return 'bg-green-200';
+              case 1: return 'bg-gray-400';
+              case 2: return 'bg-blue-400';
+              case 3: return 'bg-green-400';
+              case 4: return 'bg-orange-400';
+              case 5: return 'bg-red-400';
+              default: return 'bg-green-400';
             }
           };
 
           return (
-            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
-              <div className="flex-1">
-                <h4 className="font-medium text-gray-900 mb-1">{skillName}</h4>
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <div
-                        key={star}
-                        className={`w-3 h-3 rounded-full ${
-                          star <= skillLevel ? getLevelColor(skillLevel) : 'bg-gray-200'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm font-medium text-gray-600">
-                    {getLevelText(skillLevel)}
-                  </span>
-                </div>
+            <div key={index} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-md border border-gray-100 hover:border-gray-200 transition-colors">
+              <span className="font-medium text-gray-900">{skillName}</span>
+              <div className="flex items-center space-x-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <div
+                    key={star}
+                    className={`w-2.5 h-2.5 rounded-full ${
+                      star <= skillLevel ? getLevelColor(skillLevel) : 'bg-gray-200'
+                    }`}
+                  />
+                ))}
               </div>
-              <Badge variant="outline" className="ml-4">
-                {skillLevel}/5
-              </Badge>
             </div>
           );
         })}
