@@ -262,9 +262,17 @@ const ProfileBoard = () => {
                   </Button>
                 </AboutEditDialog>
               </div>
-              <p className="text-gray-700 leading-relaxed">
-                {profile.bio || 'No bio available yet. Click edit to add your professional summary.'}
-              </p>
+              <div className="prose prose-gray max-w-none">
+                {profile.bio ? (
+                  <div className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
+                    {profile.bio}
+                  </div>
+                ) : (
+                  <div className="text-gray-500 italic">
+                    No professional summary available yet. Click edit to add your story and let others know about your journey, expertise, and career aspirations.
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
