@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "../ui/card";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -52,11 +53,11 @@ const MentorshipHub = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-3 gap-4">
+      <div className="space-y-6 w-full max-w-full px-2 sm:px-4 overflow-x-hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Skeleton className="h-20" />
-          <Skeleton className="h-20" />
-          <Skeleton className="h-20" />
+          <Skeleton className="h-20 hidden sm:block" />
+          <Skeleton className="h-20 hidden sm:block" />
         </div>
         <Skeleton className="h-48" />
         <Skeleton className="h-64" />
@@ -66,16 +67,18 @@ const MentorshipHub = () => {
 
   if (error) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-red-500 text-center">Could not load mentors. Please try again later.</p>
-        </CardContent>
-      </Card>
+      <div className="w-full max-w-full px-2 sm:px-4 overflow-x-hidden">
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-red-500 text-center">Could not load mentors. Please try again later.</p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full px-2 sm:px-4 overflow-x-hidden">
       <MentorshipStats />
 
       <MentorSearchForm 
@@ -104,3 +107,4 @@ const MentorshipHub = () => {
 };
 
 export default MentorshipHub;
+
