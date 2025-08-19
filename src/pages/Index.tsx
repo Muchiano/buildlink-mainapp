@@ -10,16 +10,17 @@ import MentorshipHub from "@/components/feeds/MentorshipHub";
 import PostCreate from "@/components/feeds/PostCreate";
 import SkillUpFeed from "@/components/feeds/SkillUpFeed";
 import ProfileBoard from "@/components/feeds/ProfileBoard";
+import DashboardRouter from "@/components/dashboards/DashboardRouter";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [activeFilter, setActiveFilter] = useState("latest");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isAdmin } = useIsAdmin();
 
   const handleLogoClick = () => {
-    setActiveTab("home");
+    setActiveTab("dashboard");
     setActiveFilter("latest");
   };
 
@@ -29,18 +30,36 @@ const Index = () => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "dashboard":
+        return <DashboardRouter />;
       case "home":
         return <HomeFeed activeFilter={activeFilter} />;
       case "mentorship":
+      case "job-search":
+      case "recruitment":
+      case "thought-leadership":
+      case "networking":
+      case "alumni-network":
         return <MentorshipHub />;
       case "post":
         return <PostCreate />;
       case "skillup":
+      case "courses":
+      case "skill-development":
+      case "employee-development":
         return <SkillUpFeed activeFilter={activeFilter} />;
       case "profile":
+      case "branding":
         return <ProfileBoard />;
+      case "study-groups":
+      case "assignments":
+      case "analytics":
+        return <div className="text-center py-12">
+          <h3 className="text-lg font-semibold mb-2">Coming Soon</h3>
+          <p className="text-muted-foreground">This feature is under development</p>
+        </div>;
       default:
-        return <HomeFeed activeFilter={activeFilter} />;
+        return <DashboardRouter />;
     }
   };
 

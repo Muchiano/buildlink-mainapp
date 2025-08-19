@@ -1,5 +1,5 @@
 
-import { Home, Users, Plus, BookOpen, User } from "lucide-react";
+import { useUserTypeNavigation } from "@/components/navigation/UserTypeNavigation";
 import {
   Sidebar,
   SidebarContent,
@@ -16,33 +16,7 @@ interface AppSidebarProps {
 }
 
 const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
-  const items = [
-    {
-      id: "home",
-      title: "Home Feed",
-      icon: Home,
-    },
-    {
-      id: "mentorship",
-      title: "Mentorship Hub",
-      icon: Users,
-    },
-    {
-      id: "post",
-      title: "Post/Create",
-      icon: Plus,
-    },
-    {
-      id: "skillup",
-      title: "Skill Up",
-      icon: BookOpen,
-    },
-    {
-      id: "profile",
-      title: "Profile Board",
-      icon: User,
-    },
-  ];
+  const { navigationItems } = useUserTypeNavigation();
 
   return (
     <Sidebar>
@@ -50,7 +24,7 @@ const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.id)}
