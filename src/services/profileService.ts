@@ -26,6 +26,10 @@ export const profileService = {
     certifications?: any[];
     interests?: string[];
     banner?: string;
+    social_links?: Record<string, string>;
+    verification_badges?: any[];
+    profile_visibility?: string;
+    profile_completion_score?: number;
   }) {
     const { data, error } = await supabase
       .from('profiles')

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { profileService } from "@/services/profileService";
+import { publicProfileService } from "@/services/publicProfileService";
 import { postsService } from "@/services/postsService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -45,6 +46,10 @@ export const useProfile = () => {
 
   const handleProfileUpdate = () => {
     loadUserData();
+    // Update profile completion score
+    if (user) {
+      publicProfileService.updateProfileCompletion(user.id);
+    }
     toast({
       title: 'Success',
       description: 'Profile updated successfully!'
