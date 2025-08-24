@@ -9,7 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import PostTypeSelector from "./PostTypeSelector";
 import UserAvatarHeader from "./UserAvatarHeader";
 import { useAuth } from "@/contexts/AuthContext";
-import { postsService } from '@/services/postsService';
+import { postsService } from "@/services/postsService";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,19 +26,22 @@ const PostCreate = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isMobile = useIsMobile();
 
-  // Memoize handlers to avoid unnecessary re-renders.
-  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-  }, []);
+  // Memorize handlers to avoid unnecessary re-renders.
+  const handleImageChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
+      }
+    },
+    []
+  );
 
   const handleRemoveImage = useCallback(() => {
     setImageFile(null);
     setImagePreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -46,7 +49,7 @@ const PostCreate = () => {
       toast({
         title: "Error",
         description: "Please write something before posting",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -57,15 +60,14 @@ const PostCreate = () => {
       let image_url: string | undefined;
       if (imageFile) {
         // upload image to Supabase Storage
-        const fileExt = imageFile.name.split('.').pop();
+        const fileExt = imageFile.name.split(".").pop();
         const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
-        const { data: uploadData, error: uploadError } = await supabase
-          .storage
-          .from('post-media')
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("post-media")
           .upload(filePath, imageFile, { upsert: false });
 
         if (uploadError) {
-          console.error('Upload error:', uploadError);
+          console.error("Upload error:", uploadError);
           toast({
             title: "Upload Failed",
             description: "Could not upload image. Please try again.",
@@ -75,9 +77,8 @@ const PostCreate = () => {
           return;
         }
 
-        const { data: publicUrlData } = supabase
-          .storage
-          .from('post-media')
+        const { data: publicUrlData } = supabase.storage
+          .from("post-media")
           .getPublicUrl(filePath);
         if (!publicUrlData?.publicUrl) {
           toast({
@@ -104,20 +105,20 @@ const PostCreate = () => {
 
       toast({
         title: "Success",
-        description: "Your post has been created successfully!"
+        description: "Your post has been created successfully!",
       });
 
       setContent("");
       setPostType("update");
       setImageFile(null);
       setImagePreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error("Error creating post:", error);
       toast({
         title: "Error",
         description: "Failed to create post. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -141,13 +142,15 @@ const PostCreate = () => {
       <PostTypeSelector postType={postType} setPostType={setPostType} />
 
       {/* Content Creation */}
-      <Card className={cn("border-0 shadow-sm", isMobile ? "rounded-none" : "")}>
+      <Card
+        className={cn("border-0 shadow-sm", isMobile ? "rounded-none" : "")}
+      >
         <CardContent className={cn(isMobile ? "p-2" : "p-4")}>
           <UserAvatarHeader user={user} />
 
           <Textarea
             placeholder={
-              postType === "job" 
+              postType === "job"
                 ? "Describe the job opportunity, requirements, and how to apply..."
                 : postType === "project"
                 ? "Tell us about your project - what you built, challenges faced, and key learnings..."
@@ -164,11 +167,17 @@ const PostCreate = () => {
           />
           {/* Image Preview */}
           {imagePreview && (
-            <div className={cn(
-              "relative my-4 w-full max-w-xs",
-              isMobile && "mx-auto"
-            )}>
-              <img src={imagePreview} className="w-full h-40 rounded-md object-cover border" alt="Preview" />
+            <div
+              className={cn(
+                "relative my-4 w-full max-w-xs",
+                isMobile && "mx-auto"
+              )}
+            >
+              <img
+                src={imagePreview}
+                className="w-full h-40 rounded-md object-cover border"
+                alt="Preview"
+              />
               <button
                 type="button"
                 aria-label="Remove image"
@@ -181,7 +190,12 @@ const PostCreate = () => {
           )}
 
           {/* Media Upload Options */}
-          <div className={cn("flex items-center space-x-4 mt-4 pt-4 border-t", isMobile && "flex-wrap space-x-2")}>
+          <div
+            className={cn(
+              "flex items-center space-x-4 mt-4 pt-4 border-t",
+              isMobile && "flex-wrap space-x-2"
+            )}
+          >
             <Button
               variant="ghost"
               size={isMobile ? "sm" : "sm"}
@@ -203,66 +217,127 @@ const PostCreate = () => {
                 />
               </span>
             </Button>
-            <Button variant="ghost" size={isMobile ? "sm" : "sm"} className="text-gray-600" disabled>
+            <Button
+              variant="ghost"
+              size={isMobile ? "sm" : "sm"}
+              className="text-gray-600"
+              disabled
+            >
               <FileText className="h-4 w-4 mr-2" />
-              <span className={isMobile ? "sr-only" : ""}>Add Document (soon)</span>
+              <span className={isMobile ? "sr-only" : ""}>
+                Add Document (soon)
+              </span>
             </Button>
-            <Button variant="ghost" size={isMobile ? "sm" : "sm"} className="text-gray-600" disabled>
+            <Button
+              variant="ghost"
+              size={isMobile ? "sm" : "sm"}
+              className="text-gray-600"
+              disabled
+            >
               <MapPin className="h-4 w-4 mr-2" />
-              <span className={isMobile ? "sr-only" : ""}>Add Location (soon)</span>
+              <span className={isMobile ? "sr-only" : ""}>
+                Add Location (soon)
+              </span>
             </Button>
           </div>
 
           <div className={cn("flex justify-end mt-4", isMobile && "mt-2")}>
-            <Button 
-              className={cn("bg-primary hover:bg-primary-800", isMobile && "w-full py-3 text-base")}
+            <Button
+              className={cn(
+                "bg-primary hover:bg-primary-800",
+                isMobile && "w-full py-3 text-base"
+              )}
               disabled={!content.trim() || isLoading}
               onClick={handleSubmit}
             >
-              {isLoading ? 'Posting...' : 
-              postType === "job" ? "Post Job" : 
-              postType === "project" ? "Share Project" :
-              postType === "collaboration" ? "Seek Collaboration" : "Share Update"}
+              {isLoading
+                ? "Posting..."
+                : postType === "job"
+                ? "Post Job"
+                : postType === "project"
+                ? "Share Project"
+                : postType === "collaboration"
+                ? "Seek Collaboration"
+                : "Share Update"}
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Quick Templates */}
-      <Card className={cn("border-0 shadow-sm", isMobile ? "rounded-none" : "")}>
+      <Card
+        className={cn("border-0 shadow-sm", isMobile ? "rounded-none" : "")}
+      >
         <CardHeader>
-          <CardTitle className={cn("text-lg text-gray-800", isMobile ? "text-base" : "")}>Quick Templates</CardTitle>
+          <CardTitle
+            className={cn("text-lg text-gray-800", isMobile ? "text-base" : "")}
+          >
+            Quick Templates
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className={cn("w-full justify-start text-left p-3 h-auto", isMobile ? "text-sm p-2" : "")}
-              onClick={() => setContent("🎉 Excited to announce that our team just completed [Project Name]! The project involved [brief description]. Key learnings include [insights]. #ProjectComplete #BuildingKenya")}
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start text-left p-3 h-auto",
+                isMobile ? "text-sm p-2" : ""
+              )}
+              onClick={() =>
+                setContent(
+                  "🎉 Excited to announce that our team just completed [Project Name]! The project involved [brief description]. Key learnings include [insights]. #ProjectComplete #BuildingKenya"
+                )
+              }
             >
               <div>
-                <div className={cn("font-medium", isMobile ? "text-base" : "")}>Project Completion</div>
-                <div className="text-sm text-gray-600">Announce a finished project</div>
+                <div className={cn("font-medium", isMobile ? "text-base" : "")}>
+                  Project Completion
+                </div>
+                <div className="text-sm text-gray-600">
+                  Announce a finished project
+                </div>
               </div>
             </Button>
-            <Button 
-              variant="ghost" 
-              className={cn("w-full justify-start text-left p-3 h-auto", isMobile ? "text-sm p-2" : "")}
-              onClick={() => setContent("💡 Industry Insight: After working on [project type] for [duration], I've learned that [key insight]. This could help fellow professionals because [explanation]. What's your experience? #IndustryInsights")}
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start text-left p-3 h-auto",
+                isMobile ? "text-sm p-2" : ""
+              )}
+              onClick={() =>
+                setContent(
+                  "💡 Industry Insight: After working on [project type] for [duration], I've learned that [key insight]. This could help fellow professionals because [explanation]. What's your experience? #IndustryInsights"
+                )
+              }
             >
               <div>
-                <div className={cn("font-medium", isMobile ? "text-base" : "")}>Industry Insight</div>
-                <div className="text-sm text-gray-600">Share professional knowledge</div>
+                <div className={cn("font-medium", isMobile ? "text-base" : "")}>
+                  Industry Insight
+                </div>
+                <div className="text-sm text-gray-600">
+                  Share professional knowledge
+                </div>
               </div>
             </Button>
-            <Button 
-              variant="ghost" 
-              className={cn("w-full justify-start text-left p-3 h-auto", isMobile ? "text-sm p-2" : "")}
-              onClick={() => setContent("📢 We're hiring! Looking for a [position] to join our team at [company]. Requirements: [key requirements]. Interested candidates can [how to apply]. #JobOpening #Hiring")}
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start text-left p-3 h-auto",
+                isMobile ? "text-sm p-2" : ""
+              )}
+              onClick={() =>
+                setContent(
+                  "📢 We're hiring! Looking for a [position] to join our team at [company]. Requirements: [key requirements]. Interested candidates can [how to apply]. #JobOpening #Hiring"
+                )
+              }
             >
               <div>
-                <div className={cn("font-medium", isMobile ? "text-base" : "")}>Job Opening</div>
-                <div className="text-sm text-gray-600">Quick job post template</div>
+                <div className={cn("font-medium", isMobile ? "text-base" : "")}>
+                  Job Opening
+                </div>
+                <div className="text-sm text-gray-600">
+                  Quick job post template
+                </div>
               </div>
             </Button>
           </div>
