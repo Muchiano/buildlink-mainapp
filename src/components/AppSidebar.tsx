@@ -1,4 +1,3 @@
-
 import { Home, Users, Plus, BookOpen, User } from "lucide-react";
 import {
   Sidebar,
@@ -22,11 +21,11 @@ const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
       title: "Home Feed",
       icon: Home,
     },
-    {
-      id: "mentorship",
-      title: "Mentorship Hub",
-      icon: Users,
-    },
+    // {
+    //   id: "mentorship",
+    //   title: "Mentorship Hub",
+    //   icon: Users,
+    // },
     {
       id: "post",
       title: "Post/Create",
