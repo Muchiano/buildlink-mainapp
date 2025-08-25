@@ -1,16 +1,18 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
 
 export const mentorshipService = {
   async getMentors() {
     const { data, error } = await supabase
-      .from('mentor_profiles')
-      .select(`
+      .from("mentor_profiles")
+      .select(
+        `
         *,
         profiles!mentor_profiles_user_id_fkey(*),
         mentor_expertise(skill)
-      `)
-      .order('rating', { ascending: false });
-    
+      `
+      )
+      .order("rating", { ascending: false });
+
     return { data, error };
   },
 
@@ -22,11 +24,11 @@ export const mentorshipService = {
     availability?: string[];
   }) {
     const { data, error } = await supabase
-      .from('mentor_profiles')
+      .from("mentor_profiles")
       .insert(mentorData)
       .select()
       .single();
-    
+
     return { data, error };
   },
 
@@ -38,27 +40,27 @@ export const mentorshipService = {
     message: string;
   }) {
     const { data, error } = await supabase
-      .from('mentorship_requests')
+      .from("mentorship_requests")
       .insert(sessionData)
       .select()
       .single();
-    
+
     return { data, error };
   },
 
   async getStats() {
     const { count: mentorsCount, error: mentorsError } = await supabase
-      .from('mentor_profiles')
-      .select('*', { count: 'exact', head: true });
-    
+      .from("mentor_profiles")
+      .select("*", { count: "exact", head: true });
+
     const { count: menteesMatchedCount, error: menteesError } = await supabase
-      .from('mentorship_sessions')
-      .select('*', { count: 'exact', head: true });
+      .from("mentorship_sessions")
+      .select("*", { count: "exact", head: true });
 
     if (mentorsError || menteesError) {
       return { data: null, error: mentorsError || menteesError };
     }
-    
+
     return { data: { mentorsCount, menteesMatchedCount }, error: null };
-  }
+  },
 };
