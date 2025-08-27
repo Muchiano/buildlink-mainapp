@@ -1,10 +1,12 @@
 
-import { Bell, Menu, Search } from "lucide-react";
+import { Bell, Menu, Search, BarChart3, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
 import UserProfileButton from "@/components/UserProfileButton";
 import SearchDialog from "@/components/SearchDialog";
 import NotificationsDropdown from "@/components/NotificationsDropdown";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 interface TopBarProps {
   onLogoClick: () => void;
@@ -12,6 +14,8 @@ interface TopBarProps {
 }
 
 const TopBar = ({ onLogoClick, onMenuClick }: TopBarProps) => {
+  const { isAdmin } = useIsAdmin();
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center justify-between px-4 max-w-6xl mx-auto">
@@ -52,6 +56,20 @@ const TopBar = ({ onLogoClick, onMenuClick }: TopBarProps) => {
               <Search className="h-5 w-5" />
             </Button>
           </SearchDialog>
+          {isAdmin && (
+            <>
+              <Link to="/admin-analytics">
+                <Button variant="ghost" size="icon" title="Analytics">
+                  <BarChart3 className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/admin-resources">
+                <Button variant="ghost" size="icon" title="Admin Panel">
+                  <Settings className="h-5 w-5" />
+                </Button>
+              </Link>
+            </>
+          )}
           <NotificationsDropdown />
           <UserProfileButton />
         </div>

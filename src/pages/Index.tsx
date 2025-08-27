@@ -10,13 +10,13 @@ import MentorshipHub from "@/components/feeds/MentorshipHub";
 import PostCreate from "@/components/feeds/PostCreate";
 import SkillUpFeed from "@/components/feeds/SkillUpFeed";
 import ProfileBoard from "@/components/feeds/ProfileBoard";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [activeFilter, setActiveFilter] = useState("latest");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { isAdmin } = useIsAdmin();
+  
 
   const handleLogoClick = () => {
     setActiveTab("home");
@@ -85,20 +85,6 @@ const Index = () => {
           </div>
         </div>
       </SidebarProvider>
-      {isAdmin && (
-        <div className="fixed top-4 right-4 z-50 flex gap-2">
-          <a href="/admin-analytics">
-            <button className="bg-secondary text-primary px-4 py-2 rounded shadow-md hover:bg-secondary/80 transition">
-              Analytics
-            </button>
-          </a>
-          <a href="/admin-resources">
-            <button className="bg-primary text-white px-4 py-2 rounded shadow-md hover:bg-primary/80 transition">
-              Admin Panel
-            </button>
-          </a>
-        </div>
-      )}
     </div>
   );
 };
