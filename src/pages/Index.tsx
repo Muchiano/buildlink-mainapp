@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import TopBar from "@/components/TopBar";
 import AppSidebar from "@/components/AppSidebar";
 import BottomNavigation from "@/components/BottomNavigation";
@@ -11,12 +10,10 @@ import PostCreate from "@/components/feeds/PostCreate";
 import SkillUpFeed from "@/components/feeds/SkillUpFeed";
 import ProfileBoard from "@/components/feeds/ProfileBoard";
 
-
 const Index = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [activeFilter, setActiveFilter] = useState("latest");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
 
   const handleLogoClick = () => {
     setActiveTab("home");
@@ -47,44 +44,43 @@ const Index = () => {
   const shouldShowFilters = activeTab === "home" || activeTab === "skillup";
 
   return (
-    <div>
-      <SidebarProvider>
-        <div className="min-h-screen bg-gray-50 flex w-full">
-          {/* Sidebar */}
-          <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="w-full">
+      <div className="min-h-screen bg-gray-50 flex w-full">
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Top Navigation */}
+          <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
 
-          {/* Main Content Area */}
-          <div className="flex-1 flex flex-col min-w-0">
-            {/* Top Navigation */}
-            <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
-            
-            {/* Content Filters */}
-            {shouldShowFilters && (
-              <ContentFilters
-                activeFilter={activeFilter}
-                onFilterChange={setActiveFilter}
-                filterType={activeTab}
-              />
-            )}
-            
-            {/* Main Content */}
-            <main className={cn(
-              "flex-1 px-4 max-w-4xl mx-auto w-full",
-              shouldShowFilters ? "pt-4" : "pt-6",
-              "pb-20 md:pb-8"
+          {/* Main Content */}
+          <main
+            className={cn(
+              "grid grid-cols-12 h-screen px-4 pb-20 md:pb-8 w-full max-w-screen-xl mx-auto",
+              shouldShowFilters ? "" : ""
             )}>
-              <div className="animate-fade-in">
-                {renderContent()}
-              </div>
-            </main>
-          </div>
+            {/* Sidebar */}
+            <div className="col-span-3 bg-white border-r">
+              <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+            </div>
 
-          {/* Bottom Navigation - Mobile Only */}
-          <div className="md:hidden">
-            <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-          </div>
+            <div className="col-span-6 col-start-4">
+              {/* Content Filters */}
+              {shouldShowFilters && (
+                <ContentFilters
+                  activeFilter={activeFilter}
+                  onFilterChange={setActiveFilter}
+                  filterType={activeTab}
+                />
+              )}
+              <div className="animate-fade-in">{renderContent()}</div>
+            </div>
+          </main>
         </div>
-      </SidebarProvider>
+
+        {/* Bottom Navigation - Mobile Only */}
+        <div className="md:hidden">
+          <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
+      </div>
     </div>
   );
 };

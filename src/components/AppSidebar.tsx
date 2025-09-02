@@ -1,13 +1,6 @@
+import React from "react";
 import { Home, Users, Plus, BookOpen, User } from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 interface AppSidebarProps {
   activeTab: string;
@@ -21,11 +14,6 @@ const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
       title: "Home Feed",
       icon: Home,
     },
-    // {
-    //   id: "mentorship",
-    //   title: "Mentorship Hub",
-    //   icon: Users,
-    // },
     {
       id: "post",
       title: "Post/Create",
@@ -44,27 +32,33 @@ const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
   ];
 
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    onClick={() => onTabChange(item.id)}
-                    isActive={activeTab === item.id}
-                  >
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <div className="fixed top-0 h-full pt-14 z-10">
+      <div className="flex flex-col p-4">
+        <nav className="space-y-2">
+          {items.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            
+            return (
+              <button
+                key={item.id}
+                onClick={() => onTabChange(item.id)}
+                className={cn(
+                  "flex items-center gap-3 w-full p-3 rounded-md text-left transition-colors",
+                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isActive 
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" 
+                    : "text-sidebar-foreground"
+                )}
+              >
+                <Icon size={20} />
+                <span>{item.title}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    </div>
   );
 };
 
