@@ -50,12 +50,12 @@ const Index = () => {
     <div>
       <SidebarProvider>
         <div className="min-h-screen bg-gray-50 flex w-full">
-          {/* Sidebar */}
-
+          {/* Top Navigation */}
+           <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
+          
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col min-w-0">
-            {/* Top Navigation */}
-            <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
+       
             
             {/* Content Filters */}
             {shouldShowFilters && (
