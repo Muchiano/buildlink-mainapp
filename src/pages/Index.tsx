@@ -50,14 +50,15 @@ const Index = () => {
     <div>
       <SidebarProvider>
         <div className="min-h-screen bg-gray-50 flex w-full">
-          {/* Sidebar */}
-          {/* <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} /> */}
 
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col min-w-0">
             {/* Top Navigation */}
             <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
-            
+
+           {/* Sidebar */}
+            <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+
             {/* Content Filters */}
             {shouldShowFilters && (
               <ContentFilters
