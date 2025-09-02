@@ -50,17 +50,14 @@ const Index = () => {
     <div>
       <SidebarProvider>
         <div className="min-h-screen bg-gray-50 flex w-full">
-            {/* Top Navigation */}
-            <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
+          {/* Sidebar */}
+          <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col min-w-0">
-           {/* Sidebar */}
-            <div className="w-1/4">
-              <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-            </div>
-
-            <div className="w-3/4">
+            {/* Top Navigation */}
+            <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
+            
             {/* Content Filters */}
             {shouldShowFilters && (
               <ContentFilters
@@ -82,10 +79,9 @@ const Index = () => {
             </main>
           </div>
 
-            {/* Bottom Navigation - Mobile Only */}
-            <div className="md:hidden">
-              <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-            </div>
+          {/* Bottom Navigation - Mobile Only */}
+          <div className="md:hidden">
+            <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
         </div>
       </SidebarProvider>
