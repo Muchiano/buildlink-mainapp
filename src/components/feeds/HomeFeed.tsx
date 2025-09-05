@@ -48,14 +48,20 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
 
   useEffect(() => {
     loadPosts();
-    if (user) {
+  }, [activeFilter, user]);
+
+  useEffect(() => {
+    if (user && posts.length > 0) {
       loadUserInteractions();
     }
-  }, [activeFilter, user]);
+  }, [posts, user]);
 
   const loadPosts = async () => {
     try {
       setLoading(true);
+      // Clear interactions when reloading posts to prevent stale state
+      setPostInteractions({});
+      
       const { data, error } = await postsService.getPosts(activeFilter, 'latest');
       
       if (error) {
@@ -68,6 +74,7 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
         return;
       }
 
+      console.log('Posts loaded:', data?.length || 0);
       setPosts(data || []);
     } catch (error) {
       console.error('Error loading posts:', error);
@@ -200,6 +207,17 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
   };
 
   const handleCreatePost = () => {
+    console.log('Post created, reloading posts...');
+    loadPosts();
+  };
+
+  const handlePostUpdated = () => {
+    console.log('Post updated, reloading posts...');
+    loadPosts();
+  };
+
+  const handlePostDeleted = () => {
+    console.log('Post deleted, reloading posts...');
     loadPosts();
   };
 
@@ -326,8 +344,8 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
               post={post}
               onLike={() => handleLike(post.id)}
               onComment={() => handleComment(post.id)}
-              onPostUpdated={loadPosts}
-              onPostDeleted={loadPosts}
+              onPostUpdated={handlePostUpdated}
+              onPostDeleted={handlePostDeleted}
             />
           ))
         ) : (
