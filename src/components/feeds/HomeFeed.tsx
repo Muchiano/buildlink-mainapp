@@ -342,6 +342,7 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
             <PostCard
               key={post.id}
               post={post}
+              isLiked={postInteractions[post.id]?.liked || false}
               onLike={() => handleLike(post.id)}
               onComment={() => handleComment(post.id)}
               onPostUpdated={handlePostUpdated}

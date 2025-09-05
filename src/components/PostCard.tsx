@@ -15,53 +15,27 @@ import EditPostDialog from './EditPostDialog';
 
 interface PostCardProps {
   post: Post;
+  isLiked?: boolean;
   onLike?: () => void;
   onComment?: () => void;
   onPostUpdated?: () => void;
   onPostDeleted?: () => void;
 }
 
-const PostCard = ({ post, onLike, onComment, onPostUpdated, onPostDeleted }: PostCardProps) => {
+const PostCard = ({ post, isLiked = false, onLike, onComment, onPostUpdated, onPostDeleted }: PostCardProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [isLiked, setIsLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.likes_count);
   const [isLiking, setIsLiking] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleLike = async () => {
-    if (!user) return;
+    if (!user || isLiking) return;
     
     setIsLiking(true);
     try {
-      const { action, error } = await postsService.likePost(post.id, user.id);
-      
-      if (error) {
-        toast({
-          title: 'Error',
-          description: 'Failed to update like status',
-          variant: 'destructive'
-        });
-        return;
-      }
-
-      if (action === 'liked') {
-        setIsLiked(true);
-        setLikesCount(prev => prev + 1);
-      } else {
-        setIsLiked(false);
-        setLikesCount(prev => prev - 1);
-      }
-      
       onLike?.();
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to update like status',
-        variant: 'destructive'
-      });
     } finally {
       setIsLiking(false);
     }
@@ -190,7 +164,7 @@ const PostCard = ({ post, onLike, onComment, onPostUpdated, onPostDeleted }: Pos
                 className="flex items-center space-x-2 text-muted-foreground hover:text-red-500"
               >
                 <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                <span>{likesCount}</span>
+                <span>{post.likes_count}</span>
               </Button>
               
               <Button
