@@ -58,11 +58,11 @@ const Index = () => {
               shouldShowFilters ? "" : ""
             )}>
             {/* Sidebar */}
-            <div className="col-span-3 bg-white border-r">
+            <div className="hidden md:block col-span-3 bg-white border-r">
               <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
-            <div className="col-span-6 col-start-4">
+            <div className="lg:col-span-6 md:col-span-9 col-span-12 md:col-start-4">
               {/* Content Filters */}
               {shouldShowFilters && (
                 <ContentFilters

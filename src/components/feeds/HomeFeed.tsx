@@ -248,34 +248,7 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
               Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
             </p>
           </div>
-          {user && (
-            <div className="flex space-x-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setSearchDialog(true)}
-                className="text-white hover:bg-white/20"
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="text-white hover:bg-white/20"
-              >
-                <Bell className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setProfileEditDialog(true)}
-                className="text-white hover:bg-white/20"
-              >
-                <Edit3 className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+
         </div>
         <div className="grid grid-cols-2 gap-4">
            <div className="text-center">

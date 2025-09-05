@@ -21,9 +21,6 @@ const TopBar = ({ onLogoClick, onMenuClick }: TopBarProps) => {
       <div className="flex h-14 items-center justify-between px-4 max-w-7xl mx-auto">
         {/* Left side - Menu + Logo */}
         <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="icon" onClick={onMenuClick} className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
           <div 
             className="flex items-center cursor-pointer" 
             onClick={onLogoClick}
@@ -31,7 +28,7 @@ const TopBar = ({ onLogoClick, onMenuClick }: TopBarProps) => {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
               <span className="text-white font-bold text-sm">B</span>
             </div>
-            <span className="font-semibold text-lg hidden sm:block">BuildLink</span>
+            <span className="font-semibold text-lg">BuildLink</span>
           </div>
         </div>
 
