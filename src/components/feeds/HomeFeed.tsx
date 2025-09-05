@@ -59,8 +59,6 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
   const loadPosts = async () => {
     try {
       setLoading(true);
-      // Clear interactions when reloading posts to prevent stale state
-      setPostInteractions({});
       
       const { data, error } = await postsService.getPosts(activeFilter, 'latest');
       
