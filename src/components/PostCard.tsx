@@ -62,6 +62,9 @@ const PostCard = ({ post, isLiked = false, onLike, onComment, onPostUpdated, onP
         description: 'Post deleted successfully'
       });
       
+      // Close the dialog before triggering parent reload to avoid leftover overlays
+      setShowDeleteDialog(false);
+      
       onPostDeleted?.();
     } catch (error) {
       toast({
@@ -71,7 +74,6 @@ const PostCard = ({ post, isLiked = false, onLike, onComment, onPostUpdated, onP
       });
     } finally {
       setIsDeleting(false);
-      setShowDeleteDialog(false);
     }
   };
 
