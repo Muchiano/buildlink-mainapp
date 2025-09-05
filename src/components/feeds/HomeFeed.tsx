@@ -15,6 +15,7 @@ import EnhancedSearchDialog from "@/components/EnhancedSearchDialog";
 import ProfileEditForm from "@/components/ProfileEditForm";
 import NotificationsList from "@/components/NotificationsList";
 import EmptyState from "@/components/EmptyStates";
+import PostCard from "@/components/PostCard";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "../ui/skeleton";
 
@@ -319,104 +320,16 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       {/* Posts Feed */}
       <div className="space-y-4">
         {posts.length > 0 ? (
-          posts.map((post) => {
-            const interactions = {
-              liked: false,
-              bookmarked: false,
-              reposted: false,
-              ...postInteractions[post.id]
-            };
-            
-            return (
-              <div key={post.id} className="bg-white rounded-lg border p-6 space-y-4">
-                {/* Post Header */}
-                <div className="flex items-start justify-between">
-                  <div 
-                    className="flex items-center space-x-3 cursor-pointer"
-                    onClick={() => handleUserClick(post.profiles)}
-                  >
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={post.profiles?.avatar} />
-                      <AvatarFallback>
-                        {post.profiles?.full_name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 hover:text-primary">
-                        {post.profiles?.full_name || 'Anonymous User'}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {post.profiles?.profession || 'Professional'} 
-                        {post.profiles?.organization && ` at ${post.profiles.organization}`}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(post.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
-                      <Bookmark className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Post Content */}
-                <div className="space-y-3">
-                  <p className="text-gray-800">{post.content}</p>
-                  {post.location && (
-                    <Badge variant="secondary" className="text-xs">
-                      {post.location}
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Post Actions */}
-                <div className="flex items-center justify-between pt-3 border-t">
-                  <div className="flex items-center space-x-6">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLike(post.id)}
-                      className={`flex items-center space-x-2 ${interactions.liked ? 'text-red-500' : 'text-gray-500'} hover:text-red-500`}
-                    >
-                      <Heart className={`h-5 w-5 ${interactions.liked ? 'fill-current' : ''}`} />
-                      <span>{post.likes_count || 0}</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleComment(post.id)}
-                      className="flex items-center space-x-2 text-gray-500 hover:text-primary"
-                    >
-                      <MessageCircle className="h-5 w-5" />
-                      <span>{post.comments_count || 0}</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleRepost(post)}
-                      className={`flex items-center space-x-2 ${interactions.reposted ? 'text-green-500' : 'text-gray-500'} hover:text-green-500`}
-                    >
-                      <Repeat2 className="h-5 w-5" />
-                      <span>{post.reposts_count || 0}</span>
-                    </Button>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleShare(post.id)}
-                    className="flex items-center space-x-2 text-gray-500 hover:text-primary"
-                  >
-                    <Share className="h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-            );
-          })
+          posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onLike={() => handleLike(post.id)}
+              onComment={() => handleComment(post.id)}
+              onPostUpdated={loadPosts}
+              onPostDeleted={loadPosts}
+            />
+          ))
         ) : (
           <EmptyState 
             type="posts" 

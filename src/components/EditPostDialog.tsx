@@ -2,37 +2,29 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Camera, FileText, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Camera, FileText, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { postsService } from '@/services/postsService';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-interface CreatePostDialogProps {
-  onPostCreated?: () => void;
+interface EditPostDialogProps {
+  post: any;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onPostUpdated?: () => void;
 }
 
-type PostCategory = 'general' | 'project' | 'career' | 'technical' | 'news';
-
-interface FormData {
-  content: string;
-  category: PostCategory;
-}
-
-const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
+const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    content: '',
-    category: 'general'
-  });
+  const [content, setContent] = useState(post?.content || '');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(post?.image_url || null);
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,6 +33,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
+      setRemoveExistingImage(false);
     }
   };
 
@@ -54,16 +47,17 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview(null);
+    setRemoveExistingImage(true);
     if (imageInputRef.current) imageInputRef.current.value = '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !formData.content.trim()) return;
+    if (!user || !content.trim()) return;
 
     setIsLoading(true);
     try {
-      let image_url: string | undefined;
+      let image_url = post.image_url;
 
       // Handle image upload
       if (imageFile) {
@@ -81,6 +75,8 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           .from('post-media')
           .getPublicUrl(filePath);
         image_url = publicUrlData?.publicUrl;
+      } else if (removeExistingImage) {
+        image_url = null;
       }
 
       // Handle document upload (for future use)
@@ -89,10 +85,8 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         console.log('Document upload not yet implemented');
       }
 
-      const { error } = await postsService.createPost({
-        content: formData.content,
-        category: formData.category,
-        user_id: user.id,
+      const { error } = await postsService.updatePost(post.id, {
+        content,
         image_url
       });
 
@@ -100,19 +94,16 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
 
       toast({
         title: 'Success',
-        description: 'Your post has been created successfully!'
+        description: 'Your post has been updated successfully!'
       });
 
-      setFormData({ content: '', category: 'general' });
-      setImageFile(null);
-      setDocumentFile(null);
-      setImagePreview(null);
-      setOpen(false);
-      onPostCreated?.();
+      onOpenChange(false);
+      onPostUpdated?.();
     } catch (error) {
+      console.error('Error updating post:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create post. Please try again.',
+        description: 'Failed to update post. Please try again.',
         variant: 'destructive'
       });
     } finally {
@@ -120,54 +111,20 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     }
   };
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleCategoryChange = (value: PostCategory) => {
-    setFormData(prev => ({ ...prev, category: value }));
-  };
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="w-full">
-          <Plus className="h-4 w-4 mr-2" />
-          Create Post
-        </Button>
-      </DialogTrigger>
-      
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create New Post</DialogTitle>
+          <DialogTitle>Edit Post</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Select
-              value={formData.category}
-              onValueChange={handleCategoryChange}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="project">Project</SelectItem>
-                <SelectItem value="career">Career</SelectItem>
-                <SelectItem value="technical">Technical</SelectItem>
-                <SelectItem value="news">News</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-2">
             <Label htmlFor="content">Content</Label>
             <Textarea
               id="content"
-              value={formData.content}
-              onChange={(e) => handleInputChange('content', e.target.value)}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               placeholder="Share your thoughts, insights, or questions..."
               rows={4}
               required
@@ -202,7 +159,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
               onClick={() => imageInputRef.current?.click()}
             >
               <Camera className="h-4 w-4 mr-2" />
-              Add Image
+              {imagePreview ? 'Change Image' : 'Add Image'}
               <input
                 ref={imageInputRef}
                 type="file"
@@ -238,11 +195,11 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           )}
           
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create Post'}
+              {isLoading ? 'Updating...' : 'Update Post'}
             </Button>
           </div>
         </form>
@@ -251,4 +208,4 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   );
 };
 
-export default CreatePostDialog;
+export default EditPostDialog;

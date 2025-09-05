@@ -220,12 +220,16 @@ const PostCreate = () => {
             <Button
               variant="ghost"
               size={isMobile ? "sm" : "sm"}
-              className="text-gray-600"
-              disabled
+              className={cn("text-gray-600", isMobile && "px-2 py-1")}
+              asChild
+              onClick={() => {
+                // Document input could be added here for future use
+                console.log('Document upload feature coming soon');
+              }}
             >
-              <FileText className="h-4 w-4 mr-2" />
-              <span className={isMobile ? "sr-only" : ""}>
-                Add Document (soon)
+              <span>
+                <FileText className="h-4 w-4 mr-2" />
+                <span className={isMobile ? "sr-only" : ""}>Add Document</span>
               </span>
             </Button>
             <Button

@@ -187,5 +187,32 @@ export const postsService = {
       .eq('post_id', postId);
     
     return { data, error };
+  },
+  async updatePost(postId: string, updates: {
+    content?: string;
+    image_url?: string;
+  }) {
+    const { data, error } = await supabase
+      .from('posts')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', postId)
+      .select(`
+        *,
+        profiles!posts_author_id_fkey(*)
+      `)
+      .single();
+    
+    return { data, error };
+  },
+  async deletePost(postId: string) {
+    const { data, error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', postId);
+    
+    return { data, error };
   }
 };
