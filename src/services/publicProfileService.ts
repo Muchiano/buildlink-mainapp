@@ -2,9 +2,25 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const publicProfileService = {
   async getPublicProfile(profileId: string) {
+    // Only select safe public fields - sensitive data like social_links, education, experiences are excluded
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select(`
+        id,
+        full_name,
+        user_type,
+        title,
+        profession,
+        organization,
+        avatar,
+        bio,
+        skills,
+        interests,
+        banner,
+        profile_completion_score,
+        profile_visibility,
+        created_at
+      `)
       .eq('id', profileId)
       .eq('profile_visibility', 'public')
       .single();
@@ -39,6 +55,23 @@ export const publicProfileService = {
       .eq('viewed_profile_id', profileId)
       .order('created_at', { ascending: false })
       .limit(10);
+    
+    return { data, error };
+  },
+
+  // New method for getting basic profile info for search results, user lists, etc.
+  async getBasicProfile(profileId: string) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select(`
+        id,
+        full_name,
+        profession,
+        avatar,
+        profile_visibility
+      `)
+      .eq('id', profileId)
+      .single();
     
     return { data, error };
   },
