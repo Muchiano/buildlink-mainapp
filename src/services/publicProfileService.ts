@@ -2,30 +2,44 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const publicProfileService = {
   async getPublicProfile(profileId: string) {
-    // Only select safe public fields - sensitive data like social_links, education, experiences are excluded
-    const { data, error } = await supabase
-      .from('profiles')
-      .select(`
-        id,
-        full_name,
-        user_type,
-        title,
-        profession,
-        organization,
-        avatar,
-        bio,
-        skills,
-        interests,
-        banner,
-        profile_completion_score,
-        profile_visibility,
-        created_at
-      `)
-      .eq('id', profileId)
-      .eq('profile_visibility', 'public')
-      .single();
+    // Check if user is authenticated to determine access level
+    const { data: { user } } = await supabase.auth.getUser();
     
-    return { data, error };
+    if (user) {
+      // Authenticated users can see more profile information
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          user_type,
+          title,
+          profession,
+          organization,
+          avatar,
+          bio,
+          skills,
+          interests,
+          banner,
+          profile_completion_score,
+          profile_visibility,
+          created_at
+        `)
+        .eq('id', profileId)
+        .eq('profile_visibility', 'public')
+        .single();
+      
+      return { data, error };
+    } else {
+      // Anonymous users get minimal profile information using the secure view
+      const { data, error } = await supabase
+        .from('public_profiles')
+        .select('*')
+        .eq('id', profileId)
+        .single();
+      
+      return { data, error };
+    }
   },
 
   async recordProfileView(viewedProfileId: string) {
@@ -59,21 +73,39 @@ export const publicProfileService = {
     return { data, error };
   },
 
-  // New method for getting basic profile info for search results, user lists, etc.
+  // Method for getting basic profile info for search results, user lists, etc.
+  // This uses the secure public_profiles view for anonymous access
   async getBasicProfile(profileId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select(`
-        id,
-        full_name,
-        profession,
-        avatar,
-        profile_visibility
-      `)
-      .eq('id', profileId)
-      .single();
+    const { data: { user } } = await supabase.auth.getUser();
     
-    return { data, error };
+    if (user) {
+      // Authenticated users can access more profile fields
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          title,
+          profession,
+          organization,
+          avatar,
+          user_type,
+          profile_visibility
+        `)
+        .eq('id', profileId)
+        .single();
+      
+      return { data, error };
+    } else {
+      // Anonymous users use the secure view
+      const { data, error } = await supabase
+        .from('public_profiles')
+        .select('*')
+        .eq('id', profileId)
+        .single();
+      
+      return { data, error };
+    }
   },
 
   async updateProfileCompletion(userId: string) {
