@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 import { MapPin, Users, MessageCircle, Edit } from "lucide-react";
 import ProfileEditDialog from "../ProfileEditDialog";
 import AvatarUploader from "../profile-sections/AvatarUploader";
-import { useState, useEffect } from "react";
 
 interface ProfileHeaderProps {
   profile: any;
@@ -23,29 +22,10 @@ const ProfileHeader = ({
   handleAvatarRemove,
   handleProfileUpdate,
 }: ProfileHeaderProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollingDown = currentScrollY > lastScrollY && currentScrollY > 100;
-      
-      setIsCollapsed(scrollingDown);
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
-
   return (
-    <div className={`sticky top-14 z-30 transition-all duration-300 ${
-      isCollapsed ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-    }`}>
-      <Card className="border-0 shadow-sm bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
+    <Card className="border-0 shadow-sm">
+      <CardContent className="p-6">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
             {/* Info and Avatar */}
             <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
               <div className="relative">
@@ -97,8 +77,7 @@ const ProfileHeader = ({
             </div>
           </div>
         </CardContent>
-      </Card>
-    </div>
+    </Card>
   );
 };
 
