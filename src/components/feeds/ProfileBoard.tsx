@@ -40,20 +40,18 @@ const ProfileBoard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-0 z-20 bg-background pb-2">
-        <ProfileBanner 
-          profile={profile} 
-          onProfileUpdated={handleProfileUpdate}
-        />
-        <ProfileHeader 
-          profile={profile}
-          uploading={uploading}
-          userPostsCount={userPosts.length}
-          handleAvatarChange={handleAvatarChange}
-          handleAvatarRemove={handleAvatarRemove}
-          handleProfileUpdate={handleProfileUpdate}
-        />
-      </div>
+      <ProfileBanner 
+        profile={profile} 
+        onProfileUpdated={handleProfileUpdate}
+      />
+      <ProfileHeader 
+        profile={profile}
+        uploading={uploading}
+        userPostsCount={userPosts.length}
+        handleAvatarChange={handleAvatarChange}
+        handleAvatarRemove={handleAvatarRemove}
+        handleProfileUpdate={handleProfileUpdate}
+      />
       
       {/* Profile Completion - moved above tabs */}
       <Card className="border-0 shadow-sm">
