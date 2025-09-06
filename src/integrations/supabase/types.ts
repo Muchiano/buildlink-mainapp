@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_features: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          feature_name: string
+          id: string
+          is_premium: boolean | null
+          user_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          feature_name: string
+          id?: string
+          is_premium?: boolean | null
+          user_type: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          feature_name?: string
+          id?: string
+          is_premium?: boolean | null
+          user_type?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           author_id: string
@@ -769,7 +796,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_tier: string | null
           avatar: string | null
+          average_rating: number | null
           banner: string | null
           bio: string | null
           certifications: Json | null
@@ -783,18 +812,23 @@ export type Database = {
           languages: Json | null
           organization: string | null
           portfolio: Json | null
+          premium_features: Json | null
           profession: string | null
           profile_completion_score: number | null
           profile_visibility: string | null
           skills: string[] | null
           social_links: Json | null
           title: string | null
+          total_ratings: number | null
           updated_at: string | null
           user_type: string
           verification_badges: Json | null
+          verification_level: string | null
         }
         Insert: {
+          account_tier?: string | null
           avatar?: string | null
+          average_rating?: number | null
           banner?: string | null
           bio?: string | null
           certifications?: Json | null
@@ -808,18 +842,23 @@ export type Database = {
           languages?: Json | null
           organization?: string | null
           portfolio?: Json | null
+          premium_features?: Json | null
           profession?: string | null
           profile_completion_score?: number | null
           profile_visibility?: string | null
           skills?: string[] | null
           social_links?: Json | null
           title?: string | null
+          total_ratings?: number | null
           updated_at?: string | null
           user_type: string
           verification_badges?: Json | null
+          verification_level?: string | null
         }
         Update: {
+          account_tier?: string | null
           avatar?: string | null
+          average_rating?: number | null
           banner?: string | null
           bio?: string | null
           certifications?: Json | null
@@ -833,15 +872,18 @@ export type Database = {
           languages?: Json | null
           organization?: string | null
           portfolio?: Json | null
+          premium_features?: Json | null
           profession?: string | null
           profile_completion_score?: number | null
           profile_visibility?: string | null
           skills?: string[] | null
           social_links?: Json | null
           title?: string | null
+          total_ratings?: number | null
           updated_at?: string | null
           user_type?: string
           verification_badges?: Json | null
+          verification_level?: string | null
         }
         Relationships: []
       }
@@ -1003,6 +1045,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_description: string | null
+          achievement_name: string
+          achievement_type: string
+          awarded_by: string | null
+          badge_icon: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          achievement_description?: string | null
+          achievement_name: string
+          achievement_type: string
+          awarded_by?: string | null
+          badge_icon?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          achievement_description?: string | null
+          achievement_name?: string
+          achievement_type?: string
+          awarded_by?: string | null
+          badge_icon?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_progress: {
         Row: {
           completed: boolean | null
@@ -1054,6 +1132,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_ratings: {
+        Row: {
+          communication_rating: number | null
+          created_at: string
+          id: string
+          professionalism_rating: number | null
+          project_id: string | null
+          rated_user_id: string
+          rater_id: string
+          rating: number
+          review_text: string | null
+          timeliness_rating: number | null
+          updated_at: string
+          work_quality_rating: number | null
+        }
+        Insert: {
+          communication_rating?: number | null
+          created_at?: string
+          id?: string
+          professionalism_rating?: number | null
+          project_id?: string | null
+          rated_user_id: string
+          rater_id: string
+          rating: number
+          review_text?: string | null
+          timeliness_rating?: number | null
+          updated_at?: string
+          work_quality_rating?: number | null
+        }
+        Update: {
+          communication_rating?: number | null
+          created_at?: string
+          id?: string
+          professionalism_rating?: number | null
+          project_id?: string | null
+          rated_user_id?: string
+          rater_id?: string
+          rating?: number
+          review_text?: string | null
+          timeliness_rating?: number | null
+          updated_at?: string
+          work_quality_rating?: number | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

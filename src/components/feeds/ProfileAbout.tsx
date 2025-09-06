@@ -10,6 +10,7 @@ import ProfileCompletionIndicator from "../profile/ProfileCompletionIndicator";
 import SocialMediaLinks from "../profile/SocialMediaLinks";
 import SocialLinksEditDialog from "../profile/SocialLinksEditDialog";
 import VerificationBadges from "../profile/VerificationBadges";
+import AccountTypeDashboard from "../AccountTypeDashboard";
 
 interface ProfileAboutProps {
   profile: any;
@@ -19,6 +20,17 @@ interface ProfileAboutProps {
 const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
   return (
     <div className="space-y-6">
+      {/* Account Type Dashboard */}
+      <AccountTypeDashboard profile={profile} />
+      
+      {/* Verification Badges */}
+      {profile.verification_badges && profile.verification_badges.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="font-semibold">Verification Badges</h3>
+          <VerificationBadges badges={profile.verification_badges} />
+        </div>
+      )}
+      
       {/* Social Links */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -38,14 +50,6 @@ const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
           editable={false}
         />
       </div>
-      
-      {/* Verification Badges */}
-      {profile.verification_badges && profile.verification_badges.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="font-semibold">Verification Badges</h3>
-          <VerificationBadges badges={profile.verification_badges} />
-        </div>
-      )}
       
       <AboutSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <PortfolioSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
