@@ -97,8 +97,13 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
         description: 'Your post has been updated successfully!'
       });
 
+      // Close dialog and allow proper cleanup before parent reload
       onOpenChange(false);
-      onPostUpdated?.();
+      
+      // Use setTimeout to ensure dialog cleanup completes before parent reload
+      setTimeout(() => {
+        onPostUpdated?.();
+      }, 100);
     } catch (error) {
       console.error('Error updating post:', error);
       toast({
@@ -112,7 +117,18 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog 
+      open={open} 
+      onOpenChange={(isOpen) => {
+        onOpenChange(isOpen);
+        // Force cleanup of body styles when dialog closes
+        if (!isOpen) {
+          setTimeout(() => {
+            document.body.style.removeProperty('pointer-events');
+          }, 50);
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Edit Post</DialogTitle>

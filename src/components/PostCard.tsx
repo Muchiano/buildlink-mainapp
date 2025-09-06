@@ -243,7 +243,18 @@ const PostCard = ({
         onPostUpdated={onPostUpdated}
       />
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <AlertDialog 
+        open={showDeleteDialog} 
+        onOpenChange={(open) => {
+          setShowDeleteDialog(open);
+          // Force cleanup of body styles when dialog closes
+          if (!open) {
+            setTimeout(() => {
+              document.body.style.removeProperty('pointer-events');
+            }, 50);
+          }
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Post</AlertDialogTitle>
