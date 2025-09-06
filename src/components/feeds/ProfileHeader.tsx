@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { MapPin, Users, MessageCircle, Edit } from "lucide-react";
 import ProfileEditDialog from "../ProfileEditDialog";
 import AvatarUploader from "../profile-sections/AvatarUploader";
+import { useState, useEffect } from "react";
 
 interface ProfileHeaderProps {
   profile: any;
@@ -21,62 +22,84 @@ const ProfileHeader = ({
   handleAvatarChange,
   handleAvatarRemove,
   handleProfileUpdate,
-}: ProfileHeaderProps) => (
-  <Card className="border-0 shadow-sm">
-    <CardContent className="p-6">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
-        {/* Info and Avatar */}
-        <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
-          <div className="relative">
-            <AvatarUploader
-              avatarUrl={profile.avatar || ""}
-              fullName={profile.full_name}
-              uploading={uploading}
-              onAvatarChange={handleAvatarChange}
-              onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
-            />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">
-              {profile.full_name || 'User'}
-            </h1>
-            <p className="text-lg text-gray-700 mb-1">
-              {profile.profession || 'No profession specified'}
-            </p>
-            <p className="text-gray-600 mb-3">
-              {profile.organization || 'No organization specified'}
-            </p>
-            <div className="flex items-center text-sm text-gray-500 space-x-4">
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-1" />
-                Kenya
+}: ProfileHeaderProps) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollingDown = currentScrollY > lastScrollY && currentScrollY > 100;
+      
+      setIsCollapsed(scrollingDown);
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
+  return (
+    <div className={`sticky top-14 z-30 transition-all duration-300 ${
+      isCollapsed ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+    }`}>
+      <Card className="border-0 shadow-sm bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
+            {/* Info and Avatar */}
+            <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
+              <div className="relative">
+                <AvatarUploader
+                  avatarUrl={profile.avatar || ""}
+                  fullName={profile.full_name}
+                  uploading={uploading}
+                  onAvatarChange={handleAvatarChange}
+                  onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
+                />
               </div>
-              <div className="flex items-center">
-                <Users className="h-4 w-4 mr-1" />
-                {userPostsCount} posts
+              <div className="flex-1">
+                <h1 className="text-2xl font-bold text-foreground mb-1">
+                  {profile.full_name || 'User'}
+                </h1>
+                <p className="text-lg text-muted-foreground mb-1">
+                  {profile.profession || 'No profession specified'}
+                </p>
+                <p className="text-muted-foreground mb-3">
+                  {profile.organization || 'No organization specified'}
+                </p>
+                <div className="flex items-center text-sm text-muted-foreground space-x-4">
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    Kenya
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-1" />
+                    {userPostsCount} posts
+                  </div>
+                </div>
               </div>
             </div>
+            {/* Action Buttons */}
+            <div className="flex space-x-2">
+              <Button variant="outline">
+                <MessageCircle className="h-4 w-4 mr-1" />
+                Message
+              </Button>
+              <ProfileEditDialog 
+                currentProfile={profile}
+                onProfileUpdated={handleProfileUpdate}
+              >
+                <Button>
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit Profile
+                </Button>
+              </ProfileEditDialog>
+            </div>
           </div>
-        </div>
-        {/* Action Buttons */}
-        <div className="flex space-x-2">
-          <Button variant="outline">
-            <MessageCircle className="h-4 w-4 mr-1" />
-            Message
-          </Button>
-          <ProfileEditDialog 
-            currentProfile={profile}
-            onProfileUpdated={handleProfileUpdate}
-          >
-            <Button>
-              <Edit className="h-4 w-4 mr-1" />
-              Edit Profile
-            </Button>
-          </ProfileEditDialog>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 export default ProfileHeader;
