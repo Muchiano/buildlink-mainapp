@@ -62,7 +62,7 @@ const Index = () => {
               <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
             </div>
 
-            <div className="lg:col-span-6 md:col-span-9 col-span-12 md:col-start-4">
+            <div className="lg:col-span-8 md:col-span-9 col-span-12 md:col-start-4">
               {/* Content Filters */}
               {shouldShowFilters && (
                 <ContentFilters
