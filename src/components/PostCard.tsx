@@ -90,19 +90,32 @@ const PostCard = ({ post, isLiked = false, onLike, onComment, onPostUpdated, onP
 
   const isOwnPost = user && post.author_id === user.id;
 
+  const handleProfileClick = () => {
+    // Navigate to user profile - could be implemented with router
+    console.log('Navigate to profile:', post.author_id);
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
+            <Avatar 
+              className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all"
+              onClick={handleProfileClick}
+            >
               <AvatarImage src={post.profiles?.avatar_url || post.user?.avatar_url} />
               <AvatarFallback>
                 {(post.profiles?.full_name || post.user?.full_name)?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-semibold text-sm">{post.profiles?.full_name || post.user?.full_name}</p>
+              <p 
+                className="font-semibold text-sm cursor-pointer hover:text-primary transition-colors"
+                onClick={handleProfileClick}
+              >
+                {post.profiles?.full_name || post.user?.full_name}
+              </p>
               <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                 <span>{post.profiles?.profession || post.user?.profession}</span>
                 <span>•</span>

@@ -221,16 +221,31 @@ const PostCreate = () => {
               variant="ghost"
               size={isMobile ? "sm" : "sm"}
               className={cn("text-gray-600", isMobile && "px-2 py-1")}
-              asChild
               onClick={() => {
-                // Document input could be added here for future use
-                console.log('Document upload feature coming soon');
+                // Document upload feature (PDFs only, max 10MB)
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.pdf';
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    if (file.size > 10 * 1024 * 1024) {
+                      toast({
+                        title: "File too large",
+                        description: "PDF files must be under 10MB",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    // Handle PDF upload logic here
+                    console.log('PDF file selected:', file.name);
+                  }
+                };
+                input.click();
               }}
             >
-              <span>
-                <FileText className="h-4 w-4 mr-2" />
-                <span className={isMobile ? "sr-only" : ""}>Add Document</span>
-              </span>
+              <FileText className="h-4 w-4 mr-2" />
+              <span className={isMobile ? "sr-only" : ""}>Add Document</span>
             </Button>
             <Button
               variant="ghost"

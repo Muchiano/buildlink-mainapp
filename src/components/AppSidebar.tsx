@@ -16,12 +16,12 @@ const AppSidebar = ({ activeTab, onTabChange }: AppSidebarProps) => {
     },
     {
       id: "post",
-      title: "Post/Create",
+      title: "Create",
       icon: Plus,
     },
     {
       id: "skillup",
-      title: "Skill Up",
+      title: "Resource Hub",
       icon: BookOpen,
     },
     {

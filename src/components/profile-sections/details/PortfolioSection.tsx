@@ -105,9 +105,10 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
           )}
         </div>
         {portfolioList.length === 0 ? (
-          <div className="text-center py-12 flex flex-col items-center bg-muted rounded-lg">
+            <div className="text-center py-12 flex flex-col items-center bg-muted rounded-lg">
             <p className="text-gray-500 italic text-lg mb-2">No portfolio items yet</p>
             <p className="text-gray-400 mb-4 text-sm">Showcase your work, websites, or downloadable files here!</p>
+            <p className="text-gray-400 text-xs italic">*Max 5MB per file recommended</p>
             <Button
               variant="default"
               size="lg"

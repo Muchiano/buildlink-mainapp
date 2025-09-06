@@ -48,7 +48,19 @@ const ProfileActivity = ({ userPosts }: ProfileActivityProps) => {
         </div>
         {userPosts.length > 0 ? (
           <div className="space-y-4">
-            {userPosts.map(renderActivityItem)}
+            {/* Show only first 2 posts in grid layout initially */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {userPosts.slice(0, 2).map(renderActivityItem)}
+            </div>
+            
+            {/* View more button if there are more posts */}
+            {userPosts.length > 2 && (
+              <div className="pt-4 border-t text-center">
+                <button className="text-primary hover:text-primary/80 text-sm font-medium transition-colors">
+                  View all {userPosts.length} posts →
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-8">

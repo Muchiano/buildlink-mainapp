@@ -13,8 +13,8 @@ const BottomNavigation = ({
   const tabs = [
     { id: "home", icon: Home, label: "Home" },
     // { id: "mentorship", icon: Users, label: "Mentorship" },
-    { id: "post", icon: Plus, label: "Post" },
-    { id: "skillup", icon: BookOpen, label: "Skill Up" },
+    { id: "post", icon: Plus, label: "Create" },
+    { id: "skillup", icon: BookOpen, label: "Resource Hub" },
     { id: "profile", icon: User, label: "Profile" },
   ];
 

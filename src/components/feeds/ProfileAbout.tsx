@@ -1,5 +1,6 @@
 
 import AboutSection from "../profile-sections/details/AboutSection";
+import PortfolioSection from "../profile-sections/details/PortfolioSection";
 import ExperienceSection from "../profile-sections/details/ExperienceSection";
 import EducationSection from "../profile-sections/details/EducationSection";
 import CertificationsSection from "../profile-sections/details/CertificationsSection";
@@ -18,33 +19,24 @@ interface ProfileAboutProps {
 const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
   return (
     <div className="space-y-6">
-      {/* Profile Completion & Social Links */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h3 className="font-semibold">Profile Completion</h3>
-          <ProfileCompletionIndicator 
-            score={profile.profile_completion_score || 0} 
-            showDetails={true}
+      {/* Social Links */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">Social Links</h3>
+          <SocialLinksEditDialog
+            currentLinks={profile.social_links || {}}
+            onLinksUpdated={handleProfileUpdate}
+            trigger={
+              <button className="text-sm text-muted-foreground hover:text-foreground">
+                Edit
+              </button>
+            }
           />
         </div>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Social Links</h3>
-            <SocialLinksEditDialog
-              currentLinks={profile.social_links || {}}
-              onLinksUpdated={handleProfileUpdate}
-              trigger={
-                <button className="text-sm text-muted-foreground hover:text-foreground">
-                  Edit
-                </button>
-              }
-            />
-          </div>
-          <SocialMediaLinks 
-            links={profile.social_links || {}} 
-            editable={false}
-          />
-        </div>
+        <SocialMediaLinks 
+          links={profile.social_links || {}} 
+          editable={false}
+        />
       </div>
       
       {/* Verification Badges */}
@@ -56,6 +48,7 @@ const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
       )}
       
       <AboutSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
+      <PortfolioSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <ExperienceSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <EducationSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <CompactSkillsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />

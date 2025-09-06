@@ -6,6 +6,8 @@ import ProfileTabs from "./ProfileTabs";
 import ProfileAbout from "./ProfileAbout";
 import ProfileActivity from "./ProfileActivity";
 import { useProfile } from "@/hooks/useProfile";
+import { Card, CardContent } from "@/components/ui/card";
+import ProfileCompletionIndicator from "@/components/profile/ProfileCompletionIndicator";
 
 const ProfileBoard = () => {
   const [activeTab, setActiveTab] = useState("about");
@@ -38,18 +40,28 @@ const ProfileBoard = () => {
 
   return (
     <div className="space-y-6">
-      <ProfileBanner 
-        profile={profile} 
-        onProfileUpdated={handleProfileUpdate}
-      />
-      <ProfileHeader 
-        profile={profile}
-        uploading={uploading}
-        userPostsCount={userPosts.length}
-        handleAvatarChange={handleAvatarChange}
-        handleAvatarRemove={handleAvatarRemove}
-        handleProfileUpdate={handleProfileUpdate}
-      />
+      <div className="sticky top-0 z-20 bg-background pb-2">
+        <ProfileBanner 
+          profile={profile} 
+          onProfileUpdated={handleProfileUpdate}
+        />
+        <ProfileHeader 
+          profile={profile}
+          uploading={uploading}
+          userPostsCount={userPosts.length}
+          handleAvatarChange={handleAvatarChange}
+          handleAvatarRemove={handleAvatarRemove}
+          handleProfileUpdate={handleProfileUpdate}
+        />
+      </div>
+      
+      {/* Profile Completion - moved above tabs */}
+      <Card className="border-0 shadow-sm">
+        <CardContent className="p-6">
+          <ProfileCompletionIndicator score={profile?.profile_completion_score || 0} showDetails />
+        </CardContent>
+      </Card>
+      
       <ProfileTabs 
         activeTab={activeTab}
         setActiveTab={setActiveTab}

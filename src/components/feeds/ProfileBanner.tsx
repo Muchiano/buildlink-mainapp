@@ -11,7 +11,7 @@ interface ProfileBannerProps {
 
 const ProfileBanner = ({ profile, onProfileUpdated }: ProfileBannerProps) => (
   <Card className="border-0 shadow-sm overflow-hidden">
-    <div className="h-32 relative">
+    <div className="h-48 sm:h-40 relative">
       {/* Banner image (if exists; fallback to gradient) */}
       {profile.banner ? (
         <img
@@ -37,6 +37,9 @@ const ProfileBanner = ({ profile, onProfileUpdated }: ProfileBannerProps) => (
           Edit Cover
         </Button>
       </BannerEditDialog>
+      <div className="absolute bottom-2 right-2 text-xs text-white/80 italic">
+        Max 5MB recommended
+      </div>
     </div>
   </Card>
 );
