@@ -707,6 +707,45 @@ export type Database = {
           },
         ]
       }
+      profile_privacy_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          show_education: boolean | null
+          show_email: boolean | null
+          show_experience: boolean | null
+          show_phone: boolean | null
+          show_skills: boolean | null
+          show_social_links: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          show_education?: boolean | null
+          show_email?: boolean | null
+          show_experience?: boolean | null
+          show_phone?: boolean | null
+          show_skills?: boolean | null
+          show_social_links?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          show_education?: boolean | null
+          show_email?: boolean | null
+          show_experience?: boolean | null
+          show_phone?: boolean | null
+          show_skills?: boolean | null
+          show_social_links?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_views: {
         Row: {
           created_at: string | null
@@ -1084,12 +1123,40 @@ export type Database = {
         }
         Returns: string
       }
+      get_connected_profile_info: {
+        Args: { user_id_param: string }
+        Returns: {
+          avatar: string
+          bio: string
+          created_at: string
+          full_name: string
+          id: string
+          organization: string
+          profession: string
+          skills: string[]
+          title: string
+          user_type: string
+        }[]
+      }
       get_post_interaction_counts: {
         Args: { post_id_param: string }
         Returns: {
           bookmarks_count: number
           likes_count: number
           reposts_count: number
+        }[]
+      }
+      get_public_profile_info: {
+        Args: { user_id_param: string }
+        Returns: {
+          avatar: string
+          created_at: string
+          full_name: string
+          id: string
+          organization: string
+          profession: string
+          title: string
+          user_type: string
         }[]
       }
       get_user_post_interactions: {

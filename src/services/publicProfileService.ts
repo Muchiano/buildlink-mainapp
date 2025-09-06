@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { secureProfileService } from './secureProfileService';
 
 export const publicProfileService = {
   async getPublicProfile(profileId: string) {
@@ -139,5 +140,61 @@ export const publicProfileService = {
       .single();
     
     return { data, error };
+  },
+
+  // Check profile visibility status
+  async getProfileVisibility(userId: string) {
+    if (!userId) {
+      return { data: null, error: 'User ID is required' };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('profile_visibility')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error checking profile visibility:', error);
+        return { data: null, error };
+      }
+
+      return { data: data?.profile_visibility || 'private', error: null };
+    } catch (err) {
+      console.error('Exception in getProfileVisibility:', err);
+      return { data: null, error: err };
+    }
+  },
+
+  // Update profile visibility (only for own profile)
+  async updateProfileVisibility(visibility: 'public' | 'private') {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return { data: null, error: 'Authentication required' };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ 
+          profile_visibility: visibility,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating profile visibility:', error);
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      console.error('Exception in updateProfileVisibility:', err);
+      return { data: null, error: err };
+    }
   }
 };

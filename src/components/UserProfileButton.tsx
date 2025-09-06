@@ -8,13 +8,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings, Shield } from 'lucide-react';
 import { profileService } from '@/services/profileService';
 import { useState, useEffect } from 'react';
+import { PrivacySettingsDialog } from './PrivacySettingsDialog';
 
 const UserProfileButton = () => {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+  const [showPrivacySettings, setShowPrivacySettings] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -67,11 +69,20 @@ const UserProfileButton = () => {
           <Settings className="mr-2 h-4 w-4" />
           Profile Settings
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setShowPrivacySettings(true)}>
+          <Shield className="mr-2 h-4 w-4" />
+          Privacy Settings
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
+      
+      <PrivacySettingsDialog
+        open={showPrivacySettings}
+        onOpenChange={setShowPrivacySettings}
+      />
     </DropdownMenu>
   );
 };
