@@ -39,52 +39,40 @@ const ProfileBoard = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* LinkedIn-style header with banner and overlapping avatar */}
-      <Card className="overflow-hidden border-0 shadow-sm mb-4">
-        <ProfileBanner 
-          profile={profile} 
-          onProfileUpdated={handleProfileUpdate}
-        />
-        <ProfileHeader 
+    <div className="space-y-6">
+      <ProfileBanner 
+        profile={profile} 
+        onProfileUpdated={handleProfileUpdate}
+      />
+      <ProfileHeader 
+        profile={profile}
+        uploading={uploading}
+        userPostsCount={userPosts.length}
+        handleAvatarChange={handleAvatarChange}
+        handleAvatarRemove={handleAvatarRemove}
+        handleProfileUpdate={handleProfileUpdate}
+      />
+      
+      {/* Profile Completion - moved above tabs */}
+      <Card className="border-0 shadow-sm">
+        <CardContent className="p-6">
+          <ProfileCompletionIndicator score={profile?.profile_completion_score || 0} showDetails />
+        </CardContent>
+      </Card>
+      
+      <ProfileTabs 
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        postsCount={userPosts.length}
+      />
+      {activeTab === "about" ? (
+        <ProfileAbout 
           profile={profile}
-          uploading={uploading}
-          userPostsCount={userPosts.length}
-          handleAvatarChange={handleAvatarChange}
-          handleAvatarRemove={handleAvatarRemove}
           handleProfileUpdate={handleProfileUpdate}
         />
-      </Card>
-
-      {/* LinkedIn-style content area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left sidebar - Profile completion and quick info */}
-        <div className="lg:col-span-1 space-y-4">
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-3">Profile Strength</h3>
-              <ProfileCompletionIndicator score={profile?.profile_completion_score || 0} showDetails={false} />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main content area */}
-        <div className="lg:col-span-2 space-y-4">
-          <ProfileTabs 
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            postsCount={userPosts.length}
-          />
-          {activeTab === "about" ? (
-            <ProfileAbout 
-              profile={profile}
-              handleProfileUpdate={handleProfileUpdate}
-            />
-          ) : (
-            <ProfileActivity userPosts={userPosts} />
-          )}
-        </div>
-      </div>
+      ) : (
+        <ProfileActivity userPosts={userPosts} />
+      )}
     </div>
   );
 };

@@ -11,8 +11,6 @@ import SocialMediaLinks from "../profile/SocialMediaLinks";
 import SocialLinksEditDialog from "../profile/SocialLinksEditDialog";
 import VerificationBadges from "../profile/VerificationBadges";
 import AccountTypeDashboard from "../AccountTypeDashboard";
-import { Card, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
 
 interface ProfileAboutProps {
   profile: any;
@@ -21,67 +19,45 @@ interface ProfileAboutProps {
 
 const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
   return (
-    <div className="space-y-4">
-      {/* Account Type Dashboard - LinkedIn style card */}
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-6">
-          <AccountTypeDashboard profile={profile} />
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      {/* Account Type Dashboard */}
+      <AccountTypeDashboard profile={profile} />
       
-      {/* About Section */}
+      {/* Verification Badges */}
+      {profile.verification_badges && profile.verification_badges.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="font-semibold">Verification Badges</h3>
+          <VerificationBadges badges={profile.verification_badges} />
+        </div>
+      )}
+      
+      {/* Social Links */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold">Social Links</h3>
+          <SocialLinksEditDialog
+            currentLinks={profile.social_links || {}}
+            onLinksUpdated={handleProfileUpdate}
+            trigger={
+              <button className="text-sm text-muted-foreground hover:text-foreground">
+                Edit
+              </button>
+            }
+          />
+        </div>
+        <SocialMediaLinks 
+          links={profile.social_links || {}} 
+          editable={false}
+        />
+      </div>
+      
       <AboutSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      
-      {/* Experience */}
-      <ExperienceSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      
-      {/* Education */}
-      <EducationSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      
-      {/* Skills */}
-      <CompactSkillsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      
-      {/* Portfolio */}
       <PortfolioSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      
-      {/* Certifications */}
+      <ExperienceSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
+      <EducationSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
+      <CompactSkillsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <CertificationsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      
-      {/* Additional Info Card */}
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-6 space-y-6">
-          {/* Verification Badges */}
-          {profile.verification_badges && profile.verification_badges.length > 0 && (
-            <div>
-              <h3 className="font-semibold text-lg mb-3">Verification Badges</h3>
-              <VerificationBadges badges={profile.verification_badges} />
-            </div>
-          )}
-          
-          {/* Social Links */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-lg">Contact & Social</h3>
-              <SocialLinksEditDialog
-                currentLinks={profile.social_links || {}}
-                onLinksUpdated={handleProfileUpdate}
-                trigger={
-                  <Button variant="ghost" size="sm">
-                    Edit
-                  </Button>
-                }
-              />
-            </div>
-            <SocialMediaLinks 
-              links={profile.social_links || {}} 
-              editable={false}
-            />
-          </div>
-          
-          {/* Interests */}
-          <InterestsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-        </CardContent>
-      </Card>
+      <InterestsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
     </div>
   );
 };
