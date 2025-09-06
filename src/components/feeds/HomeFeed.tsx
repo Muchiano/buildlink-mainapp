@@ -172,63 +172,107 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
 
   if (initialLoading) {
     return (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-6 text-white">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Welcome to BuildLink Kenya</h2>
-              <p className="text-primary-foreground/90">
+      <div className="space-y-4 md:space-y-6 animate-fade-in">
+        {/* Loading Banner */}
+        <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-4 md:p-6 text-white">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+            <div className="flex-1">
+              <h2 className="text-xl md:text-2xl font-bold mb-2">Welcome to BuildLink Kenya</h2>
+              <p className="text-primary-foreground/90 text-sm md:text-base">
                 Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
               </p>
             </div>
-            <DataSaverToggle className="text-white" showNetworkInfo />
+            <div className="flex-shrink-0">
+              <DataSaverToggle className="text-white" showNetworkInfo />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold">
-                {isLoadingStats ? <div className="h-8 w-24 mx-auto bg-white/20 rounded animate-pulse" /> : statsData?.data?.professionalsCount ?? '0'}
+              <div className="text-xl md:text-2xl font-bold">
+                {isLoadingStats ? (
+                  <div className="h-6 md:h-8 w-16 md:w-24 mx-auto bg-white/20 rounded animate-pulse" />
+                ) : (
+                  statsData?.data?.professionalsCount ?? '0'
+                )}
               </div>
-              <div className="text-sm text-primary-foreground/80">Professionals</div>
+              <div className="text-xs md:text-sm text-primary-foreground/80">Professionals</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">
-                {isLoadingStats ? <div className="h-8 w-24 mx-auto bg-white/20 rounded animate-pulse" /> : statsData?.data?.companiesCount ?? '0'}
+              <div className="text-xl md:text-2xl font-bold">
+                {isLoadingStats ? (
+                  <div className="h-6 md:h-8 w-16 md:w-24 mx-auto bg-white/20 rounded animate-pulse" />
+                ) : (
+                  statsData?.data?.companiesCount ?? '0'
+                )}
               </div>
-              <div className="text-sm text-primary-foreground/80">Companies</div>
+              <div className="text-xs md:text-sm text-primary-foreground/80">Companies</div>
             </div>
           </div>
         </div>
         
-        <SkeletonFeed count={dataSaverMode ? 3 : 5} />
+        {/* Loading Posts */}
+        <div className="space-y-4">
+          {Array.from({ length: dataSaverMode ? 3 : 5 }).map((_, i) => (
+            <div key={i} className="bg-card rounded-lg p-4 md:p-6 shadow-sm animate-pulse">
+              <div className="flex items-start space-x-3 mb-4">
+                <div className="w-10 h-10 bg-muted rounded-full flex-shrink-0"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-muted rounded w-1/4"></div>
+                  <div className="h-3 bg-muted rounded w-1/6"></div>
+                </div>
+              </div>
+              <div className="space-y-2 mb-4">
+                <div className="h-4 bg-muted rounded w-full"></div>
+                <div className="h-4 bg-muted rounded w-4/5"></div>
+              </div>
+              {i % 2 === 0 && <div className="h-32 md:h-48 bg-muted rounded-md mb-4"></div>}
+              <div className="flex items-center space-x-6">
+                {Array.from({ length: 4 }).map((_, j) => (
+                  <div key={j} className="h-8 w-16 bg-muted rounded"></div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 animate-fade-in">
       {/* Stats Banner */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-6 text-white">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h2 className="text-2xl font-bold mb-2">Welcome to BuildLink Kenya</h2>
-            <p className="text-primary-foreground/90">
+      <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-4 md:p-6 text-white shadow-lg transition-all duration-300 hover:shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+          <div className="flex-1">
+            <h2 className="text-xl md:text-2xl font-bold mb-2">Welcome to BuildLink Kenya</h2>
+            <p className="text-primary-foreground/90 text-sm md:text-base">
               Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
             </p>
           </div>
-          <DataSaverToggle className="text-white" showNetworkInfo />
+          <div className="flex-shrink-0">
+            <DataSaverToggle className="text-white" showNetworkInfo />
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
            <div className="text-center">
-            <div className="text-2xl font-bold">
-              {isLoadingStats ? <div className="h-8 w-24 mx-auto bg-white/20 rounded animate-pulse" /> : statsData?.data?.professionalsCount ?? '0'}
+            <div className="text-xl md:text-2xl font-bold transition-all duration-300">
+              {isLoadingStats ? (
+                <div className="h-6 md:h-8 w-16 md:w-24 mx-auto bg-white/20 rounded animate-pulse" />
+              ) : (
+                statsData?.data?.professionalsCount ?? '0'
+              )}
             </div>
-            <div className="text-sm text-primary-foreground/80">Professionals</div>
+            <div className="text-xs md:text-sm text-primary-foreground/80">Professionals</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">
-              {isLoadingStats ? <div className="h-8 w-24 mx-auto bg-white/20 rounded animate-pulse" /> : statsData?.data?.companiesCount ?? '0'}
+            <div className="text-xl md:text-2xl font-bold transition-all duration-300">
+              {isLoadingStats ? (
+                <div className="h-6 md:h-8 w-16 md:w-24 mx-auto bg-white/20 rounded animate-pulse" />
+              ) : (
+                statsData?.data?.companiesCount ?? '0'
+              )}
             </div>
-            <div className="text-sm text-primary-foreground/80">Companies</div>
+            <div className="text-xs md:text-sm text-primary-foreground/80">Companies</div>
           </div>
         </div>
       </div>
