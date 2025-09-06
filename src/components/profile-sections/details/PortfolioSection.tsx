@@ -4,9 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import PortfolioGallery from "./PortfolioGallery";
 import PortfolioEditorDialog from "./PortfolioEditorDialog";
 import PortfolioThumbnails from "./PortfolioThumbnails";
+import PortfolioThumbnail from "./PortfolioThumbnail";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2, BadgePlus } from "lucide-react";
+import { Plus, Loader2, BadgePlus, Trash2, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type PortfolioItem = {
@@ -80,61 +81,112 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
 
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="px-4 py-8 sm:px-8 sm:py-10">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-            Portfolio
-            <span className="ml-2 text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-500 font-semibold">
-              {portfolioList.length} {portfolioList.length === 1 ? 'project' : 'projects'}
-            </span>
-          </h2>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2">
+            <h3 className="text-lg font-semibold text-foreground">Portfolio</h3>
+            <span className="text-sm text-muted-foreground">({portfolioList.length})</span>
+          </div>
           {canEdit && (
-            <div>
-              <Button
-                variant="default"
-                size="sm"
-                className="gap-2 shadow hover-scale"
-                onClick={() => setEditorOpen(true)}
-                disabled={updating}
-                aria-label="Add to Portfolio"
-              >
-                <BadgePlus className="h-4 w-4" />
-                Add New Project
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => setEditorOpen(true)}
+              disabled={updating}
+            >
+              <Plus className="h-4 w-4" />
+              Add Project
+            </Button>
           )}
         </div>
         {portfolioList.length === 0 ? (
-            <div className="text-center py-12 flex flex-col items-center bg-muted rounded-lg">
-            <p className="text-gray-500 italic text-lg mb-2">No portfolio items yet</p>
-            <p className="text-gray-400 mb-4 text-sm">Showcase your work, websites, or downloadable files here!</p>
-            <p className="text-gray-400 text-xs italic">*Max 5MB per file recommended</p>
-            <Button
-              variant="default"
-              size="lg"
-              className="gap-2 w-full max-w-xs shadow hover-scale"
-              onClick={() => setEditorOpen(true)}
-              disabled={updating}
-              aria-label="Add to Portfolio"
-            >
-              <Plus className="h-5 w-5" />
-              Add your first project
-            </Button>
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4">
+              <FolderOpen className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h4 className="text-lg font-medium text-foreground mb-2">No projects yet</h4>
+            <p className="text-muted-foreground mb-6">Showcase your work and achievements</p>
+            {canEdit && (
+              <Button
+                variant="outline"
+                onClick={() => setEditorOpen(true)}
+                disabled={updating}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add your first project
+              </Button>
+            )}
           </div>
         ) : (
-          <div>
-            <PortfolioThumbnails
-              portfolioList={portfolioList}
-              onThumbnailClick={(index) => {
-                setActiveGalleryIndex(index);
-                setGalleryOpen(true);
-              }}
-              onBrowseAllClick={() => {
-                setActiveGalleryIndex(0);
-                setGalleryOpen(true);
-              }}
-              updating={updating}
-            />
+          <div className="space-y-6">
+            {/* Enhanced Portfolio Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {portfolioList.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="group relative bg-card rounded-lg border border-border hover:border-primary/50 transition-all duration-200 cursor-pointer overflow-hidden"
+                  onClick={() => {
+                    setActiveGalleryIndex(index);
+                    setGalleryOpen(true);
+                  }}
+                >
+                  <div className="aspect-video relative overflow-hidden">
+                    <PortfolioThumbnail
+                      type={item.type}
+                      url={item.url}
+                      name={item.name}
+                      thumbnailUrl={item.thumbnailUrl}
+                    />
+                    <div className="absolute inset-0 bg-background/0 group-hover:bg-background/80 transition-all duration-200 flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded-md text-sm font-medium">
+                          View Project
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                      {item.name}
+                    </h4>
+                    {item.description && (
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-muted-foreground capitalize bg-muted px-2 py-1 rounded">
+                        {item.type}
+                      </span>
+                      {canEdit && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemove(item.id);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive/80 transition-all p-1"
+                          disabled={updating}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {portfolioList.length > 6 && (
+              <div className="text-center">
+                <button 
+                  onClick={() => setGalleryOpen(true)}
+                  className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
+                >
+                  View all {portfolioList.length} projects →
+                </button>
+              </div>
+            )}
           </div>
         )}
         <PortfolioGallery
