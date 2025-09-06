@@ -26,10 +26,10 @@ export const optimizedPostsService = {
       fields = ['minimal'] // 'minimal' | 'full' | 'preview'
     } = options;
 
-    // Define field selections based on use case
+    // Define field selections based on use case - now includes image_url
     const fieldSelections = {
       minimal: `
-        id, content, created_at, author_id, likes_count, comments_count, reposts_count, location,
+        id, content, created_at, author_id, likes_count, comments_count, reposts_count, location, image_url,
         profiles!posts_author_id_fkey(id, full_name, avatar, profession)
       `,
       preview: `
@@ -134,31 +134,40 @@ export const optimizedPostsService = {
     return originalUrl;
   },
 
-  // Get lightweight post interactions
+  // Get lightweight post interactions using secure functions
   async getPostInteractionsOptimized(postIds: string[], userId: string) {
     if (!userId || postIds.length === 0) return { data: {}, error: null };
     
-    const { data, error } = await supabase
-      .from('post_interactions')
-      .select('post_id, type')
-      .eq('user_id', userId)
-      .in('post_id', postIds);
-    
-    // Convert to lookup object for O(1) access
+    // Use the secure function for each post
     const interactions: { [postId: string]: { liked: boolean; bookmarked: boolean; reposted: boolean } } = {};
     
-    postIds.forEach(postId => {
-      interactions[postId] = { liked: false, bookmarked: false, reposted: false };
-    });
-    
-    data?.forEach(interaction => {
-      if (interactions[interaction.post_id]) {
-        if (interaction.type === 'like') interactions[interaction.post_id].liked = true;
-        if (interaction.type === 'bookmark') interactions[interaction.post_id].bookmarked = true;
-        if (interaction.type === 'repost') interactions[interaction.post_id].reposted = true;
-      }
-    });
-    
-    return { data: interactions, error };
+    try {
+      // Initialize all posts
+      postIds.forEach(postId => {
+        interactions[postId] = { liked: false, bookmarked: false, reposted: false };
+      });
+
+      // Fetch interactions for each post using the secure function
+      const promises = postIds.map(async (postId) => {
+        const { data, error } = await supabase
+          .rpc('get_user_post_interactions', { post_id_param: postId });
+        
+        if (!error && data?.[0]) {
+          const result = data[0];
+          interactions[postId] = {
+            liked: result.has_liked || false,
+            bookmarked: result.has_bookmarked || false,
+            reposted: result.has_reposted || false
+          };
+        }
+      });
+
+      await Promise.all(promises);
+      return { data: interactions, error: null };
+      
+    } catch (error) {
+      console.error('Error fetching optimized interactions:', error);
+      return { data: interactions, error };
+    }
   }
 };

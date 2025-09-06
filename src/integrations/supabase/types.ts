@@ -657,6 +657,7 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
+          image_url: string | null
           likes_count: number | null
           location: string | null
           reposts_count: number | null
@@ -669,6 +670,7 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
+          image_url?: string | null
           likes_count?: number | null
           location?: string | null
           reposts_count?: number | null
@@ -681,6 +683,7 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
+          image_url?: string | null
           likes_count?: number | null
           location?: string | null
           reposts_count?: number | null
@@ -1080,6 +1083,22 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      get_post_interaction_counts: {
+        Args: { post_id_param: string }
+        Returns: {
+          bookmarks_count: number
+          likes_count: number
+          reposts_count: number
+        }[]
+      }
+      get_user_post_interactions: {
+        Args: { post_id_param: string }
+        Returns: {
+          has_bookmarked: boolean
+          has_liked: boolean
+          has_reposted: boolean
+        }[]
       }
       has_role: {
         Args: {

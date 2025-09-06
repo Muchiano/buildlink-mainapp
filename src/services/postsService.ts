@@ -88,14 +88,30 @@ export const postsService = {
       return { data, error, action: 'liked' };
     }
   },
+  // SECURE: Use new privacy-focused function to get user interactions
   async getUserInteractions(postId: string, userId: string) {
+    if (!userId) {
+      return { data: [], error: null };
+    }
+
     const { data, error } = await supabase
-      .from('post_interactions')
-      .select('type')
-      .eq('post_id', postId)
-      .eq('user_id', userId);
+      .rpc('get_user_post_interactions', { post_id_param: postId });
     
-    return { data, error };
+    if (error) {
+      console.error('Error fetching user interactions:', error);
+      return { data: [], error };
+    }
+
+    // Convert the secure function result to the expected format
+    const interactions = [];
+    if (data?.[0]) {
+      const result = data[0];
+      if (result.has_liked) interactions.push({ type: 'like' });
+      if (result.has_bookmarked) interactions.push({ type: 'bookmark' });
+      if (result.has_reposted) interactions.push({ type: 'repost' });
+    }
+
+    return { data: interactions, error: null };
   },
   async getComments(postId: string) {
     const { data, error } = await supabase
@@ -180,13 +196,28 @@ export const postsService = {
       error: null 
     };
   },
+  // SECURE: Use privacy-focused approach for post interactions
   async getPostInteractions(postId: string) {
+    // Use the secure function to get aggregated counts without exposing user identities
     const { data, error } = await supabase
-      .from('post_interactions')
-      .select('type, user_id')
-      .eq('post_id', postId);
+      .rpc('get_post_interaction_counts', { post_id_param: postId });
     
-    return { data, error };
+    if (error) {
+      console.error('Error fetching post interactions:', error);
+      return { data: [], error };
+    }
+
+    // Convert to the expected format
+    const result = data?.[0] || { likes_count: 0, bookmarks_count: 0, reposts_count: 0 };
+    
+    return { 
+      data: {
+        likes_count: result.likes_count || 0,
+        bookmarks_count: result.bookmarks_count || 0,
+        reposts_count: result.reposts_count || 0
+      }, 
+      error: null 
+    };
   },
   async updatePost(postId: string, updates: {
     content?: string;
