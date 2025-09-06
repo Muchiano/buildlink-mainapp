@@ -1,8 +1,5 @@
-import { useState, useEffect } from "react";
-import { Heart, MessageCircle, Share, Repeat2, Bookmark, MoreHorizontal, Search, Edit3, Bell } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { useState, useCallback } from "react";
+import { Edit3 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { postsService } from "@/services/postsService";
 import { profileService } from "@/services/profileService";
@@ -17,7 +14,10 @@ import NotificationsList from "@/components/NotificationsList";
 import EmptyState from "@/components/EmptyStates";
 import PostCard from "@/components/PostCard";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "../ui/skeleton";
+import { SkeletonFeed, SkeletonPostCard } from "../ui/enhanced-skeleton";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useDataSaver } from "@/contexts/DataSaverContext";
+import { DataSaverToggle } from "@/components/DataSaverToggle";
 
 interface HomeFeedProps {
   activeFilter: string;
@@ -26,85 +26,44 @@ interface HomeFeedProps {
 const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { dataSaverMode } = useDataSaver();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [posts, setPosts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [postInteractions, setPostInteractions] = useState<{[key: string]: {liked: boolean, bookmarked: boolean, reposted: boolean}}>({});
   const [commentsDialog, setCommentsDialog] = useState<{isOpen: boolean, postId: string}>({isOpen: false, postId: ''});
   const [repostDialog, setRepostDialog] = useState<{isOpen: boolean, post: any}>({isOpen: false, post: null});
   const [searchDialog, setSearchDialog] = useState(false);
   const [profileEditDialog, setProfileEditDialog] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
+  // Use infinite scroll hook
+  const {
+    posts,
+    loading: postsLoading,
+    initialLoading,
+    hasMore,
+    error: postsError,
+    postInteractions,
+    refresh,
+    observerRef,
+    updatePostInteraction,
+    updatePostCounts
+  } = useInfiniteScroll({
+    category: activeFilter,
+    limit: dataSaverMode ? 5 : 10, // Smaller batches in data saver mode
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to load posts",
+        variant: "destructive"
+      });
+    }
+  });
+
   const { data: statsData, isLoading: isLoadingStats } = useQuery({
     queryKey: ['profileStats'],
     queryFn: profileService.getStats
   });
 
-  const stats = [
-    { label: "Professionals", value: "12,547" },
-    { label: "Companies", value: "1,284" },
-  ];
-
-  useEffect(() => {
-    loadPosts();
-  }, [activeFilter, user]);
-
-  useEffect(() => {
-    if (user && posts.length > 0) {
-      loadUserInteractions();
-    }
-  }, [posts, user]);
-
-  const loadPosts = async () => {
-    try {
-      setLoading(true);
-      
-      const { data, error } = await postsService.getPosts(activeFilter, 'latest');
-      
-      if (error) {
-        console.error('Error loading posts:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load posts",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      console.log('Posts loaded:', data?.length || 0);
-      setPosts(data || []);
-    } catch (error) {
-      console.error('Error loading posts:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadUserInteractions = async () => {
-    if (!user || posts.length === 0) return;
-
-    const interactions: {[key: string]: {liked: boolean, bookmarked: boolean, reposted: boolean}} = {};
-    
-    for (const post of posts) {
-      try {
-        const { data } = await postsService.getUserInteractions(post.id, user.id);
-        const userInteractions = data || [];
-        
-        interactions[post.id] = {
-          liked: userInteractions.some(i => i.type === 'like'),
-          bookmarked: userInteractions.some(i => i.type === 'bookmark'),
-          reposted: userInteractions.some(i => i.type === 'repost')
-        };
-      } catch (error) {
-        console.error('Error loading interactions for post', post.id, error);
-      }
-    }
-    
-    setPostInteractions(interactions);
-  };
-
-  const handleLike = async (postId: string) => {
+  const handleLike = useCallback(async (postId: string) => {
     if (!user) {
       toast({
         title: "Authentication required",
@@ -126,25 +85,13 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
         return;
       }
 
-      setPostInteractions(prev => ({
-        ...prev,
-        [postId]: {
-          ...prev[postId],
-          liked: action === 'liked'
-        }
-      }));
-
-      // Update post count in the posts array
-      setPosts(prev => prev.map(post => 
-        post.id === postId 
-          ? { 
-              ...post, 
-              likes_count: action === 'liked' 
-                ? (post.likes_count || 0) + 1 
-                : Math.max(0, (post.likes_count || 0) - 1)
-            }
-          : post
-      ));
+      // Update interactions and counts using the hook functions
+      updatePostInteraction(postId, { liked: action === 'liked' });
+      updatePostCounts(postId, {
+        likes_count: action === 'liked' 
+          ? (posts.find(p => p.id === postId)?.likes_count || 0) + 1 
+          : Math.max(0, (posts.find(p => p.id === postId)?.likes_count || 0) - 1)
+      });
 
       toast({
         title: "Success",
@@ -153,7 +100,7 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
     } catch (error) {
       console.error('Error handling like:', error);
     }
-  };
+  }, [user, toast, updatePostInteraction, updatePostCounts, posts]);
 
   const handleComment = (postId: string) => {
     setCommentsDialog({isOpen: true, postId});
@@ -204,52 +151,55 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
     setSelectedUserId(userProfile?.id);
   };
 
-  const handleCreatePost = () => {
-    console.log('Post created, reloading posts...');
-    loadPosts();
-  };
+  const handleCreatePost = useCallback(() => {
+    console.log('Post created, refreshing feed...');
+    refresh();
+  }, [refresh]);
 
-  const handlePostUpdated = () => {
-    console.log('Post updated, reloading posts...');
-    loadPosts();
-  };
+  const handlePostUpdated = useCallback(() => {
+    console.log('Post updated, refreshing feed...');
+    refresh();
+  }, [refresh]);
 
-  const handlePostDeleted = () => {
-    console.log('Post deleted, reloading posts...');
-    loadPosts();
-  };
+  const handlePostDeleted = useCallback(() => {
+    console.log('Post deleted, refreshing feed...');
+    refresh();
+  }, [refresh]);
 
-  const handleRepostComplete = () => {
-    loadPosts();
-  };
+  const handleRepostComplete = useCallback(() => {
+    refresh();
+  }, [refresh]);
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="space-y-6">
         <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-6 text-white">
-          <h2 className="text-2xl font-bold mb-4">Welcome to BuildLink Kenya</h2>
-          <p className="text-primary-foreground/90 mb-6">
-            Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
-          </p>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Welcome to BuildLink Kenya</h2>
+              <p className="text-primary-foreground/90">
+                Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
+              </p>
+            </div>
+            <DataSaverToggle className="text-white" showNetworkInfo />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold">
-                {isLoadingStats ? <Skeleton className="h-8 w-24 mx-auto bg-white/20" /> : statsData?.data?.professionalsCount ?? '0'}
+                {isLoadingStats ? <div className="h-8 w-24 mx-auto bg-white/20 rounded animate-pulse" /> : statsData?.data?.professionalsCount ?? '0'}
               </div>
               <div className="text-sm text-primary-foreground/80">Professionals</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold">
-                {isLoadingStats ? <Skeleton className="h-8 w-24 mx-auto bg-white/20" /> : statsData?.data?.companiesCount ?? '0'}
+                {isLoadingStats ? <div className="h-8 w-24 mx-auto bg-white/20 rounded animate-pulse" /> : statsData?.data?.companiesCount ?? '0'}
               </div>
               <div className="text-sm text-primary-foreground/80">Companies</div>
             </div>
           </div>
         </div>
         
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
+        <SkeletonFeed count={dataSaverMode ? 3 : 5} />
       </div>
     );
   }
@@ -265,18 +215,18 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
               Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
             </p>
           </div>
-
+          <DataSaverToggle className="text-white" showNetworkInfo />
         </div>
         <div className="grid grid-cols-2 gap-4">
            <div className="text-center">
             <div className="text-2xl font-bold">
-              {isLoadingStats ? <Skeleton className="h-8 w-24 mx-auto bg-white/20" /> : statsData?.data?.professionalsCount ?? '0'}
+              {isLoadingStats ? <div className="h-8 w-24 mx-auto bg-white/20 rounded animate-pulse" /> : statsData?.data?.professionalsCount ?? '0'}
             </div>
             <div className="text-sm text-primary-foreground/80">Professionals</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold">
-              {isLoadingStats ? <Skeleton className="h-8 w-24 mx-auto bg-white/20" /> : statsData?.data?.companiesCount ?? '0'}
+              {isLoadingStats ? <div className="h-8 w-24 mx-auto bg-white/20 rounded animate-pulse" /> : statsData?.data?.companiesCount ?? '0'}
             </div>
             <div className="text-sm text-primary-foreground/80">Companies</div>
           </div>
@@ -309,17 +259,39 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
       {/* Posts Feed */}
       <div className="space-y-4">
         {posts.length > 0 ? (
-          posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              isLiked={postInteractions[post.id]?.liked || false}
-              onLike={() => handleLike(post.id)}
-              onComment={() => handleComment(post.id)}
-              onPostUpdated={handlePostUpdated}
-              onPostDeleted={handlePostDeleted}
-            />
-          ))
+          <>
+            {posts.map((post, index) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                isLiked={postInteractions[post.id]?.liked || false}
+                onLike={() => handleLike(post.id)}
+                onComment={() => handleComment(post.id)}
+                onPostUpdated={handlePostUpdated}
+                onPostDeleted={handlePostDeleted}
+                dataSaver={dataSaverMode}
+                priority={index < 2} // First 2 posts get priority loading
+              />
+            ))}
+            
+            {/* Infinite scroll trigger */}
+            {hasMore && (
+              <div ref={observerRef} className="flex justify-center py-8">
+                {postsLoading ? (
+                  <SkeletonPostCard />
+                ) : (
+                  <div className="text-muted-foreground text-sm">Loading more posts...</div>
+                )}
+              </div>
+            )}
+            
+            {!hasMore && posts.length > 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-sm">You've reached the end! 🎉</p>
+                <p className="text-xs mt-1">Check back later for new posts</p>
+              </div>
+            )}
+          </>
         ) : (
           <EmptyState 
             type="posts" 

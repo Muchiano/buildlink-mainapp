@@ -10,8 +10,10 @@ import { formatDistanceToNow } from 'date-fns';
 import { Post } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { postsService } from '@/services/postsService';
+import { optimizedPostsService } from '@/services/optimizedPostsService';
 import { useToast } from '@/hooks/use-toast';
 import EditPostDialog from './EditPostDialog';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 interface PostCardProps {
   post: Post;
@@ -20,15 +22,35 @@ interface PostCardProps {
   onComment?: () => void;
   onPostUpdated?: () => void;
   onPostDeleted?: () => void;
+  dataSaver?: boolean;
+  priority?: boolean;
 }
 
-const PostCard = ({ post, isLiked = false, onLike, onComment, onPostUpdated, onPostDeleted }: PostCardProps) => {
+const PostCard = ({ 
+  post, 
+  isLiked = false, 
+  onLike, 
+  onComment, 
+  onPostUpdated, 
+  onPostDeleted,
+  dataSaver = false,
+  priority = false
+}: PostCardProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLiking, setIsLiking] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPrefetching, setIsPrefetching] = useState(false);
+
+  // Prefetch post data on hover
+  const handleMouseEnter = async () => {
+    if (!isPrefetching && !dataSaver) {
+      setIsPrefetching(true);
+      await optimizedPostsService.prefetchPost(post.id);
+    }
+  };
 
   const handleLike = async () => {
     if (!user || isLiking) return;
@@ -96,7 +118,10 @@ const PostCard = ({ post, isLiked = false, onLike, onComment, onPostUpdated, onP
   };
 
   return (
-    <Card className="w-full">
+    <Card 
+      className="w-full transition-all hover:shadow-md"
+      onMouseEnter={handleMouseEnter}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
@@ -161,10 +186,14 @@ const PostCard = ({ post, isLiked = false, onLike, onComment, onPostUpdated, onP
           
           {post.image_url && (
             <div className="rounded-lg overflow-hidden">
-              <img
+              <OptimizedImage
                 src={post.image_url}
                 alt="Post content"
                 className="w-full h-auto object-cover"
+                width={dataSaver ? 300 : 600}
+                quality={dataSaver ? 50 : 75}
+                priority={priority}
+                dataSaver={dataSaver}
               />
             </div>
           )}
