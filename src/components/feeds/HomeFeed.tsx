@@ -17,7 +17,6 @@ import { useQuery } from "@tanstack/react-query";
 import { SkeletonFeed, SkeletonPostCard } from "../ui/enhanced-skeleton";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useDataSaver } from "@/contexts/DataSaverContext";
-import { DataSaverToggle } from "@/components/DataSaverToggle";
 
 interface HomeFeedProps {
   activeFilter: string;
@@ -181,7 +180,6 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
                 Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
               </p>
             </div>
-            <DataSaverToggle className="text-white" showNetworkInfo />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
@@ -215,7 +213,6 @@ const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
               Connect with professionals, discover opportunities, and grow your career in Kenya's construction industry.
             </p>
           </div>
-          <DataSaverToggle className="text-white" showNetworkInfo />
         </div>
         <div className="grid grid-cols-2 gap-4">
            <div className="text-center">
