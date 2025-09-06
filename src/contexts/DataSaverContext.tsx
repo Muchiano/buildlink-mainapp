@@ -75,7 +75,14 @@ export const DataSaverProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 export const useDataSaver = () => {
   const context = useContext(DataSaverContext);
   if (context === undefined) {
-    throw new Error('useDataSaver must be used within a DataSaverProvider');
+    // Provide fallback values instead of throwing error to prevent app crashes
+    console.warn('useDataSaver called outside DataSaverProvider, using fallback values');
+    return {
+      dataSaverMode: false,
+      setDataSaverMode: () => {},
+      networkType: 'unknown',
+      isSlowConnection: false
+    };
   }
   return context;
 };

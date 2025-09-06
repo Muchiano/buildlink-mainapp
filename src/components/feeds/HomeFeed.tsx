@@ -26,7 +26,7 @@ interface HomeFeedProps {
 const HomeFeed = ({ activeFilter }: HomeFeedProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { dataSaverMode } = useDataSaver();
+  const { dataSaverMode } = useDataSaver(); // Now using the safe hook with fallbacks
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [commentsDialog, setCommentsDialog] = useState<{isOpen: boolean, postId: string}>({isOpen: false, postId: ''});
   const [repostDialog, setRepostDialog] = useState<{isOpen: boolean, post: any}>({isOpen: false, post: null});
