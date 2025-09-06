@@ -84,10 +84,13 @@ const PostCard = ({
         description: 'Post deleted successfully'
       });
       
-      // Close the dialog before triggering parent reload to avoid leftover overlays
+      // Close the dialog and allow proper cleanup before parent reload
       setShowDeleteDialog(false);
       
-      onPostDeleted?.();
+      // Use setTimeout to ensure dialog cleanup completes before parent reload
+      setTimeout(() => {
+        onPostDeleted?.();
+      }, 100);
     } catch (error) {
       toast({
         title: 'Error',
