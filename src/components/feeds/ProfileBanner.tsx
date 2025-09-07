@@ -10,7 +10,7 @@ interface ProfileBannerProps {
 }
 
 const ProfileBanner = ({ profile, onProfileUpdated }: ProfileBannerProps) => (
-  <Card className="border-0 shadow-sm overflow-hidden">
+  <Card className="border-0 shadow-sm overflow-hidden mt-14">
     <div className="h-48 sm:h-40 relative">
       {/* Banner image (if exists; fallback to gradient) */}
       {profile.banner ? (
