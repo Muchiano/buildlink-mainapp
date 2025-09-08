@@ -31,7 +31,7 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
 
   return (
     <div className="bg-white border-b border-gray-200 mb-4 mt-14">
-      <div className="px-4 py-3">
+      <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-gray-700">Filters</h3>
           <Button

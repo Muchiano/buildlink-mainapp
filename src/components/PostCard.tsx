@@ -116,8 +116,9 @@ const PostCard = ({
   const isOwnPost = user && post.author_id === user.id;
 
   const handleProfileClick = () => {
-    // Navigate to user profile - could be implemented with router
-    console.log('Navigate to profile:', post.author_id);
+    if (post.author_id) {
+      window.location.href = `/profile/${post.author_id}`;
+    }
   };
 
   return (

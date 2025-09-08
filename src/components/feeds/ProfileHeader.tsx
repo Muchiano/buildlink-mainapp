@@ -1,11 +1,12 @@
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
-import { MapPin, Users, MessageCircle, Edit, Star } from "lucide-react";
+import { MapPin, Users, MessageCircle, Edit, Star, Settings } from "lucide-react";
 import ProfileEditDialog from "../ProfileEditDialog";
 import AvatarUploader from "../profile-sections/AvatarUploader";
 import UserRating from "../UserRating";
 import AccountTypeBadge from "../AccountTypeBadge";
 import RatingDialog from "../RatingDialog";
+import ProfileSettingsDialog from "../ProfileSettingsDialog";
 import { useState } from "react";
 
 interface ProfileHeaderProps {
@@ -29,9 +30,9 @@ const ProfileHeader = ({
   return (
     <Card className="border-0 shadow-sm">
       <CardContent className="p-6">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
           {/* Info and Avatar */}
-          <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
+          <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-6">
             <div className="relative">
               <AvatarUploader
                 avatarUrl={profile.avatar || ""}
@@ -65,8 +66,8 @@ const ProfileHeader = ({
             </div>
           </div>
           {/* Action Buttons */}
-          <div className="flex space-x-2">
-            <Button variant="outline">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" className="flex-1 sm:flex-none">
               <MessageCircle className="h-4 w-4 mr-1" />
               Message
             </Button>
@@ -74,11 +75,17 @@ const ProfileHeader = ({
             <ProfileEditDialog
               currentProfile={profile}
               onProfileUpdated={handleProfileUpdate}>
-              <Button>
+              <Button className="flex-1 sm:flex-none">
                 <Edit className="h-4 w-4 mr-1" />
                 Edit Profile
               </Button>
             </ProfileEditDialog>
+
+            <ProfileSettingsDialog>
+              <Button variant="outline" size="icon" className="flex-shrink-0">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </ProfileSettingsDialog>
           </div>
         </div>
       </CardContent>

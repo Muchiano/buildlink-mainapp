@@ -123,7 +123,10 @@ const SearchDialog = ({ children }: SearchDialogProps) => {
                     <div
                       key={profile.id}
                       className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
-                      onClick={handleClose}
+                      onClick={() => {
+                        window.location.href = `/profile/${profile.id}`;
+                        handleClose();
+                      }}
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={profile.avatar} />

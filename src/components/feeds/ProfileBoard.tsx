@@ -39,7 +39,7 @@ const ProfileBoard = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 px-2 md:px-0">
       <ProfileBanner 
         profile={profile} 
         onProfileUpdated={handleProfileUpdate}
@@ -54,8 +54,8 @@ const ProfileBoard = () => {
       />
       
       {/* Profile Completion - moved above tabs */}
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-6">
+      <Card className="border-0 shadow-sm mx-2 md:mx-0">
+        <CardContent className="p-4 md:p-6">
           <ProfileCompletionIndicator score={profile?.profile_completion_score || 0} showDetails />
         </CardContent>
       </Card>
@@ -65,14 +65,16 @@ const ProfileBoard = () => {
         setActiveTab={setActiveTab}
         postsCount={userPosts.length}
       />
-      {activeTab === "about" ? (
-        <ProfileAbout 
-          profile={profile}
-          handleProfileUpdate={handleProfileUpdate}
-        />
-      ) : (
-        <ProfileActivity userPosts={userPosts} />
-      )}
+      <div className="px-2 md:px-0">
+        {activeTab === "about" ? (
+          <ProfileAbout 
+            profile={profile}
+            handleProfileUpdate={handleProfileUpdate}
+          />
+        ) : (
+          <ProfileActivity userPosts={userPosts} />
+        )}
+      </div>
     </div>
   );
 };

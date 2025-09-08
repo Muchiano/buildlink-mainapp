@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminResourcesPage from "@/pages/AdminResources";
 import AdminAnalyticsPage from "@/pages/AdminAnalytics";
 import AdminRoute from "@/components/auth/AdminRoute";
+import PublicProfile from "@/pages/PublicProfile";
 
 const AppRoutes = () => (
   <Routes>
@@ -33,6 +34,14 @@ const AppRoutes = () => (
         <AdminRoute>
           <AdminAnalyticsPage />
         </AdminRoute>
+      }
+    />
+    <Route
+      path="/profile/:profileId"
+      element={
+        <ProtectedRoute>
+          <PublicProfile />
+        </ProtectedRoute>
       }
     />
     <Route path="*" element={<NotFound />} />
