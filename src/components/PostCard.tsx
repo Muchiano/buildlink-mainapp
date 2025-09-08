@@ -13,6 +13,7 @@ import { postsService } from '@/services/postsService';
 import { optimizedPostsService } from '@/services/optimizedPostsService';
 import { useToast } from '@/hooks/use-toast';
 import EditPostDialog from './EditPostDialog';
+import ShareDialog from './ShareDialog';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 
 interface PostCardProps {
@@ -41,6 +42,7 @@ const PostCard = ({
   const [isLiking, setIsLiking] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPrefetching, setIsPrefetching] = useState(false);
 
@@ -229,6 +231,7 @@ const PostCard = ({
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => setShowShareDialog(true)}
               className="text-muted-foreground hover:text-green-500"
             >
               <Share2 className="h-4 w-4" />
@@ -244,7 +247,13 @@ const PostCard = ({
         onPostUpdated={onPostUpdated}
       />
 
-      <AlertDialog 
+      <ShareDialog
+        post={post}
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+      />
+
+      <AlertDialog
         open={showDeleteDialog} 
         onOpenChange={(open) => {
           setShowDeleteDialog(open);
