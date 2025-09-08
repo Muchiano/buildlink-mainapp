@@ -81,6 +81,13 @@ export type Database = {
             foreignKeyName: "comments_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -134,6 +141,13 @@ export type Database = {
             foreignKeyName: "connections_connected_user_id_fkey"
             columns: ["connected_user_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connections_connected_user_id_fkey"
+            columns: ["connected_user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -142,6 +156,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profile_directory"
             referencedColumns: ["id"]
           },
           {
@@ -261,6 +282,13 @@ export type Database = {
             foreignKeyName: "mentor_profiles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -306,6 +334,13 @@ export type Database = {
             foreignKeyName: "mentor_reviews_mentor_id_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_reviews_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -314,6 +349,13 @@ export type Database = {
             columns: ["reviewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profile_directory"
             referencedColumns: ["id"]
           },
           {
@@ -378,6 +420,13 @@ export type Database = {
             foreignKeyName: "mentorship_requests_mentee_id_fkey"
             columns: ["mentee_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_requests_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -386,6 +435,13 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_requests_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "public_profile_directory"
             referencedColumns: ["id"]
           },
           {
@@ -449,6 +505,13 @@ export type Database = {
             foreignKeyName: "mentorship_sessions_mentee_id_fkey"
             columns: ["mentee_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_sessions_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -457,6 +520,13 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentorship_sessions_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "public_profile_directory"
             referencedColumns: ["id"]
           },
           {
@@ -554,6 +624,13 @@ export type Database = {
             foreignKeyName: "notifications_from_user_id_fkey"
             columns: ["from_user_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_from_user_id_fkey"
+            columns: ["from_user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -562,6 +639,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profile_directory"
             referencedColumns: ["id"]
           },
           {
@@ -637,6 +721,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_interactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profile_directory"
             referencedColumns: ["id"]
           },
           {
@@ -729,10 +820,47 @@ export type Database = {
             foreignKeyName: "posts_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      profile_access_logs: {
+        Row: {
+          access_type: string
+          accessed_profile_id: string
+          accessor_user_id: string | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+        }
+        Insert: {
+          access_type: string
+          accessed_profile_id: string
+          accessor_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Update: {
+          access_type?: string
+          accessed_profile_id?: string
+          accessor_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       profile_privacy_settings: {
         Row: {
@@ -928,6 +1056,13 @@ export type Database = {
             foreignKeyName: "reposts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reposts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -971,6 +1106,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profile_directory"
             referencedColumns: ["id"]
           },
           {
@@ -1128,6 +1270,13 @@ export type Database = {
             foreignKeyName: "user_progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_profile_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
@@ -1198,6 +1347,39 @@ export type Database = {
       }
     }
     Views: {
+      public_profile_directory: {
+        Row: {
+          avatar: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string | null
+          profession: string | null
+          title: string | null
+          user_type: string | null
+          verification_level: string | null
+        }
+        Insert: {
+          avatar?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          profession?: string | null
+          title?: string | null
+          user_type?: string | null
+          verification_level?: string | null
+        }
+        Update: {
+          avatar?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          profession?: string | null
+          title?: string | null
+          user_type?: string | null
+          verification_level?: string | null
+        }
+        Relationships: []
+      }
       public_profiles: {
         Row: {
           avatar: string | null
@@ -1261,6 +1443,28 @@ export type Database = {
           user_type: string
         }[]
       }
+      get_filtered_profile: {
+        Args: { profile_user_id: string }
+        Returns: {
+          avatar: string
+          bio: string
+          created_at: string
+          education: Json
+          experiences: Json
+          full_name: string
+          id: string
+          organization: string
+          profession: string
+          skills: string[]
+          social_links: Json
+          title: string
+          user_type: string
+        }[]
+      }
+      get_limited_profile_info: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
       get_post_interaction_counts: {
         Args: { post_id_param: string }
         Returns: {
@@ -1296,6 +1500,21 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      is_connected_user: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
+      search_connected_profiles: {
+        Args: { search_term: string }
+        Returns: {
+          avatar: string
+          full_name: string
+          id: string
+          profession: string
+          title: string
+          user_type: string
+        }[]
       }
     }
     Enums: {
