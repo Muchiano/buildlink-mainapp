@@ -1,30 +1,40 @@
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState, useCallback } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import TopBar from "@/components/TopBar";
-import AppSidebar from "@/components/AppSidebar";
-import BottomNavigation from "@/components/BottomNavigation";
-import ContentFilters from "@/components/ContentFilters";
 import HomeFeed from "@/components/feeds/HomeFeed";
 import MentorshipHub from "@/components/feeds/MentorshipHub";
-import PostCreate from "@/components/feeds/PostCreate";
 import SkillUpFeed from "@/components/feeds/SkillUpFeed";
+import PostCreate from "@/components/feeds/PostCreate";
 import ProfileBoard from "@/components/feeds/ProfileBoard";
+import ResponsiveNavigation from "@/components/ResponsiveNavigation";
+import ContentFilters from "@/components/ContentFilters";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 
 const Index = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("home");
   const [activeFilter, setActiveFilter] = useState("latest");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleTabChange = useCallback((tab: string) => {
+    setLoading(true);
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+    // Reset filter when changing tabs
+    if (tab === "home" || tab === "skillup") {
+      setActiveFilter("latest");
+    }
+    // Simulate loading time for smooth transition
+    setTimeout(() => setLoading(false), 300);
+  }, []);
 
   const handleLogoClick = () => {
-    setActiveTab("home");
+    handleTabChange("home");
     setActiveFilter("latest");
   };
 
-  const handleMenuClick = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const renderContent = () => {
+  const renderActiveContent = () => {
     switch (activeTab) {
       case "home":
         return <HomeFeed activeFilter={activeFilter} />;
@@ -44,41 +54,42 @@ const Index = () => {
   const shouldShowFilters = activeTab === "home" || activeTab === "skillup";
 
   return (
-    <div className="w-full">
-      <div className="min-h-screen bg-gray-50 flex w-full">
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Top Navigation */}
-          <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
-
-          {/* Main Content */}
-          <main
-            className={cn(
-              "grid grid-cols-12 min-h-screen px-2 md:px-4 pb-20 md:pb-8 w-full max-w-screen-xl mx-auto",
-              shouldShowFilters ? "" : ""
-            )}>
-            {/* Sidebar */}
-            <div className="hidden md:block col-span-3 bg-white border-r">
-              <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-            </div>
-
-            <div className="lg:col-span-7 md:col-span-9 col-span-12 md:col-start-4 px-2 md:px-0">
-              {/* Content Filters */}
-              {shouldShowFilters && (
+    <div className="min-h-screen bg-background">
+      <TopBar 
+        onLogoClick={handleLogoClick} 
+        onMenuClick={() => setMobileMenuOpen(true)}
+        activeTab={activeTab}
+        loading={loading}
+      />
+      <OfflineIndicator />
+      
+      <div className="flex">
+        {/* Responsive Navigation */}
+        <ResponsiveNavigation 
+          activeTab={activeTab} 
+          onTabChange={handleTabChange}
+          loading={loading}
+        />
+        
+        {/* Main Content */}
+        <div className="flex-1 pt-12 lg:ml-64 pb-16 lg:pb-0">
+          <div className="min-h-[calc(100vh-3rem)] max-w-7xl mx-auto px-4">
+            {/* Content Filters */}
+            {shouldShowFilters && (
+              <div className="mb-4">
                 <ContentFilters
                   activeFilter={activeFilter}
                   onFilterChange={setActiveFilter}
                   filterType={activeTab}
                 />
-              )}
-              <div className="animate-fade-in">{renderContent()}</div>
+              </div>
+            )}
+            
+            {/* Content Area */}
+            <div className={`transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
+              {renderActiveContent()}
             </div>
-          </main>
-        </div>
-
-        {/* Bottom Navigation - Mobile Only */}
-        <div className="md:hidden">
-          <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+          </div>
         </div>
       </div>
     </div>

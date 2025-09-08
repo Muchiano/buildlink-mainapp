@@ -19,7 +19,7 @@ const BottomNavigation = ({
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
       <div className="flex items-center justify-around py-2 max-w-6xl mx-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -30,7 +30,7 @@ const BottomNavigation = ({
               onClick={() => onTabChange(tab.id)}
               className={cn(
                 "flex flex-col items-center p-2 min-w-[60px] transition-colors",
-                isActive ? "text-primary" : "text-gray-500 hover:text-primary"
+                isActive ? "text-primary" : "text-muted-foreground hover:text-primary"
               )}
             >
               <Icon
@@ -38,7 +38,7 @@ const BottomNavigation = ({
                   "h-6 w-6 mb-1",
                   tab.id === "post" &&
                     isActive &&
-                    "bg-primary text-white rounded-full p-1 h-8 w-8"
+                    "bg-primary text-primary-foreground rounded-full p-1 h-8 w-8"
                 )}
               />
               <span className="text-xs font-medium">{tab.label}</span>

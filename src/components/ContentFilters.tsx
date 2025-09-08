@@ -30,10 +30,10 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
   const filters = filterType === "skillup" ? skillUpFilters : homeFilters;
 
   return (
-    <div className="bg-white border-b border-gray-200 mb-4 mt-14">
+    <div className="bg-background border-b border-border mb-4 pt-12">
       <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-sm font-medium text-gray-700">Filters</h3>
+          <h3 className="text-sm font-medium text-foreground">Filters</h3>
           <Button
             variant="ghost"
             size="sm"
@@ -49,17 +49,18 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
         </div>
         
         {isExpanded && (
-          <div className="flex space-x-1 overflow-x-auto">
+          <div className="flex space-x-1 overflow-x-auto pb-2">
             {filters.map((filter) => (
               <Button
                 key={filter.id}
                 variant={activeFilter === filter.id ? "default" : "ghost"}
                 onClick={() => onFilterChange(filter.id)}
+                size="sm"
                 className={cn(
-                  "whitespace-nowrap",
+                  "whitespace-nowrap text-xs h-7",
                   activeFilter === filter.id 
-                    ? "bg-primary text-white" 
-                    : "text-gray-600 hover:text-primary hover:bg-gray-100"
+                    ? "bg-primary text-primary-foreground" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 )}
               >
                 {filter.label}
