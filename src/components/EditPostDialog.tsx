@@ -97,13 +97,13 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
         description: 'Your post has been updated successfully!'
       });
 
-      // Close dialog and allow proper cleanup before parent reload
+      // Close dialog first
       onOpenChange(false);
       
-      // Use setTimeout to ensure dialog cleanup completes before parent reload
+      // Then trigger parent update after a brief delay
       setTimeout(() => {
         onPostUpdated?.();
-      }, 100);
+      }, 200);
     } catch (error) {
       console.error('Error updating post:', error);
       toast({
@@ -120,13 +120,15 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
     <Dialog 
       open={open} 
       onOpenChange={(isOpen) => {
-        onOpenChange(isOpen);
-        // Force cleanup of body styles when dialog closes
         if (!isOpen) {
-          setTimeout(() => {
-            document.body.style.removeProperty('pointer-events');
-          }, 50);
+          // Reset form state on close
+          setContent(post?.content || '');
+          setImageFile(null);
+          setDocumentFile(null);
+          setImagePreview(post?.image_url || null);
+          setRemoveExistingImage(false);
         }
+        onOpenChange(isOpen);
       }}
     >
       <DialogContent className="sm:max-w-[600px]">

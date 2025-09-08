@@ -8,6 +8,7 @@ import AdminResourcesPage from "@/pages/AdminResources";
 import AdminAnalyticsPage from "@/pages/AdminAnalytics";
 import AdminRoute from "@/components/auth/AdminRoute";
 import PublicProfile from "@/pages/PublicProfile";
+import ProfileSettings from "@/pages/ProfileSettings";
 
 const AppRoutes = () => (
   <Routes>
@@ -41,6 +42,14 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute>
           <PublicProfile />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/profile/settings"
+      element={
+        <ProtectedRoute>
+          <ProfileSettings />
         </ProtectedRoute>
       }
     />

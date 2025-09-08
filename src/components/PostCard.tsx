@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import EditPostDialog from './EditPostDialog';
 import ShareDialog from './ShareDialog';
 import { OptimizedImage } from '@/components/ui/optimized-image';
+import { useNavigate } from 'react-router-dom';
 
 interface PostCardProps {
   post: Post;
@@ -39,6 +40,7 @@ const PostCard = ({
 }: PostCardProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isLiking, setIsLiking] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -86,13 +88,13 @@ const PostCard = ({
         description: 'Post deleted successfully'
       });
       
-      // Close the dialog and allow proper cleanup before parent reload
+      // Close the dialog first
       setShowDeleteDialog(false);
       
-      // Use setTimeout to ensure dialog cleanup completes before parent reload
+      // Then trigger parent update after a brief delay to ensure proper cleanup
       setTimeout(() => {
         onPostDeleted?.();
-      }, 100);
+      }, 200);
     } catch (error) {
       toast({
         title: 'Error',
@@ -119,7 +121,7 @@ const PostCard = ({
 
   const handleProfileClick = () => {
     if (post.author_id) {
-      window.location.href = `/profile/${post.author_id}`;
+      navigate(`/profile/${post.author_id}`);
     }
   };
 
@@ -255,15 +257,7 @@ const PostCard = ({
 
       <AlertDialog
         open={showDeleteDialog} 
-        onOpenChange={(open) => {
-          setShowDeleteDialog(open);
-          // Force cleanup of body styles when dialog closes
-          if (!open) {
-            setTimeout(() => {
-              document.body.style.removeProperty('pointer-events');
-            }, 50);
-          }
-        }}
+        onOpenChange={setShowDeleteDialog}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -12,9 +12,11 @@ import { User, LogOut, Settings, Shield } from 'lucide-react';
 import { profileService } from '@/services/profileService';
 import { useState, useEffect } from 'react';
 import { PrivacySettingsDialog } from './PrivacySettingsDialog';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfileButton = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [showPrivacySettings, setShowPrivacySettings] = useState(false);
 
@@ -42,6 +44,10 @@ const UserProfileButton = () => {
     await signOut();
   };
 
+  const handleSettingsClick = () => {
+    navigate('/profile/settings');
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -65,7 +71,7 @@ const UserProfileButton = () => {
           )}
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSettingsClick}>
           <Settings className="mr-2 h-4 w-4" />
           Profile Settings
         </DropdownMenuItem>
