@@ -24,7 +24,6 @@ export const profileService = {
     experiences?: any[];
     education?: any[];
     certifications?: any[];
-    interests?: string[];
     banner?: string;
     social_links?: Record<string, string>;
     verification_badges?: any[];

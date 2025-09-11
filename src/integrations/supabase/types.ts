@@ -936,7 +936,6 @@ export type Database = {
           experiences: Json | null
           full_name: string
           id: string
-          interests: string[] | null
           languages: Json | null
           organization: string | null
           portfolio: Json | null
@@ -966,7 +965,6 @@ export type Database = {
           experiences?: Json | null
           full_name: string
           id: string
-          interests?: string[] | null
           languages?: Json | null
           organization?: string | null
           portfolio?: Json | null
@@ -996,7 +994,6 @@ export type Database = {
           experiences?: Json | null
           full_name?: string
           id?: string
-          interests?: string[] | null
           languages?: Json | null
           organization?: string | null
           portfolio?: Json | null

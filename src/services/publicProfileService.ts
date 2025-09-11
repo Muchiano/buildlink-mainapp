@@ -20,7 +20,6 @@ export const publicProfileService = {
           avatar,
           bio,
           skills,
-          interests,
           banner,
           profile_completion_score,
           profile_visibility,

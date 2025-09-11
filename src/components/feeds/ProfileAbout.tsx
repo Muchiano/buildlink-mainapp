@@ -4,7 +4,6 @@ import PortfolioSection from "../profile-sections/details/PortfolioSection";
 import ExperienceSection from "../profile-sections/details/ExperienceSection";
 import EducationSection from "../profile-sections/details/EducationSection";
 import CertificationsSection from "../profile-sections/details/CertificationsSection";
-import InterestsSection from "../profile-sections/details/InterestsSection";
 import CompactSkillsSection from "../profile-sections/details/CompactSkillsSection";
 import ProfileCompletionIndicator from "../profile/ProfileCompletionIndicator";
 import SocialMediaLinks from "../profile/SocialMediaLinks";
@@ -57,7 +56,6 @@ const ProfileAbout = ({ profile, handleProfileUpdate }: ProfileAboutProps) => {
       <EducationSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <CompactSkillsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
       <CertificationsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
-      <InterestsSection profile={profile} handleProfileUpdate={handleProfileUpdate} />
     </div>
   );
 };
