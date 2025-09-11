@@ -3,7 +3,6 @@ import { Button } from "../ui/button";
 import { MapPin, Users, MessageCircle, Edit, Star, Settings } from "lucide-react";
 import ProfileEditDialog from "../ProfileEditDialog";
 import AvatarUploader from "../profile-sections/AvatarUploader";
-import UserRating from "../UserRating";
 import AccountTypeBadge from "../AccountTypeBadge";
 import RatingDialog from "../RatingDialog";
 import ProfileSettingsDialog from "../ProfileSettingsDialog";
