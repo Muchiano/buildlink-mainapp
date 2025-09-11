@@ -137,7 +137,7 @@ const PostCard = ({
               className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all"
               onClick={handleProfileClick}
             >
-              <AvatarImage src={post.profiles?.avatar_url || post.user?.avatar_url} />
+              <AvatarImage src={post.profiles?.avatar || post.user?.avatar_url} />
               <AvatarFallback>
                 {(post.profiles?.full_name || post.user?.full_name)?.charAt(0) || 'U'}
               </AvatarFallback>
@@ -147,10 +147,10 @@ const PostCard = ({
                 className="font-semibold text-sm cursor-pointer hover:text-primary transition-colors"
                 onClick={handleProfileClick}
               >
-                {post.profiles?.full_name || post.user?.full_name}
+                {post.profiles?.full_name || post.user?.full_name || 'Anonymous User'}
               </p>
               <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                <span>{post.profiles?.profession || post.user?.profession}</span>
+                <span>{post.profiles?.profession || post.user?.profession || 'No profession'}</span>
                 <span>•</span>
                 <span>{formatDistanceToNow(new Date(post.created_at))} ago</span>
               </div>

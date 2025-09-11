@@ -26,7 +26,14 @@ export interface Post {
   created_at: string;
   updated_at: string;
   user?: User;
-  profiles?: User;
+  profiles?: {
+    id: string;
+    full_name: string;
+    avatar?: string;
+    profession?: string;
+    user_type?: string;
+    title?: string;
+  };
 }
 
 export interface Comment {

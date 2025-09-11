@@ -6,7 +6,14 @@ export const postsService = {
       .from('posts')
       .select(`
         *,
-        profiles!posts_author_id_fkey(*),
+        profiles:author_id (
+          id,
+          full_name,
+          avatar,
+          profession,
+          user_type,
+          title
+        ),
         likes_count,
         comments_count,
         reposts_count
@@ -118,7 +125,13 @@ export const postsService = {
       .from('comments')
       .select(`
         *,
-        profiles!comments_author_id_fkey(*)
+        profiles:author_id (
+          id,
+          full_name,
+          avatar,
+          profession,
+          user_type
+        )
       `)
       .eq('post_id', postId)
       .is('parent_id', null)
@@ -137,7 +150,13 @@ export const postsService = {
       .insert(commentData)
       .select(`
         *,
-        profiles!comments_author_id_fkey(*)
+        profiles:author_id (
+          id,
+          full_name,
+          avatar,
+          profession,
+          user_type
+        )
       `)
       .single();
     
@@ -176,7 +195,13 @@ export const postsService = {
       .from('posts')
       .select(`
         *,
-        profiles!posts_author_id_fkey(*)
+        profiles:author_id (
+          id,
+          full_name,
+          avatar,
+          profession,
+          user_type
+        )
       `)
       .eq('id', postId)
       .single();
@@ -232,7 +257,13 @@ export const postsService = {
       .eq('id', postId)
       .select(`
         *,
-        profiles!posts_author_id_fkey(*)
+        profiles:author_id (
+          id,
+          full_name,
+          avatar,
+          profession,
+          user_type
+        )
       `)
       .single();
     

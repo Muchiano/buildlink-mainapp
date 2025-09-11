@@ -7,7 +7,7 @@ export const publicProfileService = {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (user) {
-      // Authenticated users can see more profile information
+      // Authenticated users can see profile information for public profiles or users who have posted publicly
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -23,10 +23,14 @@ export const publicProfileService = {
           banner,
           profile_completion_score,
           profile_visibility,
-          created_at
+          created_at,
+          experiences,
+          education,
+          certifications,
+          social_links,
+          verification_badges
         `)
         .eq('id', profileId)
-        .eq('profile_visibility', 'public')
         .single();
       
       return { data, error };
