@@ -65,7 +65,7 @@ const Index = () => {
 
       {/* Main Content */}
       <div className="relative top-12 grid grid-cols-12 h-screen px-4 pb-20 md:pb-8 w-full max-w-screen-xl mx-auto">
-        <div className="hidden md:block col-span-3 bg-white border-r">
+        <div className="col-span-3 bg-white border-r">
           {/* Responsive Navigation */}
           <ResponsiveNavigation
             activeTab={activeTab}
@@ -73,7 +73,7 @@ const Index = () => {
             loading={loading}
           />
         </div>
-        <div className="lg:col-span-7 md:col-span-9 col-span-12 md:col-start-4">
+        <div className="xl:col-span-7 lg:col-span-9 col-span-12 md:col-start-4">
           {/* Content Filters */}
           {shouldShowFilters && (
             <div className="mb-4">

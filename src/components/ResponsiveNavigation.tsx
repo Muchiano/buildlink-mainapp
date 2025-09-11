@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Home, Users, Plus, BookOpen, User, X } from "lucide-react";
+import { Home, Plus, BookOpen, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface ResponsiveNavigationProps {
   activeTab: string;
@@ -28,7 +27,7 @@ const ResponsiveNavigation = ({ activeTab, onTabChange, loading }: ResponsiveNav
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="">
+      <div className="md:block hidden">
         <nav className="p-4 space-y-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
@@ -59,47 +58,9 @@ const ResponsiveNavigation = ({ activeTab, onTabChange, loading }: ResponsiveNav
         </nav>
       </div>
 
-      {/* Mobile Sheet */}
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="w-64 p-0">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold">Navigation</h2>
-            </div>
-            <nav className="space-y-2">
-              {navigationItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleTabChange(item.id)}
-                    disabled={loading}
-                    className={cn(
-                      "flex items-center gap-3 w-full p-3 rounded-md text-left transition-colors",
-                      "hover:bg-accent hover:text-accent-foreground",
-                      isActive 
-                        ? "bg-accent text-accent-foreground font-medium" 
-                        : "text-foreground",
-                      loading && "opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    <Icon size={20} />
-                    <span>{item.title}</span>
-                    {loading && isActive && (
-                      <div className="ml-auto animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </SheetContent>
-      </Sheet>
 
       {/* Mobile Bottom Navigation */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
+      <div className="md:hidden block fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
         <div className="flex items-center justify-around py-2 max-w-6xl mx-auto">
           {navigationItems.map((tab) => {
             const Icon = tab.icon;

@@ -26,16 +26,6 @@ const TopBar = ({ onLogoClick, onMenuClick, activeTab, loading }: TopBarProps) =
       <div className="flex h-12 items-center justify-between px-4 max-w-7xl mx-auto">
         {/* Left side - Menu + Logo */}
         <div className="flex items-center space-x-3">
-          {onMenuClick && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={onMenuClick}
-              className="lg:hidden"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          )}
           <div 
             className="flex items-center cursor-pointer" 
             onClick={onLogoClick}
