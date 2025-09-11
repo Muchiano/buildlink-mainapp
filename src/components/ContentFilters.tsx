@@ -30,7 +30,7 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
   const filters = filterType === "skillup" ? skillUpFilters : homeFilters;
 
   return (
-    <div className="bg-background border-b border-border mb-4 pt-12">
+    <div className="bg-background border-b border-border mb-4">
       <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-foreground">Filters</h3>

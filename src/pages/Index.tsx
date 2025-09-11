@@ -55,40 +55,42 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopBar 
-        onLogoClick={handleLogoClick} 
+      <TopBar
+        onLogoClick={handleLogoClick}
         onMenuClick={() => setMobileMenuOpen(true)}
         activeTab={activeTab}
         loading={loading}
       />
       <OfflineIndicator />
-      
-      <div className="flex">
-        {/* Responsive Navigation */}
-        <ResponsiveNavigation 
-          activeTab={activeTab} 
-          onTabChange={handleTabChange}
-          loading={loading}
-        />
-        
-        {/* Main Content */}
-        <div className="flex-1 pt-12 lg:ml-64 pb-16 lg:pb-0">
-          <div className="min-h-[calc(100vh-3rem)] max-w-7xl mx-auto px-4">
-            {/* Content Filters */}
-            {shouldShowFilters && (
-              <div className="mb-4">
-                <ContentFilters
-                  activeFilter={activeFilter}
-                  onFilterChange={setActiveFilter}
-                  filterType={activeTab}
-                />
-              </div>
-            )}
-            
-            {/* Content Area */}
-            <div className={`transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
-              {renderActiveContent()}
+
+      {/* Main Content */}
+      <div className="relative top-12 grid grid-cols-12 h-screen px-4 pb-20 md:pb-8 w-full max-w-screen-xl mx-auto">
+        <div className="hidden md:block col-span-3 bg-white border-r">
+          {/* Responsive Navigation */}
+          <ResponsiveNavigation
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            loading={loading}
+          />
+        </div>
+        <div className="lg:col-span-7 md:col-span-9 col-span-12 md:col-start-4">
+          {/* Content Filters */}
+          {shouldShowFilters && (
+            <div className="mb-4">
+              <ContentFilters
+                activeFilter={activeFilter}
+                onFilterChange={setActiveFilter}
+                filterType={activeTab}
+              />
             </div>
+          )}
+
+          {/* Content Area */}
+          <div
+            className={`transition-opacity duration-300 ${
+              loading ? "opacity-50" : "opacity-100"
+            }`}>
+            {renderActiveContent()}
           </div>
         </div>
       </div>

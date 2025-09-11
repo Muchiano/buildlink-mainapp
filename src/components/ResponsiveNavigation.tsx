@@ -28,7 +28,7 @@ const ResponsiveNavigation = ({ activeTab, onTabChange, loading }: ResponsiveNav
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block fixed left-0 top-12 h-[calc(100vh-3rem)] w-64 bg-background border-r border-border z-40">
+      <div className="">
         <nav className="p-4 space-y-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
