@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import ProfileBanner from "./ProfileBanner";
 import ProfileHeader from "./ProfileHeader";
 import ProfileTabs from "./ProfileTabs";
 import ProfileAbout from "./ProfileAbout";
@@ -40,10 +39,6 @@ const ProfileBoard = () => {
 
   return (
     <div className="space-y-4 md:space-y-6 px-2 md:px-0">
-      <ProfileBanner 
-        profile={profile} 
-        onProfileUpdated={handleProfileUpdate}
-      />
       <ProfileHeader 
         profile={profile}
         uploading={uploading}
