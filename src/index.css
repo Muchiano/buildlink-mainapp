@@ -98,4 +98,9 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Ensure body pointer events are always enabled */
+  body {
+    pointer-events: auto !important;
+  }
 }
