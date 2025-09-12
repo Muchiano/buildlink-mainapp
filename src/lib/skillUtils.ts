@@ -9,6 +9,7 @@ export const convertAndSanitizeSkills = (skills: any[]): Skill[] => {
     return skills
       .map(skill => {
         if (typeof skill === 'string') {
+          // For simple strings, create a skill object with default level
           return { name: skill, level: 3 };
         }
         if (typeof skill === 'object' && skill !== null) {
@@ -24,10 +25,14 @@ export const convertAndSanitizeSkills = (skills: any[]): Skill[] => {
                 level = parsedName.level || level;
               }
             } catch (e) {
-              // Not a JSON string, do nothing, keep original name
+              // Not a JSON string, keep original name
             }
           }
-          return { name, level };
+          
+          // Ensure name is a string
+          if (typeof name === 'string' && name.trim()) {
+            return { name: name.trim(), level };
+          }
         }
         return null; // Filter out invalid entries
       })

@@ -52,10 +52,10 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
 
     setIsLoading(true);
     try {
-      // Convert skills to the format expected by the database (mixed array support)
-      const skillsData = skills as any[];
+      // Convert skills to simple string array for clean storage
+      const skillNames = skills.map(skill => skill.name);
       
-      const { error } = await profileService.updateProfile(user.id, { skills: skillsData });
+      const { error } = await profileService.updateProfile(user.id, { skills: skillNames });
 
       if (error) throw error;
 
