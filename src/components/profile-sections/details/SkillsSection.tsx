@@ -12,15 +12,14 @@ interface SkillsSectionProps {
 
 const SkillsSection = ({ profile, handleProfileUpdate }: SkillsSectionProps) => {
   const renderSkillsContent = () => {
-    if (!profile.skills || profile.skills.length === 0) {
+    const sanitizedSkills = convertAndSanitizeSkills(profile?.skills || []);
+    if (sanitizedSkills.length === 0) {
       return (
         <div className="text-gray-500 italic py-4">
           No skills added yet. Click edit to showcase your expertise and specializations.
         </div>
       );
     }
-
-    const sanitizedSkills = convertAndSanitizeSkills(profile.skills);
 
     return (
       <div className="space-y-4">

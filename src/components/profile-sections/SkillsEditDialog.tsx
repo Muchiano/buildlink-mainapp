@@ -48,31 +48,26 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
 
     setIsLoading(true);
     try {
-      // Convert skills to simple string array for clean storage
-      const skillNames = skills.map(skill => skill.name);
+      const targetId = currentProfile?.id || user?.id;
+      if (!targetId) throw new Error('No user found');
+
+      // Store as simple string array for clean DB model
+      const skillNames = skills.map(s => s.name.trim()).filter(Boolean);
       
-      const { error } = await profileService.updateProfile(user.id, { skills: skillNames });
+      const { error } = await profileService.updateProfile(targetId, { skills: skillNames });
 
       if (error) throw error;
 
-      toast({
-        title: 'Success',
-        description: 'Skills updated successfully!'
-      });
+      toast({ title: 'Success', description: 'Skills updated successfully!' });
 
       setOpen(false);
       onProfileUpdated?.();
     } catch (error) {
       console.error('Error updating skills:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update skills. Please try again.',
-        variant: 'destructive'
-      });
+      toast({ title: 'Error', description: 'Failed to update skills. Please try again.', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
