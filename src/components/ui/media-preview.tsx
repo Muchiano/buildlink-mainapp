@@ -34,8 +34,8 @@ const MediaPreview = ({
 
   const sizeClasses = {
     sm: "w-16 h-16",
-    md: "w-32 h-32",
-    lg: "w-48 h-48"
+    md: "w-full h-32",
+    lg: "w-full h-48"
   };
 
   // Load PDF.js dynamically
@@ -157,14 +157,23 @@ const MediaPreview = ({
 
     if (type === "pdf") {
       return (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-300 rounded-lg hover:from-red-100 hover:to-red-200 transition-all duration-200 shadow-sm hover:shadow-md">
-          {getFileIcon()}
-          <span className="text-xs font-semibold text-red-800 mt-1 truncate px-2">
-            {name || "PDF Document"}
-          </span>
-          <span className="text-xs text-red-600 mt-1">
-            Click to view
-          </span>
+        <div className="w-full h-full flex items-center justify-between bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg hover:from-red-100 hover:to-red-200 transition-all duration-200 shadow-sm hover:shadow-md p-4">
+          <div className="flex items-center space-x-3">
+            <div className="flex-shrink-0">
+              <FileText className="h-8 w-8 text-red-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-red-900 truncate">
+                {name || "PDF Document"}
+              </p>
+              <p className="text-xs text-red-600">
+                Click to view PDF
+              </p>
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            <Eye className="h-5 w-5 text-red-500" />
+          </div>
         </div>
       );
     }
