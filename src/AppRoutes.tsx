@@ -1,6 +1,10 @@
 
 import { Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import Home from "./pages/Home";
+import Mentorship from "./pages/Mentorship";
+import ResourceHub from "./pages/ResourceHub";
+import CreatePost from "./pages/CreatePost";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -17,7 +21,39 @@ const AppRoutes = () => (
       path="/" 
       element={
         <ProtectedRoute>
-          <Index />
+          <Home />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/mentorship" 
+      element={
+        <ProtectedRoute>
+          <Mentorship />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/resource-hub" 
+      element={
+        <ProtectedRoute>
+          <ResourceHub />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/create-post" 
+      element={
+        <ProtectedRoute>
+          <CreatePost />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/profile" 
+      element={
+        <ProtectedRoute>
+          <Profile />
         </ProtectedRoute>
       } 
     />

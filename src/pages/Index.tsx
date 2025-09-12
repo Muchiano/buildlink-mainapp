@@ -102,7 +102,6 @@ const Index: React.FC<IndexProps> = ({
     <div className="min-h-screen bg-background">
       <TopBar
         onLogoClick={handleLogoClick}
-        activeTab={activeTab}
         loading={loading}
       />
       <OfflineIndicator />
@@ -112,8 +111,6 @@ const Index: React.FC<IndexProps> = ({
         {showNavigation && (
           <div className="col-span-3 bg-white border-r">
             <ResponsiveNavigation
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
               loading={loading}
             />
           </div>

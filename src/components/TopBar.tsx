@@ -1,7 +1,7 @@
 import { Search, BarChart3, Settings, Menu, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import UserProfileButton from "@/components/UserProfileButton";
 import SearchDialog from "@/components/SearchDialog";
 import EnhancedNotificationsDropdown from "@/components/EnhancedNotificationsDropdown";
@@ -13,18 +13,17 @@ import logo from "@/assets/buildlink-logo.png";
 interface TopBarProps {
   onLogoClick: () => void;
   onMenuClick?: () => void;
-  activeTab?: string;
   loading?: boolean;
 }
 
 const TopBar = ({
   onLogoClick,
   onMenuClick,
-  activeTab,
   loading,
 }: TopBarProps) => {
   const { isAdmin } = useIsAdmin();
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
 
   return (
     <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -86,7 +85,7 @@ const TopBar = ({
                   size="icon"
                   title="Analytics"
                   className={cn(
-                    activeTab === "analytics" &&
+                    location.pathname === "/admin-analytics" &&
                       "bg-accent text-accent-foreground"
                   )}>
                   <BarChart3 className="h-5 w-5" />
@@ -98,7 +97,7 @@ const TopBar = ({
                   size="icon"
                   title="Admin Panel"
                   className={cn(
-                    activeTab === "admin" && "bg-accent text-accent-foreground"
+                    location.pathname === "/admin-resources" && "bg-accent text-accent-foreground"
                   )}>
                   <Settings className="h-5 w-5" />
                 </Button>
