@@ -261,17 +261,19 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
             </Button>
           </div>
 
-{documentFile && (
-  <div className="pt-2">
-    <MediaPreview
-      url={URL.createObjectURL(documentFile)}
-      type="pdf"
-      name={documentFile.name}
-      size="lg"
-      showActions
-    />
-  </div>
-)}
+          {/* PDF Preview */}
+          {documentFile && (
+            <div className="pt-4 border-t">
+              <h4 className="text-sm font-medium mb-2">PDF Document Preview</h4>
+              <MediaPreview
+                url={URL.createObjectURL(documentFile)}
+                type="pdf"
+                name={documentFile.name}
+                size="lg"
+                showActions
+              />
+            </div>
+          )}
           
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>

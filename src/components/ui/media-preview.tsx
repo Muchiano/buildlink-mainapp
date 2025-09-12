@@ -378,12 +378,12 @@ const MediaPreview = ({
             )}
             <Button 
               variant="secondary" 
-              size="icon" 
-              className="h-7 w-7 bg-white/90 hover:bg-white"
-              onClick={handleDownload}
-            >
-              <Download className="h-3 w-3" />
-            </Button>
+                size="icon" 
+                className="h-7 w-7 bg-white/90 hover:bg-white"
+                onClick={handleDownload}
+              >
+                <Download className="h-3 w-3" />
+              </Button>
           </div>
         </div>
       )}

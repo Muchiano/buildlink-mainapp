@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { postsService } from "@/services/postsService";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import MediaPreview from "@/components/ui/media-preview";
 
 // Add support for uploading a single image per post for MVP
 
@@ -251,6 +252,19 @@ const PostCreate = () => {
               >
                 <X className="h-5 w-5 text-gray-600" />
               </button>
+            </div>
+          )}
+
+          {/* PDF Preview */}
+          {documentFile && (
+            <div className="my-4">
+              <MediaPreview
+                url={URL.createObjectURL(documentFile)}
+                type="pdf"
+                name={documentFile.name}
+                size="md"
+                showActions
+              />
             </div>
           )}
 

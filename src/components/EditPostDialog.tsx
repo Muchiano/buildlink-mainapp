@@ -249,17 +249,19 @@ const EditPostDialog = ({
             </Button>
           </div>
 
-{(documentFile || post?.document_url) && (
-  <div className="pt-2">
-    <MediaPreview
-      url={documentFile ? URL.createObjectURL(documentFile) : (post.document_url as string)}
-      type="pdf"
-      name={documentFile ? documentFile.name : `Document-${post.id.slice(0, 8)}`}
-      size="lg"
-      showActions
-    />
-  </div>
-)}
+          {/* PDF Preview - Show for both new files and existing PDFs */}
+          {(documentFile || post?.document_url) && (
+            <div className="pt-4 border-t">
+              <h4 className="text-sm font-medium mb-2">PDF Document</h4>
+              <MediaPreview
+                url={documentFile ? URL.createObjectURL(documentFile) : (post.document_url as string)}
+                type="pdf"
+                name={documentFile ? documentFile.name : `Document-${post.id.slice(0, 8)}`}
+                size="lg"
+                showActions
+              />
+            </div>
+          )}
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button

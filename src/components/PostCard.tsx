@@ -240,13 +240,16 @@ const PostCard = ({
 
           {/* Document Preview */}
           {post.document_url && (
-            <MediaPreview
-              url={post.document_url}
-              type="pdf"
-              name={`Document-${post.id.slice(0, 8)}`}
-              size="md"
-              showActions={true}
-            />
+            <div className="mt-3">
+              <MediaPreview
+                url={post.document_url}
+                type="pdf"
+                name={`Document-${post.id.slice(0, 8)}`}
+                size="md"
+                showActions
+                className="border rounded-lg"
+              />
+            </div>
           )}
 
           <div className="flex items-center justify-between pt-3 border-t">
