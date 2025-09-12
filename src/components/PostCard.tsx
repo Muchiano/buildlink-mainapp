@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import EditPostDialog from './EditPostDialog';
 import ShareDialog from './ShareDialog';
 import { OptimizedImage } from '@/components/ui/optimized-image';
+import MediaPreview from '@/components/ui/media-preview';
 import { useNavigate } from 'react-router-dom';
 
 interface PostCardProps {
@@ -202,6 +203,19 @@ const PostCard = ({
                 quality={dataSaver ? 50 : 75}
                 priority={priority}
                 dataSaver={dataSaver}
+              />
+            </div>
+          )}
+
+          {/* Document Preview */}
+          {(post as any).document_url && (
+            <div className="rounded-lg">
+              <MediaPreview
+                url={(post as any).document_url}
+                type="pdf"
+                name={`Document-${post.id.slice(0, 8)}`}
+                size="md"
+                showActions={true}
               />
             </div>
           )}

@@ -21,9 +21,11 @@ const PostCreate = () => {
   const [postType, setPostType] = useState("update");
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
   const isMobile = useIsMobile();
 
   // Memorize handlers to avoid unnecessary re-renders.
@@ -44,6 +46,16 @@ const PostCreate = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, []);
 
+  const handleDocumentChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        setDocumentFile(file);
+      }
+    },
+    []
+  );
+
   const handleSubmit = useCallback(async () => {
     if (!user || !content.trim()) {
       toast({
@@ -58,6 +70,8 @@ const PostCreate = () => {
 
     try {
       let image_url: string | undefined;
+      let document_url: string | undefined;
+      
       if (imageFile) {
         // upload image to Supabase Storage
         const fileExt = imageFile.name.split(".").pop();
@@ -92,11 +106,46 @@ const PostCreate = () => {
         image_url = publicUrlData.publicUrl;
       }
 
+      if (documentFile) {
+        // upload document to Supabase Storage
+        const fileExt = documentFile.name.split(".").pop();
+        const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("post-media")
+          .upload(filePath, documentFile, { upsert: false });
+
+        if (uploadError) {
+          console.error("Document upload error:", uploadError);
+          toast({
+            title: "Upload Failed",
+            description: "Could not upload document. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("post-media")
+          .getPublicUrl(filePath);
+        if (!publicUrlData?.publicUrl) {
+          toast({
+            title: "Document URL Error",
+            description: "Could not get document URL. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        document_url = publicUrlData.publicUrl;
+      }
+
       const { error } = await postsService.createPost({
         content,
         category: postType,
         user_id: user.id,
         image_url,
+        document_url,
       });
 
       if (error) {
@@ -111,8 +160,10 @@ const PostCreate = () => {
       setContent("");
       setPostType("update");
       setImageFile(null);
+      setDocumentFile(null);
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      if (documentInputRef.current) documentInputRef.current.value = "";
     } catch (error) {
       console.error("Error creating post:", error);
       toast({
@@ -123,7 +174,7 @@ const PostCreate = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user, content, imageFile, postType, toast]);
+  }, [user, content, imageFile, documentFile, postType, toast]);
 
   if (!user) {
     return (
@@ -221,31 +272,17 @@ const PostCreate = () => {
               variant="ghost"
               size={isMobile ? "sm" : "sm"}
               className={cn("text-gray-600", isMobile && "px-2 py-1")}
-              onClick={() => {
-                // Document upload feature (PDFs only, max 10MB)
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.pdf';
-                input.onchange = (e) => {
-                  const file = (e.target as HTMLInputElement).files?.[0];
-                  if (file) {
-                    if (file.size > 10 * 1024 * 1024) {
-                      toast({
-                        title: "File too large",
-                        description: "PDF files must be under 10MB",
-                        variant: "destructive",
-                      });
-                      return;
-                    }
-                    // Handle PDF upload logic here
-                    console.log('PDF file selected:', file.name);
-                  }
-                };
-                input.click();
-              }}
+              onClick={() => documentInputRef.current?.click()}
             >
               <FileText className="h-4 w-4 mr-2" />
               <span className={isMobile ? "sr-only" : ""}>Add Document</span>
+              <input
+                ref={documentInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.txt"
+                className="hidden"
+                onChange={handleDocumentChange}
+              />
             </Button>
             <Button
               variant="ghost"

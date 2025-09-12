@@ -83,17 +83,32 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         image_url = publicUrlData?.publicUrl;
       }
 
-      // Handle document upload (for future use)
+      let document_url: string | undefined;
+
+      // Handle document upload
       if (documentFile) {
-        // Document upload logic can be added here
-        console.log('Document upload not yet implemented');
+        const fileExt = documentFile.name.split('.').pop();
+        const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('post-media')
+          .upload(filePath, documentFile);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('post-media')
+          .getPublicUrl(filePath);
+        document_url = publicUrlData?.publicUrl;
       }
 
       const { error } = await postsService.createPost({
         content: formData.content,
         category: formData.category,
         user_id: user.id,
-        image_url
+        image_url,
+        document_url
       });
 
       if (error) throw error;

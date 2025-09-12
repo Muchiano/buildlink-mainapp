@@ -19,6 +19,7 @@ export interface Post {
   author_id: string;
   content: string;
   image_url?: string;
+  document_url?: string;
   location?: string;
   likes_count: number;
   comments_count: number;
