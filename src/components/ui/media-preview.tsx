@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { Image, FileText, Download, Eye, ExternalLink } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Image, FileText, Download, Eye, ExternalLink, AlertCircle } from "lucide-react";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 import { Badge } from "./badge";
+import { Alert, AlertDescription } from "./alert";
 import { cn } from "@/lib/utils";
 
 interface MediaPreviewProps {
@@ -26,12 +27,37 @@ const MediaPreview = ({
 }: MediaPreviewProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [pdfLoadError, setPdfLoadError] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
 
   const sizeClasses = {
     sm: "w-16 h-16",
     md: "w-32 h-32",
     lg: "w-48 h-48"
   };
+
+  // Check if PDF can be displayed inline
+  useEffect(() => {
+    if (type === 'pdf') {
+      // Test if browser supports PDF viewing
+      const testPdf = () => {
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isChrome = userAgent.includes('chrome');
+        const isFirefox = userAgent.includes('firefox');
+        const isSafari = userAgent.includes('safari') && !userAgent.includes('chrome');
+        const isEdge = userAgent.includes('edge');
+        
+        // Most modern browsers support PDF viewing, but mobile browsers often don't
+        const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+        
+        if (isMobile) {
+          setShowFallback(true);
+        }
+      };
+      
+      testPdf();
+    }
+  }, [type]);
 
   const getFileIcon = () => {
     switch (type) {
@@ -85,14 +111,106 @@ const MediaPreview = ({
 
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
-    window.open(url, '_blank');
+    // Create a proper download link
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = name || `document.${type === 'pdf' ? 'pdf' : 'file'}`;
+    link.target = '_blank';
+    // Add rel="noopener noreferrer" for security
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handlePreview = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (type === "pdf") {
-      window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  // Enhanced PDF viewer with multiple fallback options
+  const renderPdfViewer = () => {
+    if (showFallback || pdfLoadError) {
+      return (
+        <div className="w-full h-[calc(95vh-120px)] flex flex-col items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+          <FileText className="h-20 w-20 text-gray-400 mb-6" />
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">PDF Preview</h3>
+          <p className="text-gray-600 mb-6 text-center max-w-md">
+            {showFallback 
+              ? "PDF preview is not available on mobile devices. Use the buttons below to view the document."
+              : "Unable to display PDF inline. Your browser may not support embedded PDF viewing."
+            }
+          </p>
+          
+          <Alert className="max-w-md mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              For the best viewing experience, try opening the PDF in a new tab or downloading it.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex gap-3">
+            <Button onClick={handlePreview} className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              Open in New Tab
+            </Button>
+            <Button variant="outline" onClick={handleDownload} className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Download PDF
+            </Button>
+          </div>
+        </div>
+      );
     }
+
+    // Create multiple PDF viewing strategies
+    const pdfViewerUrl = `${url}#view=FitH&toolbar=1&navpanes=1`;
+    
+    return (
+      <div className="w-full h-[calc(95vh-120px)] bg-gray-100 rounded-lg border relative">
+        {/* Primary iframe attempt */}
+        <iframe
+          src={pdfViewerUrl}
+          className="w-full h-full rounded-lg border-0"
+          title={name || "PDF Document"}
+          onLoad={() => {
+            setIsLoading(false);
+            setPdfLoadError(false);
+          }}
+          onError={() => {
+            setPdfLoadError(true);
+            setIsLoading(false);
+          }}
+          style={{ 
+            minHeight: '600px',
+            backgroundColor: 'white'
+          }}
+        />
+        
+        {/* Loading overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading PDF...</p>
+            </div>
+          </div>
+        )}
+        
+        {/* Fallback button overlay if iframe fails */}
+        {!isLoading && pdfLoadError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg">
+            <div className="text-center">
+              <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 mb-4">PDF cannot be displayed inline</p>
+              <Button onClick={() => setShowFallback(true)}>
+                Show Alternative Options
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -109,7 +227,7 @@ const MediaPreview = ({
           </div>
         </DialogTrigger>
         
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden">
+        <DialogContent className="max-w-6xl w-[95vw] max-h-[95vh] overflow-hidden">
           <div className="space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between">
@@ -135,25 +253,18 @@ const MediaPreview = ({
               )}
             </div>
 
-            {/* PDF Preview Content */}
-            <div className="max-h-[75vh] overflow-hidden">
+            {/* Content */}
+            <div className="max-h-[calc(95vh-120px)] overflow-hidden">
               {type === "image" ? (
                 <img
                   src={url}
                   alt={name || "Image"}
-                  className="w-full h-auto rounded-lg"
+                  className="w-full h-auto max-h-full object-contain rounded-lg"
                 />
               ) : type === "pdf" ? (
-                <div className="w-full h-[75vh] bg-gray-50 rounded-lg">
-                  <iframe
-                    src={url}
-                    className="w-full h-full rounded-lg border-0"
-                    title={name || "PDF Document"}
-                    style={{ minHeight: '600px' }}
-                  />
-                </div>
+                renderPdfViewer()
               ) : (
-                <div className="bg-gray-50 p-8 rounded-lg text-center">
+                <div className="bg-gray-50 p-8 rounded-lg text-center h-96 flex flex-col justify-center">
                   {getFileIcon()}
                   <p className="text-lg font-semibold mt-4">File Preview</p>
                   <p className="text-gray-600">Click download to access the file</p>
@@ -162,9 +273,9 @@ const MediaPreview = ({
             </div>
             
             {/* PDF Instructions */}
-            {type === "pdf" && (
+            {type === "pdf" && !showFallback && (
               <div className="text-sm text-muted-foreground text-center border-t pt-2">
-                <p>If the PDF doesn't display, click "Open in New Tab" above or use the Download button.</p>
+                <p>Having trouble viewing the PDF? Try opening it in a new tab or downloading it directly.</p>
               </div>
             )}
           </div>

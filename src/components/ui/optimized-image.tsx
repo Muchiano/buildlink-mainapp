@@ -168,7 +168,7 @@ const OptimizedImage = ({
           src={optimizedSrc}
           alt={alt}
           className={cn(
-            'w-full h-full object-cover transition-opacity duration-300',
+            'block max-h-60 object-contain transition-opacity duration-300',
             isLoaded ? 'opacity-100' : 'opacity-0',
             error && 'hidden'
           )}
