@@ -39,6 +39,7 @@ const EditPostDialog = ({
     post?.image_url || null
   );
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
+  const [removeExistingDocument, setRemoveExistingDocument] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
 
@@ -77,6 +78,12 @@ const EditPostDialog = ({
     setImagePreview(null);
     setRemoveExistingImage(true);
     if (imageInputRef.current) imageInputRef.current.value = "";
+  };
+
+  const handleRemoveDocument = () => {
+    setDocumentFile(null);
+    setRemoveExistingDocument(true);
+    if (documentInputRef.current) documentInputRef.current.value = "";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -132,13 +139,15 @@ const EditPostDialog = ({
         console.log("File type:", documentFile.type);
         console.log("File size:", documentFile.size);
         console.log("Upload URL:", document_url);
+      } else if (removeExistingDocument) {
+        document_url = null;
       }
 
       const { error } = await postsService.updatePost(post.id, {
         content,
         image_url,
         document_url,
-        document_name: documentFile?.name || post.document_name
+        document_name: documentFile?.name || (removeExistingDocument ? null : post.document_name)
       });
 
       if (error) throw error;
@@ -178,6 +187,7 @@ const EditPostDialog = ({
           setDocumentFile(null);
           setImagePreview(post?.image_url || null);
           setRemoveExistingImage(false);
+          setRemoveExistingDocument(false);
         }
         onOpenChange(isOpen);
       }}>
@@ -254,13 +264,22 @@ const EditPostDialog = ({
           </div>
 
           {/* PDF Preview - Show for both new files and existing PDFs */}
-          {(documentFile || post?.document_url) && (
+          {(documentFile || (post?.document_url && !removeExistingDocument)) && (
             <div className="pt-4 border-t">
-              <h4 className="text-sm font-medium mb-2">PDF Document</h4>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-sm font-medium">PDF Document</h4>
+                <button
+                  type="button"
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={handleRemoveDocument}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
               <MediaPreview
                 url={documentFile ? URL.createObjectURL(documentFile) : (post.document_url as string)}
                 type="pdf"
-                name={documentFile ? documentFile.name : `Document-${post.id.slice(0, 8)}`}
+                name={documentFile ? documentFile.name : (post.document_name || `Document-${post.id.slice(0, 8)}`)}
                 size="lg"
                 showActions
               />
