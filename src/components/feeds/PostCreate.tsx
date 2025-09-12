@@ -50,10 +50,24 @@ const PostCreate = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
+        // Check if file is PDF
+        const fileType = file.type;
+        const fileExtension = file.name.split('.').pop()?.toLowerCase();
+        
+        if (fileType !== 'application/pdf' && fileExtension !== 'pdf') {
+          toast({
+            title: "Invalid File Type",
+            description: "Only PDF documents are supported for upload.",
+            variant: "destructive",
+          });
+          e.target.value = ''; // Clear the input
+          return;
+        }
+        
         setDocumentFile(file);
       }
     },
-    []
+    [toast]
   );
 
   const handleSubmit = useCallback(async () => {
@@ -275,11 +289,11 @@ const PostCreate = () => {
               onClick={() => documentInputRef.current?.click()}
             >
               <FileText className="h-4 w-4 mr-2" />
-              <span className={isMobile ? "sr-only" : ""}>Add Document</span>
+              <span className={isMobile ? "sr-only" : ""}>Add PDF</span>
               <input
                 ref={documentInputRef}
                 type="file"
-                accept=".pdf,.doc,.docx,.txt"
+                accept=".pdf"
                 className="hidden"
                 onChange={handleDocumentChange}
               />

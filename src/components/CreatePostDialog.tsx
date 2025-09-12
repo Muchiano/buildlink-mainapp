@@ -47,6 +47,20 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check if file is PDF
+      const fileType = file.type;
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      
+      if (fileType !== 'application/pdf' && fileExtension !== 'pdf') {
+        toast({
+          title: "Invalid File Type",
+          description: "Only PDF documents are supported for upload.",
+          variant: "destructive",
+        });
+        e.target.value = ''; // Clear the input
+        return;
+      }
+      
       setDocumentFile(file);
     }
   };
@@ -235,11 +249,11 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
               onClick={() => documentInputRef.current?.click()}
             >
               <FileText className="h-4 w-4 mr-2" />
-              Add Document
-              <input
+              Add PDF
+               <input
                 ref={documentInputRef}
                 type="file"
-                accept=".pdf,.doc,.docx,.txt"
+                accept=".pdf"
                 className="hidden"
                 onChange={handleDocumentChange}
               />

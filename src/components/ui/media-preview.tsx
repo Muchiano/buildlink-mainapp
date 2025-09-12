@@ -109,26 +109,24 @@ const MediaPreview = ({
           </div>
         </DialogTrigger>
         
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden">
           <div className="space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {getFileIcon()}
                 <div>
-                  <h3 className="font-semibold">{name || "Media Preview"}</h3>
+                  <h3 className="font-semibold">{name || "PDF Document"}</h3>
                   <Badge variant="secondary">{type.toUpperCase()}</Badge>
                 </div>
               </div>
               
               {showActions && (
                 <div className="flex gap-2">
-                  {type === "pdf" && (
-                    <Button variant="outline" size="sm" onClick={handlePreview}>
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Open
-                    </Button>
-                  )}
+                  <Button variant="outline" size="sm" onClick={handlePreview}>
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Open in New Tab
+                  </Button>
                   <Button variant="outline" size="sm" onClick={handleDownload}>
                     <Download className="h-4 w-4 mr-2" />
                     Download
@@ -137,8 +135,8 @@ const MediaPreview = ({
               )}
             </div>
 
-            {/* Preview Content */}
-            <div className="max-h-[60vh] overflow-auto">
+            {/* PDF Preview Content */}
+            <div className="max-h-[75vh] overflow-hidden">
               {type === "image" ? (
                 <img
                   src={url}
@@ -146,14 +144,13 @@ const MediaPreview = ({
                   className="w-full h-auto rounded-lg"
                 />
               ) : type === "pdf" ? (
-                <div className="bg-gray-50 p-8 rounded-lg text-center">
-                  <FileText className="h-16 w-16 text-red-500 mx-auto mb-4" />
-                  <p className="text-lg font-semibold mb-2">PDF Document</p>
-                  <p className="text-gray-600 mb-4">Click "Open" to view the full PDF document</p>
-                  <Button onClick={handlePreview} className="mt-4">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Open PDF
-                  </Button>
+                <div className="w-full h-[75vh] bg-gray-50 rounded-lg">
+                  <iframe
+                    src={url}
+                    className="w-full h-full rounded-lg border-0"
+                    title={name || "PDF Document"}
+                    style={{ minHeight: '600px' }}
+                  />
                 </div>
               ) : (
                 <div className="bg-gray-50 p-8 rounded-lg text-center">
@@ -163,6 +160,13 @@ const MediaPreview = ({
                 </div>
               )}
             </div>
+            
+            {/* PDF Instructions */}
+            {type === "pdf" && (
+              <div className="text-sm text-muted-foreground text-center border-t pt-2">
+                <p>If the PDF doesn't display, click "Open in New Tab" above or use the Download button.</p>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
