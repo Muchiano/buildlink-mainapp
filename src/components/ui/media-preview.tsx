@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Image, FileText, Download, Eye, ExternalLink, AlertCircle } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Image, FileText, Download, Eye, ExternalLink, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "./button";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 import { Badge } from "./badge";
-import { Alert, AlertDescription } from "./alert";
 import { cn } from "@/lib/utils";
 
 interface MediaPreviewProps {
@@ -27,8 +26,11 @@ const MediaPreview = ({
 }: MediaPreviewProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [pdfLoadError, setPdfLoadError] = useState(false);
-  const [showFallback, setShowFallback] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [scale, setScale] = useState(1.0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
 
   const sizeClasses = {
     sm: "w-16 h-16",
@@ -36,28 +38,93 @@ const MediaPreview = ({
     lg: "w-48 h-48"
   };
 
-  // Check if PDF can be displayed inline
+  // Load PDF.js dynamically
   useEffect(() => {
     if (type === 'pdf') {
-      // Test if browser supports PDF viewing
-      const testPdf = () => {
-        const userAgent = navigator.userAgent.toLowerCase();
-        const isChrome = userAgent.includes('chrome');
-        const isFirefox = userAgent.includes('firefox');
-        const isSafari = userAgent.includes('safari') && !userAgent.includes('chrome');
-        const isEdge = userAgent.includes('edge');
-        
-        // Most modern browsers support PDF viewing, but mobile browsers often don't
-        const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
-        
-        if (isMobile) {
-          setShowFallback(true);
-        }
-      };
-      
-      testPdf();
+      loadPdfJs();
     }
-  }, [type]);
+  }, [type, url]);
+
+  const loadPdfJs = async () => {
+    try {
+      // Load PDF.js from CDN
+      const pdfjsLib = await loadPdfJsLibrary();
+      
+      // Set worker source
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      
+      // Load the PDF document
+      const loadingTask = pdfjsLib.getDocument(url);
+      const pdf = await loadingTask.promise;
+      
+      setPdfDoc(pdf);
+      setTotalPages(pdf.numPages);
+      setIsLoading(false);
+      
+      // Render first page
+      renderPage(pdf, 1);
+    } catch (error) {
+      console.error('Error loading PDF:', error);
+      setHasError(true);
+      setIsLoading(false);
+    }
+  };
+
+  const loadPdfJsLibrary = (): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      // Check if PDF.js is already loaded
+      if (window.pdfjsLib) {
+        resolve(window.pdfjsLib);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = () => {
+        resolve(window.pdfjsLib);
+      };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  };
+
+  const renderPage = async (pdf: any, pageNum: number) => {
+    if (!canvasRef.current || !pdf) return;
+
+    try {
+      const page = await pdf.getPage(pageNum);
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      
+      const viewport = page.getViewport({ scale });
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport
+      };
+
+      await page.render(renderContext).promise;
+    } catch (error) {
+      console.error('Error rendering page:', error);
+      setHasError(true);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages && pdfDoc) {
+      setCurrentPage(newPage);
+      renderPage(pdfDoc, newPage);
+    }
+  };
+
+  const handleZoom = (newScale: number) => {
+    if (newScale >= 0.5 && newScale <= 3.0 && pdfDoc) {
+      setScale(newScale);
+      renderPage(pdfDoc, currentPage);
+    }
+  };
 
   const getFileIcon = () => {
     switch (type) {
@@ -111,12 +178,10 @@ const MediaPreview = ({
 
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Create a proper download link
     const link = document.createElement('a');
     link.href = url;
     link.download = name || `document.${type === 'pdf' ? 'pdf' : 'file'}`;
     link.target = '_blank';
-    // Add rel="noopener noreferrer" for security
     link.rel = 'noopener noreferrer';
     document.body.appendChild(link);
     link.click();
@@ -128,27 +193,15 @@ const MediaPreview = ({
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  // Enhanced PDF viewer with multiple fallback options
   const renderPdfViewer = () => {
-    if (showFallback || pdfLoadError) {
+    if (hasError) {
       return (
-        <div className="w-full h-[calc(95vh-120px)] flex flex-col items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+        <div className="w-full h-[calc(95vh-180px)] flex flex-col items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
           <FileText className="h-20 w-20 text-gray-400 mb-6" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">PDF Preview</h3>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">Cannot Display PDF</h3>
           <p className="text-gray-600 mb-6 text-center max-w-md">
-            {showFallback 
-              ? "PDF preview is not available on mobile devices. Use the buttons below to view the document."
-              : "Unable to display PDF inline. Your browser may not support embedded PDF viewing."
-            }
+            There was an error loading this PDF. Please try downloading it or opening it in a new tab.
           </p>
-          
-          <Alert className="max-w-md mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              For the best viewing experience, try opening the PDF in a new tab or downloading it.
-            </AlertDescription>
-          </Alert>
-          
           <div className="flex gap-3">
             <Button onClick={handlePreview} className="flex items-center gap-2">
               <ExternalLink className="h-4 w-4" />
@@ -163,52 +216,76 @@ const MediaPreview = ({
       );
     }
 
-    // Create multiple PDF viewing strategies
-    const pdfViewerUrl = `${url}#view=FitH&toolbar=1&navpanes=1`;
-    
+    if (isLoading) {
+      return (
+        <div className="w-full h-[calc(95vh-180px)] flex items-center justify-center bg-gray-100 rounded-lg">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading PDF...</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="w-full h-[calc(95vh-120px)] bg-gray-100 rounded-lg border relative">
-        {/* Primary iframe attempt */}
-        <iframe
-          src={pdfViewerUrl}
-          className="w-full h-full rounded-lg border-0"
-          title={name || "PDF Document"}
-          onLoad={() => {
-            setIsLoading(false);
-            setPdfLoadError(false);
-          }}
-          onError={() => {
-            setPdfLoadError(true);
-            setIsLoading(false);
-          }}
-          style={{ 
-            minHeight: '600px',
-            backgroundColor: 'white'
-          }}
-        />
-        
-        {/* Loading overlay */}
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading PDF...</p>
-            </div>
+      <div className="w-full h-[calc(95vh-180px)] bg-white rounded-lg border overflow-hidden">
+        {/* PDF Controls */}
+        <div className="flex items-center justify-between p-3 border-b bg-gray-50">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage <= 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
-        )}
-        
-        {/* Fallback button overlay if iframe fails */}
-        {!isLoading && pdfLoadError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg">
-            <div className="text-center">
-              <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">PDF cannot be displayed inline</p>
-              <Button onClick={() => setShowFallback(true)}>
-                Show Alternative Options
-              </Button>
-            </div>
+          
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleZoom(scale - 0.2)}
+              disabled={scale <= 0.5}
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium min-w-[60px] text-center">
+              {Math.round(scale * 100)}%
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleZoom(scale + 0.2)}
+              disabled={scale >= 3.0}
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
           </div>
-        )}
+        </div>
+
+        {/* PDF Canvas */}
+        <div className="flex-1 overflow-auto p-4 bg-gray-100">
+          <div className="flex justify-center">
+            <canvas
+              ref={canvasRef}
+              className="border border-gray-300 shadow-lg bg-white"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
+          </div>
+        </div>
       </div>
     );
   };
@@ -254,28 +331,19 @@ const MediaPreview = ({
             </div>
 
             {/* Content */}
-            <div className="max-h-[calc(95vh-120px)] overflow-hidden">
-              {type === "image" ? (
-                <img
-                  src={url}
-                  alt={name || "Image"}
-                  className="w-full h-auto max-h-full object-contain rounded-lg"
-                />
-              ) : type === "pdf" ? (
-                renderPdfViewer()
-              ) : (
-                <div className="bg-gray-50 p-8 rounded-lg text-center h-96 flex flex-col justify-center">
-                  {getFileIcon()}
-                  <p className="text-lg font-semibold mt-4">File Preview</p>
-                  <p className="text-gray-600">Click download to access the file</p>
-                </div>
-              )}
-            </div>
-            
-            {/* PDF Instructions */}
-            {type === "pdf" && !showFallback && (
-              <div className="text-sm text-muted-foreground text-center border-t pt-2">
-                <p>Having trouble viewing the PDF? Try opening it in a new tab or downloading it directly.</p>
+            {type === "image" ? (
+              <img
+                src={url}
+                alt={name || "Image"}
+                className="w-full h-auto max-h-[calc(95vh-120px)] object-contain rounded-lg"
+              />
+            ) : type === "pdf" ? (
+              renderPdfViewer()
+            ) : (
+              <div className="bg-gray-50 p-8 rounded-lg text-center h-96 flex flex-col justify-center">
+                {getFileIcon()}
+                <p className="text-lg font-semibold mt-4">File Preview</p>
+                <p className="text-gray-600">Click download to access the file</p>
               </div>
             )}
           </div>
@@ -310,5 +378,12 @@ const MediaPreview = ({
     </div>
   );
 };
+
+// Extend the Window interface for TypeScript
+declare global {
+  interface Window {
+    pdfjsLib: any;
+  }
+}
 
 export default MediaPreview;

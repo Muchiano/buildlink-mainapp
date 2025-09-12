@@ -1,14 +1,19 @@
-import { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Camera, FileText, X } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { postsService } from '@/services/postsService';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { Post } from '@/types/database';
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Camera, FileText, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { postsService } from "@/services/postsService";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Post } from "@/types/database";
 
 interface EditPostDialogProps {
   post: Post;
@@ -17,14 +22,21 @@ interface EditPostDialogProps {
   onPostUpdated?: () => void;
 }
 
-const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDialogProps) => {
+const EditPostDialog = ({
+  post,
+  open,
+  onOpenChange,
+  onPostUpdated,
+}: EditPostDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [content, setContent] = useState(post?.content || '');
+  const [content, setContent] = useState(post?.content || "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(post?.image_url || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    post?.image_url || null
+  );
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
@@ -43,18 +55,18 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
     if (file) {
       // Check if file is PDF
       const fileType = file.type;
-      const fileExtension = file.name.split('.').pop()?.toLowerCase();
-      
-      if (fileType !== 'application/pdf' && fileExtension !== 'pdf') {
+      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+
+      if (fileType !== "application/pdf" && fileExtension !== "pdf") {
         toast({
           title: "Invalid File Type",
           description: "Only PDF documents are supported for upload.",
           variant: "destructive",
         });
-        e.target.value = ''; // Clear the input
+        e.target.value = ""; // Clear the input
         return;
       }
-      
+
       setDocumentFile(file);
     }
   };
@@ -63,7 +75,7 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
     setImageFile(null);
     setImagePreview(null);
     setRemoveExistingImage(true);
-    if (imageInputRef.current) imageInputRef.current.value = '';
+    if (imageInputRef.current) imageInputRef.current.value = "";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,10 +88,10 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
 
       // Handle image upload
       if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop();
+        const fileExt = imageFile.name.split(".").pop();
         const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('post-media')
+          .from("post-media")
           .upload(filePath, imageFile);
 
         if (uploadError) {
@@ -87,7 +99,7 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
         }
 
         const { data: publicUrlData } = supabase.storage
-          .from('post-media')
+          .from("post-media")
           .getPublicUrl(filePath);
         image_url = publicUrlData?.publicUrl;
       } else if (removeExistingImage) {
@@ -98,10 +110,10 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
 
       // Handle document upload
       if (documentFile) {
-        const fileExt = documentFile.name.split('.').pop();
+        const fileExt = documentFile.name.split(".").pop();
         const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('post-media')
+          .from("post-media")
           .upload(filePath, documentFile);
 
         if (uploadError) {
@@ -109,37 +121,41 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
         }
 
         const { data: publicUrlData } = supabase.storage
-          .from('post-media')
+          .from("post-media")
           .getPublicUrl(filePath);
         document_url = publicUrlData?.publicUrl;
+
+        console.log("File type:", documentFile.type);
+        console.log("File size:", documentFile.size);
+        console.log("Upload URL:", document_url);
       }
 
       const { error } = await postsService.updatePost(post.id, {
         content,
         image_url,
-        document_url
+        document_url,
       });
 
       if (error) throw error;
 
       toast({
-        title: 'Success',
-        description: 'Your post has been updated successfully!'
+        title: "Success",
+        description: "Your post has been updated successfully!",
       });
 
       // Close dialog first
       onOpenChange(false);
-      
+
       // Then trigger parent update after a brief delay
       setTimeout(() => {
         onPostUpdated?.();
       }, 200);
     } catch (error) {
-      console.error('Error updating post:', error);
+      console.error("Error updating post:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to update post. Please try again.',
-        variant: 'destructive'
+        title: "Error",
+        description: "Failed to update post. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -147,25 +163,24 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
   };
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
           // Reset form state on close
-          setContent(post?.content || '');
+          setContent(post?.content || "");
           setImageFile(null);
           setDocumentFile(null);
           setImagePreview(post?.image_url || null);
           setRemoveExistingImage(false);
         }
         onOpenChange(isOpen);
-      }}
-    >
+      }}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Edit Post</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="content">Content</Label>
@@ -190,8 +205,7 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
               <button
                 type="button"
                 className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-100"
-                onClick={handleRemoveImage}
-              >
+                onClick={handleRemoveImage}>
                 <X className="h-4 w-4 text-gray-600" />
               </button>
             </div>
@@ -204,10 +218,9 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
               variant="ghost"
               size="sm"
               className="text-gray-600"
-              onClick={() => imageInputRef.current?.click()}
-            >
+              onClick={() => imageInputRef.current?.click()}>
               <Camera className="h-4 w-4 mr-2" />
-              {imagePreview ? 'Change Image' : 'Add Image'}
+              {imagePreview ? "Change Image" : "Add Image"}
               <input
                 ref={imageInputRef}
                 type="file"
@@ -216,14 +229,13 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
                 onChange={handleImageChange}
               />
             </Button>
-            
+
             <Button
               type="button"
               variant="ghost"
               size="sm"
               className="text-gray-600"
-              onClick={() => documentInputRef.current?.click()}
-            >
+              onClick={() => documentInputRef.current?.click()}>
               <FileText className="h-4 w-4 mr-2" />
               Add PDF
               <input
@@ -241,13 +253,16 @@ const EditPostDialog = ({ post, open, onOpenChange, onPostUpdated }: EditPostDia
               Selected document: {documentFile.name}
             </div>
           )}
-          
+
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Updating...' : 'Update Post'}
+              {isLoading ? "Updating..." : "Update Post"}
             </Button>
           </div>
         </form>
