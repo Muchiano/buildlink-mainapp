@@ -126,6 +126,9 @@ const EditPostDialog = ({
           .getPublicUrl(filePath);
         document_url = publicUrlData?.publicUrl;
 
+        // Store the original filename  
+        const document_name = documentFile.name;
+
         console.log("File type:", documentFile.type);
         console.log("File size:", documentFile.size);
         console.log("Upload URL:", document_url);
@@ -135,6 +138,7 @@ const EditPostDialog = ({
         content,
         image_url,
         document_url,
+        document_name: documentFile?.name || post.document_name
       });
 
       if (error) throw error;

@@ -161,6 +161,7 @@ const PostCreate = () => {
         user_id: user.id,
         image_url,
         document_url,
+        document_name: documentFile?.name
       });
 
       if (error) {

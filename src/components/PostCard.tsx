@@ -244,7 +244,7 @@ const PostCard = ({
               <MediaPreview
                 url={post.document_url}
                 type="pdf"
-                name={`Document-${post.id.slice(0, 8)}`}
+                name={post.document_name || `Document-${post.id.slice(0, 8)}`}
                 size="md"
                 showActions
                 className="border rounded-lg"

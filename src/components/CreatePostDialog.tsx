@@ -116,6 +116,9 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           .from('post-media')
           .getPublicUrl(filePath);
         document_url = publicUrlData?.publicUrl;
+
+        // Store the original filename
+        const document_name = documentFile.name;
       }
 
       const { error } = await postsService.createPost({
@@ -123,7 +126,8 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         category: formData.category,
         user_id: user.id,
         image_url,
-        document_url
+        document_url,
+        document_name: documentFile?.name
       });
 
       if (error) throw error;

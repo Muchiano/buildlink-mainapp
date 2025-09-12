@@ -26,14 +26,14 @@ export const optimizedPostsService = {
       fields = ['minimal'] // 'minimal' | 'full' | 'preview'
     } = options;
 
-    // Define field selections based on use case - now includes image_url and document_url
+    // Define field selections based on use case - now includes image_url, document_url and document_name
     const fieldSelections = {
       minimal: `
-        id, content, created_at, author_id, likes_count, comments_count, reposts_count, location, image_url, document_url,
+        id, content, created_at, author_id, likes_count, comments_count, reposts_count, location, image_url, document_url, document_name,
         profiles!posts_author_id_fkey(id, full_name, avatar, profession)
       `,
       preview: `
-        id, content, created_at, author_id, likes_count, comments_count, reposts_count, location, image_url, document_url,
+        id, content, created_at, author_id, likes_count, comments_count, reposts_count, location, image_url, document_url, document_name,
         profiles!posts_author_id_fkey(id, full_name, avatar, profession, organization)
       `,
       full: `

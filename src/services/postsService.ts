@@ -46,6 +46,7 @@ export const postsService = {
     category: string;
     image_url?: string;
     document_url?: string;
+    document_name?: string;
     user_id: string;
   }) {
     const insertObj: any = {
@@ -61,6 +62,9 @@ export const postsService = {
     }
     if (post.document_url) {
       insertObj.document_url = post.document_url;
+    }
+    if (post.document_name) {
+      insertObj.document_name = post.document_name;
     }
     const { data, error } = await supabase
       .from('posts')
@@ -252,6 +256,7 @@ export const postsService = {
     content?: string;
     image_url?: string;
     document_url?: string;
+    document_name?: string;
   }) {
     const { data, error } = await supabase
       .from('posts')
