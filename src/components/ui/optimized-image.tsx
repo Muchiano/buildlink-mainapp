@@ -63,12 +63,20 @@ const OptimizedImage = ({
     const ctx = canvas.getContext('2d');
     
     if (ctx) {
-      const gradient = ctx.createLinearGradient(0, 0, 40, 40);
-      gradient.addColorStop(0, 'hsl(var(--muted))');
-      gradient.addColorStop(1, 'hsl(var(--muted-foreground))');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 40, 40);
-      return canvas.toDataURL();
+      try {
+        const gradient = ctx.createLinearGradient(0, 0, 40, 40);
+        // Use static fallback colors to avoid canvas errors with CSS variables
+        gradient.addColorStop(0, '#e5e7eb'); // light gray
+        gradient.addColorStop(1, '#cbd5e1'); // slightly darker gray
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 40, 40);
+        return canvas.toDataURL();
+      } catch {
+        // Fallback: solid placeholder to ensure no runtime errors
+        ctx.fillStyle = '#e5e7eb';
+        ctx.fillRect(0, 0, 40, 40);
+        return canvas.toDataURL();
+      }
     }
     
     return '';
