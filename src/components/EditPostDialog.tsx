@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { postsService } from "@/services/postsService";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import MediaPreview from "@/components/ui/media-preview";
 import { Post } from "@/types/database";
 
 interface EditPostDialogProps {
@@ -248,11 +249,17 @@ const EditPostDialog = ({
             </Button>
           </div>
 
-          {documentFile && (
-            <div className="text-sm text-gray-600">
-              Selected document: {documentFile.name}
-            </div>
-          )}
+{(documentFile || post?.document_url) && (
+  <div className="pt-2">
+    <MediaPreview
+      url={documentFile ? URL.createObjectURL(documentFile) : (post.document_url as string)}
+      type="pdf"
+      name={documentFile ? documentFile.name : `Document-${post.id.slice(0, 8)}`}
+      size="lg"
+      showActions
+    />
+  </div>
+)}
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button

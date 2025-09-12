@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { postsService } from '@/services/postsService';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import MediaPreview from '@/components/ui/media-preview';
 
 interface CreatePostDialogProps {
   onPostCreated?: () => void;
@@ -260,11 +261,17 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
             </Button>
           </div>
 
-          {documentFile && (
-            <div className="text-sm text-gray-600">
-              Selected document: {documentFile.name}
-            </div>
-          )}
+{documentFile && (
+  <div className="pt-2">
+    <MediaPreview
+      url={URL.createObjectURL(documentFile)}
+      type="pdf"
+      name={documentFile.name}
+      size="lg"
+      showActions
+    />
+  </div>
+)}
           
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
