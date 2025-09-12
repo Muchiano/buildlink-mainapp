@@ -12,7 +12,7 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
 
   const navigationItems = [
     { id: "home", title: "Home Feed", icon: Home, path: "/" },
-    { id: "mentorship", title: "Mentorship", icon: Users, path: "/mentorship" },
+    // { id: "mentorship", title: "Mentorship", icon: Users, path: "/mentorship" },
     { id: "post", title: "Create", icon: Plus, path: "/create-post" },
     { id: "skillup", title: "Resource Hub", icon: BookOpen, path: "/resource-hub" },
     { id: "profile", title: "Profile Board", icon: User, path: "/profile" },

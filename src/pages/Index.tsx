@@ -39,9 +39,9 @@ const Index: React.FC<IndexProps> = ({
         case "home":
           navigate("/");
           break;
-        case "mentorship":
-          navigate("/mentorship");
-          break;
+        // case "mentorship":
+        //   navigate("/mentorship");
+        //   break;
         case "post":
           navigate("/post");
           break;
@@ -81,8 +81,8 @@ const Index: React.FC<IndexProps> = ({
     switch (activeTab) {
       case "home":
         return <HomeFeed activeFilter={activeFilter} />;
-      case "mentorship":
-        return <MentorshipHub />;
+      // case "mentorship":
+      //   return <MentorshipHub />;
       case "post":
         return <PostCreate />;
       case "skillup":

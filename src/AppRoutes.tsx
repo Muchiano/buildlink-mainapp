@@ -1,7 +1,7 @@
 
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Mentorship from "./pages/Mentorship";
+// import Mentorship from "./pages/Mentorship";
 import ResourceHub from "./pages/ResourceHub";
 import CreatePost from "./pages/CreatePost";
 import Profile from "./pages/Profile";
@@ -25,14 +25,14 @@ const AppRoutes = () => (
         </ProtectedRoute>
       } 
     />
-    <Route 
+    {/* <Route 
       path="/mentorship" 
       element={
         <ProtectedRoute>
           <Mentorship />
         </ProtectedRoute>
       } 
-    />
+    /> */}
     <Route 
       path="/resource-hub" 
       element={
