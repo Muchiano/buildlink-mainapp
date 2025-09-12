@@ -208,10 +208,10 @@ const PostCard = ({
           )}
 
           {/* Document Preview */}
-          {(post as any).document_url && (
+          {post.document_url && (
             <div className="rounded-lg">
               <MediaPreview
-                url={(post as any).document_url}
+                url={post.document_url}
                 type="pdf"
                 name={`Document-${post.id.slice(0, 8)}`}
                 size="md"
