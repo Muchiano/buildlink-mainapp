@@ -1,21 +1,33 @@
-import { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Camera, FileText, X } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { postsService } from '@/services/postsService';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import MediaPreview from '@/components/ui/media-preview';
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Plus, Camera, FileText, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { postsService } from "@/services/postsService";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import MediaPreview from "@/components/ui/media-preview";
 
 interface CreatePostDialogProps {
   onPostCreated?: () => void;
 }
 
-type PostCategory = 'general' | 'project' | 'career' | 'technical' | 'news';
+type PostCategory = "general" | "project" | "career" | "technical" | "news";
 
 interface FormData {
   content: string;
@@ -28,8 +40,8 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    content: '',
-    category: 'general'
+    content: "",
+    category: "general",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
@@ -50,18 +62,18 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     if (file) {
       // Check if file is PDF
       const fileType = file.type;
-      const fileExtension = file.name.split('.').pop()?.toLowerCase();
-      
-      if (fileType !== 'application/pdf' && fileExtension !== 'pdf') {
+      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+
+      if (fileType !== "application/pdf" && fileExtension !== "pdf") {
         toast({
           title: "Invalid File Type",
           description: "Only PDF documents are supported for upload.",
           variant: "destructive",
         });
-        e.target.value = ''; // Clear the input
+        e.target.value = ""; // Clear the input
         return;
       }
-      
+
       setDocumentFile(file);
     }
   };
@@ -69,7 +81,12 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview(null);
-    if (imageInputRef.current) imageInputRef.current.value = '';
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  };
+
+  const handleRemoveDocument = () => {
+    setDocumentFile(null);
+    if (documentInputRef.current) documentInputRef.current.value = "";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,10 +99,10 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
 
       // Handle image upload
       if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop();
+        const fileExt = imageFile.name.split(".").pop();
         const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('post-media')
+          .from("post-media")
           .upload(filePath, imageFile);
 
         if (uploadError) {
@@ -93,7 +110,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         }
 
         const { data: publicUrlData } = supabase.storage
-          .from('post-media')
+          .from("post-media")
           .getPublicUrl(filePath);
         image_url = publicUrlData?.publicUrl;
       }
@@ -102,10 +119,10 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
 
       // Handle document upload
       if (documentFile) {
-        const fileExt = documentFile.name.split('.').pop();
-        const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
+        const originalFileName = documentFile.name;
+        const filePath = `user-${user.id}/${originalFileName}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('post-media')
+          .from("post-media")
           .upload(filePath, documentFile);
 
         if (uploadError) {
@@ -113,12 +130,9 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         }
 
         const { data: publicUrlData } = supabase.storage
-          .from('post-media')
+          .from("post-media")
           .getPublicUrl(filePath);
         document_url = publicUrlData?.publicUrl;
-
-        // Store the original filename
-        const document_name = documentFile.name;
       }
 
       const { error } = await postsService.createPost({
@@ -127,17 +141,17 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         user_id: user.id,
         image_url,
         document_url,
-        document_name: documentFile?.name
+        document_name: documentFile?.name,
       });
 
       if (error) throw error;
 
       toast({
-        title: 'Success',
-        description: 'Your post has been created successfully!'
+        title: "Success",
+        description: "Your post has been created successfully!",
       });
 
-      setFormData({ content: '', category: 'general' });
+      setFormData({ content: "", category: "general" });
       setImageFile(null);
       setDocumentFile(null);
       setImagePreview(null);
@@ -145,9 +159,9 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
       onPostCreated?.();
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to create post. Please try again.',
-        variant: 'destructive'
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -155,11 +169,11 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleCategoryChange = (value: PostCategory) => {
-    setFormData(prev => ({ ...prev, category: value }));
+    setFormData((prev) => ({ ...prev, category: value }));
   };
 
   return (
@@ -170,19 +184,18 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           Create Post
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Create New Post</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select
               value={formData.category}
-              onValueChange={handleCategoryChange}
-            >
+              onValueChange={handleCategoryChange}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -195,13 +208,13 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
               </SelectContent>
             </Select>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="content">Content</Label>
             <Textarea
               id="content"
               value={formData.content}
-              onChange={(e) => handleInputChange('content', e.target.value)}
+              onChange={(e) => handleInputChange("content", e.target.value)}
               placeholder="Share your thoughts, insights, or questions..."
               rows={4}
               required
@@ -219,10 +232,31 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
               <button
                 type="button"
                 className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-100"
-                onClick={handleRemoveImage}
-              >
+                onClick={handleRemoveImage}>
                 <X className="h-4 w-4 text-gray-600" />
               </button>
+            </div>
+          )}
+
+          {/* Document Preview with Remove Button */}
+          {documentFile && (
+            <div className="relative pt-4 border-t">
+              <h4 className="text-sm font-medium mb-2">PDF Document Preview</h4>
+              <div className="relative">
+                <MediaPreview
+                  url={URL.createObjectURL(documentFile)}
+                  type="pdf"
+                  name={documentFile.name}
+                  size="lg"
+                  showActions
+                />
+                <button
+                  type="button"
+                  className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-gray-100"
+                  onClick={handleRemoveDocument}>
+                  <X className="h-4 w-4 text-gray-600" />
+                </button>
+              </div>
             </div>
           )}
 
@@ -233,8 +267,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
               variant="ghost"
               size="sm"
               className="text-gray-600"
-              onClick={() => imageInputRef.current?.click()}
-            >
+              onClick={() => imageInputRef.current?.click()}>
               <Camera className="h-4 w-4 mr-2" />
               Add Image
               <input
@@ -245,17 +278,16 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
                 onChange={handleImageChange}
               />
             </Button>
-            
+
             <Button
               type="button"
               variant="ghost"
               size="sm"
               className="text-gray-600"
-              onClick={() => documentInputRef.current?.click()}
-            >
+              onClick={() => documentInputRef.current?.click()}>
               <FileText className="h-4 w-4 mr-2" />
               Add PDF
-               <input
+              <input
                 ref={documentInputRef}
                 type="file"
                 accept=".pdf"
@@ -265,26 +297,15 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
             </Button>
           </div>
 
-          {/* PDF Preview */}
-          {documentFile && (
-            <div className="pt-4 border-t">
-              <h4 className="text-sm font-medium mb-2">PDF Document Preview</h4>
-              <MediaPreview
-                url={URL.createObjectURL(documentFile)}
-                type="pdf"
-                name={documentFile.name}
-                size="lg"
-                showActions
-              />
-            </div>
-          )}
-          
           <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create Post'}
+              {isLoading ? "Creating..." : "Create Post"}
             </Button>
           </div>
         </form>

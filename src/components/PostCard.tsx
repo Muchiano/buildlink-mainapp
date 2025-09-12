@@ -6,6 +6,10 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
+  FileText,
+  ExternalLink,
+  Download,
+  Eye,
 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,8 +40,8 @@ import { useToast } from "@/hooks/use-toast";
 import EditPostDialog from "./EditPostDialog";
 import ShareDialog from "./ShareDialog";
 import { OptimizedImage } from "@/components/ui/optimized-image";
-import MediaPreview from "@/components/ui/media-preview";
 import { useNavigate } from "react-router-dom";
+import { getFilenameFromUrl } from "@/lib/utils";
 
 interface PostCardProps {
   post: Post;
@@ -147,6 +151,21 @@ const PostCard = ({
     }
   };
 
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = post.document_url;
+    link.download = post.document_name || `document-${post.id.slice(0, 8)}.pdf`;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handlePreview = () => {
+    window.open(post.document_url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <Card
       className="w-full transition-all hover:shadow-md"
@@ -241,14 +260,25 @@ const PostCard = ({
           {/* Document Preview */}
           {post.document_url && (
             <div className="mt-3">
-              <MediaPreview
-                url={post.document_url}
-                type="pdf"
-                name={post.document_name || `Document-${post.id.slice(0, 8)}`}
-                size="md"
-                showActions
-                className="border rounded-lg"
+              {/* Simple iframe - same as media-preview */}
+              <iframe
+                src={post.document_url}
+                className="w-full h-96 border rounded-lg"
+                title={getFilenameFromUrl(post.document_url)}
+                type="application/pdf"
               />
+
+              {/* Quick actions */}
+              <div className="flex gap-2 mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePreview}
+                  className="flex items-center gap-2">
+                  <ExternalLink className="h-4 w-4" />
+                  Open PDF
+                </Button>
+              </div>
             </div>
           )}
 

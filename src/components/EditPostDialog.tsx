@@ -118,8 +118,8 @@ const EditPostDialog = ({
 
       // Handle document upload
       if (documentFile) {
-        const fileExt = documentFile.name.split(".").pop();
-        const filePath = `user-${user.id}/${Date.now()}.${fileExt}`;
+        const originalFileName = documentFile.name;
+        const filePath = `user-${user.id}/${originalFileName}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("post-media")
           .upload(filePath, documentFile);
@@ -133,7 +133,7 @@ const EditPostDialog = ({
           .getPublicUrl(filePath);
         document_url = publicUrlData?.publicUrl;
 
-        // Store the original filename  
+        // Store the original filename
         const document_name = documentFile.name;
 
         console.log("File type:", documentFile.type);
@@ -147,7 +147,9 @@ const EditPostDialog = ({
         content,
         image_url,
         document_url,
-        document_name: documentFile?.name || (removeExistingDocument ? null : post.document_name)
+        document_name:
+          documentFile?.name ||
+          (removeExistingDocument ? null : post.document_name),
       });
 
       if (error) throw error;
@@ -264,22 +266,30 @@ const EditPostDialog = ({
           </div>
 
           {/* PDF Preview - Show for both new files and existing PDFs */}
-          {(documentFile || (post?.document_url && !removeExistingDocument)) && (
+          {(documentFile ||
+            (post?.document_url && !removeExistingDocument)) && (
             <div className="pt-4 border-t">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-sm font-medium">PDF Document</h4>
                 <button
                   type="button"
                   className="text-gray-400 hover:text-gray-600 transition-colors"
-                  onClick={handleRemoveDocument}
-                >
+                  onClick={handleRemoveDocument}>
                   <X className="h-4 w-4" />
                 </button>
               </div>
               <MediaPreview
-                url={documentFile ? URL.createObjectURL(documentFile) : (post.document_url as string)}
+                url={
+                  documentFile
+                    ? URL.createObjectURL(documentFile)
+                    : (post.document_url as string)
+                }
                 type="pdf"
-                name={documentFile ? documentFile.name : (post.document_name || `Document-${post.id.slice(0, 8)}`)}
+                name={
+                  documentFile
+                    ? documentFile.name
+                    : post.document_name || `Document-${post.id.slice(0, 8)}`
+                }
                 size="lg"
                 showActions
               />
