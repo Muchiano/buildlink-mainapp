@@ -35,11 +35,23 @@ export const publicProfileService = {
       
       return { data, error };
     } else {
-      // Anonymous users get minimal profile information using the secure view
+      // Anonymous users can only see basic public profile information
+      // This relies on RLS policies to ensure proper access control
       const { data, error } = await supabase
-        .from('public_profiles')
-        .select('*')
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          title,
+          profession,
+          organization,
+          avatar,
+          user_type,
+          profile_visibility,
+          created_at
+        `)
         .eq('id', profileId)
+        .eq('profile_visibility', 'public')
         .single();
       
       return { data, error };
@@ -101,11 +113,22 @@ export const publicProfileService = {
       
       return { data, error };
     } else {
-      // Anonymous users use the secure view
+      // Anonymous users can only see basic public profile information  
+      // This relies on RLS policies to ensure proper access control
       const { data, error } = await supabase
-        .from('public_profiles')
-        .select('*')
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          title,
+          profession,
+          organization,
+          avatar,
+          user_type,
+          profile_visibility
+        `)
         .eq('id', profileId)
+        .eq('profile_visibility', 'public')
         .single();
       
       return { data, error };
