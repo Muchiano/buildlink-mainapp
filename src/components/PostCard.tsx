@@ -265,7 +265,6 @@ const PostCard = ({
                 src={post.document_url}
                 className="w-full h-96 border rounded-lg"
                 title={getFilenameFromUrl(post.document_url)}
-                type="application/pdf"
               />
 
               {/* Quick actions */}

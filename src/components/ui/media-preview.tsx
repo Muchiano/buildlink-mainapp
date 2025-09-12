@@ -148,7 +148,6 @@ const MediaPreview = ({
               setIsLoading(false);
             }}
             title={name || getFilenameFromUrl(url)}
-            type="application/pdf"
           />
         </div>
       </div>
