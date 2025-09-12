@@ -157,10 +157,13 @@ const MediaPreview = ({
 
     if (type === "pdf") {
       return (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-red-50 border-2 border-red-200 rounded-lg">
+        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-300 rounded-lg hover:from-red-100 hover:to-red-200 transition-all duration-200 shadow-sm hover:shadow-md">
           {getFileIcon()}
-          <span className="text-xs font-medium text-red-700 mt-1 truncate px-2">
-            {name || "PDF"}
+          <span className="text-xs font-semibold text-red-800 mt-1 truncate px-2">
+            {name || "PDF Document"}
+          </span>
+          <span className="text-xs text-red-600 mt-1">
+            Click to view
           </span>
         </div>
       );
