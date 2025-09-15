@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -10,13 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { X, Plus, Star } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { profileService } from "@/services/profileService";
@@ -24,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Skill,
   convertAndSanitizeSkills,
-  getLevelText,
 } from "@/lib/skillUtils";
 
 interface SkillsEditDialogProps {
@@ -63,14 +54,6 @@ const SkillsEditDialog = ({
 
   const removeSkill = (skillToRemove: string) => {
     setSkills(skills.filter((skill) => skill.name !== skillToRemove));
-  };
-
-  const updateSkillLevel = (skillName: string, newLevel: number) => {
-    setSkills(
-      skills.map((skill) =>
-        skill.name === skillName ? { ...skill, level: newLevel } : skill
-      )
-    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
