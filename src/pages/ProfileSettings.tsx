@@ -3,25 +3,35 @@ import { Settings, User, Shield, Bell, Palette, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import ProfileEditForm from "@/components/ProfileEditForm";
 import { PrivacySettingsDialog } from "@/components/PrivacySettingsDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { profileService } from "@/services/profileService";
 import TopBar from "@/components/TopBar";
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
-  
+
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [showPrivacySettings, setShowPrivacySettings] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -34,17 +44,17 @@ const ProfileSettings = () => {
   useEffect(() => {
     const loadSettings = async () => {
       if (!user) return;
-      
+
       try {
         setLoading(true);
         // Load user's current settings
         const { data: profileData } = await profileService.getProfile(user.id);
-        
+
         if (profileData) {
-          setProfileVisibility(profileData.profile_visibility || 'public');
+          setProfileVisibility(profileData.profile_visibility || "public");
         }
       } catch (error) {
-        console.error('Error loading settings:', error);
+        console.error("Error loading settings:", error);
       } finally {
         setLoading(false);
       }
@@ -59,7 +69,7 @@ const ProfileSettings = () => {
     try {
       // Save settings logic
       await profileService.updateProfile(user.id, {
-        profile_visibility: profileVisibility
+        profile_visibility: profileVisibility,
       });
 
       toast({
@@ -70,13 +80,13 @@ const ProfileSettings = () => {
       toast({
         title: "Error",
         description: "Failed to save settings. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
 
   const handleGoBack = () => {
-    navigate('/');
+    navigate("/");
   };
 
   if (loading) {
@@ -96,18 +106,14 @@ const ProfileSettings = () => {
   return (
     <div className="min-h-screen bg-background">
       <TopBar onLogoClick={handleGoBack} />
-      
+
       <div className="pt-12 max-w-4xl mx-auto p-6">
         <div className="mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={handleGoBack}
-            className="mb-4"
-          >
+          <Button variant="ghost" onClick={handleGoBack} className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
           </Button>
-          
+
           <div className="flex items-center gap-3 mb-2">
             <Settings className="h-6 w-6 text-primary" />
             <h1 className="text-3xl font-bold">Profile Settings</h1>
@@ -137,10 +143,9 @@ const ProfileSettings = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={() => setShowProfileEdit(true)}
-                  className="w-full"
-                >
+                  className="w-full">
                   Edit Profile Details
                 </Button>
               </CardContent>
@@ -179,23 +184,26 @@ const ProfileSettings = () => {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="profile-visibility">Profile Visibility</Label>
-                  <Select value={profileVisibility} onValueChange={setProfileVisibility}>
+                  <Select
+                    value={profileVisibility}
+                    onValueChange={setProfileVisibility}>
                     <SelectTrigger className="w-32">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="public">Public</SelectItem>
-                      <SelectItem value="connections">Connections Only</SelectItem>
+                      <SelectItem value="connections">
+                        Connections Only
+                      </SelectItem>
                       <SelectItem value="private">Private</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   onClick={() => setShowPrivacySettings(true)}
-                  className="w-full"
-                >
+                  className="w-full">
                   Advanced Privacy Settings
                 </Button>
               </CardContent>
@@ -215,14 +223,16 @@ const ProfileSettings = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="email-notifications">Email Notifications</Label>
+                  <Label htmlFor="email-notifications">
+                    Email Notifications
+                  </Label>
                   <Switch
                     id="email-notifications"
                     checked={emailNotifications}
                     onCheckedChange={setEmailNotifications}
                   />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <Label htmlFor="push-notifications">Push Notifications</Label>
                   <Switch
@@ -231,9 +241,9 @@ const ProfileSettings = () => {
                     onCheckedChange={setPushNotifications}
                   />
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="space-y-2">
                   <Label>Notification Types</Label>
                   <div className="space-y-2">
@@ -259,47 +269,11 @@ const ProfileSettings = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="appearance" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-4 w-4" />
-                  Appearance
-                </CardTitle>
-                <CardDescription>
-                  Customize the look and feel of your interface
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dark-mode">Dark Mode</Label>
-                  <Switch
-                    id="dark-mode"
-                    checked={theme === 'dark'}
-                    onCheckedChange={toggleTheme}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Theme Color</Label>
-                  <div className="flex gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary border-2 border-primary cursor-pointer"></div>
-                    <div className="w-8 h-8 rounded-full bg-green-500 border-2 border-transparent cursor-pointer hover:border-green-600"></div>
-                    <div className="w-8 h-8 rounded-full bg-purple-500 border-2 border-transparent cursor-pointer hover:border-purple-600"></div>
-                    <div className="w-8 h-8 rounded-full bg-orange-500 border-2 border-transparent cursor-pointer hover:border-orange-600"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={handleGoBack}>
               Cancel
             </Button>
-            <Button onClick={handleSaveSettings}>
-              Save Changes
-            </Button>
+            <Button onClick={handleSaveSettings}>Save Changes</Button>
           </div>
         </Tabs>
 

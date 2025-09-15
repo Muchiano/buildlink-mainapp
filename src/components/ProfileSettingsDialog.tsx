@@ -10,10 +10,22 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import ProfileEditForm from "./ProfileEditForm";
 import { PrivacySettingsDialog } from "./PrivacySettingsDialog";
@@ -33,7 +45,6 @@ const ProfileSettingsDialog = ({ children }: ProfileSettingsDialogProps) => {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [profileVisibility, setProfileVisibility] = useState("public");
-  const [darkMode, setDarkMode] = useState(false);
 
   const handleSaveSettings = () => {
     // Save settings logic would go here
@@ -46,9 +57,7 @@ const ProfileSettingsDialog = ({ children }: ProfileSettingsDialogProps) => {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          {children}
-        </DialogTrigger>
+        <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -59,13 +68,12 @@ const ProfileSettingsDialog = ({ children }: ProfileSettingsDialogProps) => {
               Manage your account settings, privacy, and preferences
             </DialogDescription>
           </DialogHeader>
-          
+
           <Tabs defaultValue="profile" className="flex-1 overflow-hidden">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="privacy">Privacy</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="appearance">Appearance</TabsTrigger>
             </TabsList>
 
             <div className="mt-4 overflow-y-auto max-h-[60vh]">
@@ -81,13 +89,12 @@ const ProfileSettingsDialog = ({ children }: ProfileSettingsDialogProps) => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button 
+                    <Button
                       onClick={() => {
                         setOpen(false);
                         setShowProfileEdit(true);
                       }}
-                      className="w-full"
-                    >
+                      className="w-full">
                       Edit Profile Details
                     </Button>
                   </CardContent>
@@ -125,27 +132,32 @@ const ProfileSettingsDialog = ({ children }: ProfileSettingsDialogProps) => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="profile-visibility">Profile Visibility</Label>
-                      <Select value={profileVisibility} onValueChange={setProfileVisibility}>
+                      <Label htmlFor="profile-visibility">
+                        Profile Visibility
+                      </Label>
+                      <Select
+                        value={profileVisibility}
+                        onValueChange={setProfileVisibility}>
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="connections">Connections Only</SelectItem>
+                          <SelectItem value="connections">
+                            Connections Only
+                          </SelectItem>
                           <SelectItem value="private">Private</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    
-                    <Button 
-                      variant="outline" 
+
+                    <Button
+                      variant="outline"
                       onClick={() => {
                         setOpen(false);
                         setShowPrivacySettings(true);
                       }}
-                      className="w-full"
-                    >
+                      className="w-full">
                       Advanced Privacy Settings
                     </Button>
                   </CardContent>
@@ -165,25 +177,29 @@ const ProfileSettingsDialog = ({ children }: ProfileSettingsDialogProps) => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="email-notifications">Email Notifications</Label>
+                      <Label htmlFor="email-notifications">
+                        Email Notifications
+                      </Label>
                       <Switch
                         id="email-notifications"
                         checked={emailNotifications}
                         onCheckedChange={setEmailNotifications}
                       />
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="push-notifications">Push Notifications</Label>
+                      <Label htmlFor="push-notifications">
+                        Push Notifications
+                      </Label>
                       <Switch
                         id="push-notifications"
                         checked={pushNotifications}
                         onCheckedChange={setPushNotifications}
                       />
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-2">
                       <Label>Notification Types</Label>
                       <div className="space-y-2">
@@ -208,49 +224,13 @@ const ProfileSettingsDialog = ({ children }: ProfileSettingsDialogProps) => {
                   </CardContent>
                 </Card>
               </TabsContent>
-
-              <TabsContent value="appearance" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Palette className="h-4 w-4" />
-                      Appearance
-                    </CardTitle>
-                    <CardDescription>
-                      Customize the look and feel of your interface
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="dark-mode">Dark Mode</Label>
-                      <Switch
-                        id="dark-mode"
-                        checked={darkMode}
-                        onCheckedChange={setDarkMode}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Theme Color</Label>
-                      <div className="flex gap-2">
-                        <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-blue-600 cursor-pointer"></div>
-                        <div className="w-8 h-8 rounded-full bg-green-500 border-2 border-transparent cursor-pointer"></div>
-                        <div className="w-8 h-8 rounded-full bg-purple-500 border-2 border-transparent cursor-pointer"></div>
-                        <div className="w-8 h-8 rounded-full bg-orange-500 border-2 border-transparent cursor-pointer"></div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
             </div>
 
             <div className="flex justify-end gap-2 pt-4 border-t">
               <Button variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSaveSettings}>
-                Save Changes
-              </Button>
+              <Button onClick={handleSaveSettings}>Save Changes</Button>
             </div>
           </Tabs>
         </DialogContent>
