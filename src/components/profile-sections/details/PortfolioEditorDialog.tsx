@@ -91,6 +91,16 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
     setError(null);
 
     const file = files[0];
+    
+    // Check PDF limit
+    if (file.type === 'application/pdf') {
+      const currentPdfCount = portfolioList.filter(p => p.type === 'pdf').length;
+      if (currentPdfCount >= 5) {
+        setError("You can only upload up to 5 PDF files in your portfolio.");
+        return;
+      }
+    }
+
     const ext = file.name.split(".").pop();
     const filename = `${profileId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     setUploading(true);
@@ -204,6 +214,12 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
           )}
           <div className="text-xs text-gray-500 mt-1 mb-2">
             Max 50MB. Supported: images, video, PDF, DOCX, PPT, XLS files.
+            {portfolioList.filter(item => item.type === 'pdf').length >= 5 && (
+              <div className="text-red-600 mt-1">PDF limit reached (5/5). Remove existing PDFs to upload new ones.</div>
+            )}
+            {portfolioList.filter(item => item.type === 'pdf').length < 5 && portfolioList.filter(item => item.type === 'pdf').length > 0 && (
+              <div className="text-blue-600 mt-1">PDFs uploaded: {portfolioList.filter(item => item.type === 'pdf').length}/5</div>
+            )}
           </div>
         </div>
         <div className="mt-4">

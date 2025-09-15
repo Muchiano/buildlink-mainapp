@@ -5,9 +5,10 @@ import PortfolioGallery from "./PortfolioGallery";
 import PortfolioEditorDialog from "./PortfolioEditorDialog";
 import PortfolioThumbnails from "./PortfolioThumbnails";
 import PortfolioThumbnail from "./PortfolioThumbnail";
+import MediaPreview from "@/components/ui/media-preview";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2, BadgePlus, Trash2, FolderOpen } from "lucide-react";
+import { Plus, Loader2, BadgePlus, Trash2, FolderOpen, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type PortfolioItem = {
@@ -41,8 +42,18 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
 
   const canEdit = true;
 
-  // Add (with UI feedback)
   const handlePortfolioAdd = async (item: PortfolioItem) => {
+    // Check PDF limit
+    const currentPdfCount = portfolioList.filter(p => p.type === 'pdf').length;
+    if (item.type === 'pdf' && currentPdfCount >= 5) {
+      toast({
+        title: "PDF Limit Reached",
+        description: "You can only upload up to 5 PDF files in your portfolio.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setUpdating(true);
     const newPortfolio = [...portfolioList, item];
     setPortfolioList(newPortfolio);
@@ -132,16 +143,26 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                   }}
                 >
                   <div className="aspect-video relative overflow-hidden">
-                    <PortfolioThumbnail
-                      type={item.type}
-                      url={item.url}
-                      name={item.name}
-                      thumbnailUrl={item.thumbnailUrl}
-                    />
+                    {item.type === 'pdf' ? (
+                      <MediaPreview 
+                        url={item.url}
+                        type="pdf"
+                        name={item.name}
+                        size="md"
+                        showActions={true}
+                      />
+                    ) : (
+                      <PortfolioThumbnail
+                        type={item.type}
+                        url={item.url}
+                        name={item.name}
+                        thumbnailUrl={item.thumbnailUrl}
+                      />
+                    )}
                     <div className="absolute inset-0 bg-background/0 group-hover:bg-background/80 transition-all duration-200 flex items-center justify-center">
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <div className="bg-primary text-primary-foreground px-3 py-1 rounded-md text-sm font-medium">
-                          View Project
+                          {item.type === 'pdf' ? 'View PDF' : 'View Project'}
                         </div>
                       </div>
                     </div>
@@ -156,8 +177,10 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                       </p>
                     )}
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-muted-foreground capitalize bg-muted px-2 py-1 rounded">
-                        {item.type}
+                      <span className={`text-xs text-muted-foreground capitalize px-2 py-1 rounded ${
+                        item.type === 'pdf' ? 'bg-red-100 text-red-800' : 'bg-muted'
+                      }`}>
+                        {item.type === 'pdf' ? 'PDF Document' : item.type}
                       </span>
                       {canEdit && (
                         <button
@@ -176,6 +199,16 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                 </div>
               ))}
             </div>
+            
+            {/* PDF Count Indicator */}
+            {portfolioList.filter(item => item.type === 'pdf').length > 0 && (
+              <div className="text-center py-2">
+                <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-red-50 px-3 py-1 rounded-full">
+                  <FileText className="h-4 w-4" />
+                  {portfolioList.filter(item => item.type === 'pdf').length}/5 PDF documents uploaded
+                </div>
+              </div>
+            )}
             
             {portfolioList.length > 6 && (
               <div className="text-center">

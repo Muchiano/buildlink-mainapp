@@ -1,4 +1,8 @@
-const GraduateDashboard = () => {
+interface GraduateDashboardProps {
+  profile: any;
+}
+
+const GraduateDashboard = ({ profile }: GraduateDashboardProps) => {
   return (
     <div className="space-y-6">
 

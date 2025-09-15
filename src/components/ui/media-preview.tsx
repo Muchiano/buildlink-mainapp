@@ -154,17 +154,53 @@ const MediaPreview = ({
     );
   };
 
-  return (
-    <div className={cn("relative group")}>
-      <Dialog>
-        <DialogTrigger asChild>
-          <div className="rounded-lg overflow-hidden border-2 border-gray-200">
-            {renderThumbnail()}
-          </div>
-        </DialogTrigger>
-      </Dialog>
-    </div>
-  );
+    return (
+      <div className={cn("relative group", className)}>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className={cn(sizeClasses[size], "rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer")}>
+              {renderThumbnail()}
+            </div>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[95vh] p-6">
+            {type === "pdf" ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">{name || "PDF Document"}</h3>
+                  <div className="flex gap-2">
+                    {showActions && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handlePreview}
+                          className="flex items-center gap-2"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Open in New Tab
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDownload}
+                          className="flex items-center gap-2"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {renderPdfViewer()}
+              </div>
+            ) : (
+              renderThumbnail()
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
 };
 
 export default MediaPreview;

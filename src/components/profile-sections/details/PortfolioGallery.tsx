@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import PortfolioThumbnail from "./PortfolioThumbnail";
+import MediaPreview from "@/components/ui/media-preview";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -47,6 +48,22 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
     }, 100);
   }, [open, activeIndex, portfolio.length]);
 
+  const handleItemClick = (item: any, index: number) => {
+    if (setActiveIndex) setActiveIndex(index);
+    
+    // For PDFs, open in MediaPreview dialog
+    if (item.type === 'pdf') {
+      // The MediaPreview component will handle the PDF viewing
+      return;
+    }
+    
+    // For other files, you might want to handle them differently
+    if (item.type === 'link') {
+      window.open(item.url, '_blank');
+      return;
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-3xl shadow-lg rounded-xl">
@@ -58,16 +75,27 @@ const PortfolioGallery: React.FC<PortfolioGalleryProps> = ({
             <div
               key={item.id}
               className={`portfolio-gallery-item rounded-xl overflow-hidden border-2 ${i === activeIndex ? "border-primary ring-2 ring-primary" : "border-muted-foreground"} shadow-md relative group bg-white hover:scale-105 transition`}
-              onClick={() => setActiveIndex && setActiveIndex(i)}
               tabIndex={0}
               style={{ cursor: "pointer" }}
             >
-              <PortfolioThumbnail
-                type={item.type}
-                url={item.url}
-                name={item.name}
-                thumbnailUrl={item.thumbnailUrl}
-              />
+              {item.type === 'pdf' ? (
+                <MediaPreview 
+                  url={item.url}
+                  type="pdf"
+                  name={item.name}
+                  size="md"
+                  showActions={true}
+                />
+              ) : (
+                <div onClick={() => handleItemClick(item, i)}>
+                  <PortfolioThumbnail
+                    type={item.type}
+                    url={item.url}
+                    name={item.name}
+                    thumbnailUrl={item.thumbnailUrl}
+                  />
+                </div>
+              )}
               <div className="px-3 py-3 border-t bg-muted/40 relative min-h-[68px]">
                 <div className="font-semibold text-sm text-gray-900 truncate">{item.name}</div>
                 {item.description && (
