@@ -23,7 +23,7 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="md:block hidden fixed md:w-60 lg:w-72 h-full">
+      <div className="md:block hidden fixed md:w-30 lg:w-60 xl:w-72 h-full">
         <nav className="p-4 space-y-2 h-full overflow-y-auto">
           {navigationItems.map((item) => {
             const Icon = item.icon;
