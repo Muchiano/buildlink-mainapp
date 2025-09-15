@@ -114,9 +114,6 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
                     <SelectItem value="5">Master</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button type="button" onClick={addSkill} variant="outline" size="sm">
-                  <Plus className="h-4 w-4" />
-                </Button>
               </div>
             </div>
           </div>
@@ -178,7 +175,7 @@ const SkillsEditDialog = ({ children, currentProfile, onProfileUpdated }: Skills
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" onClick={addSkill} disabled={isLoading}>
               {isLoading ? 'Updating...' : 'Update Skills'}
             </Button>
           </div>
