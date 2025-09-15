@@ -1,11 +1,25 @@
-import { Card, CardContent } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Button } from "../ui/button";
-import { MapPin, Users, MessageCircle, Edit, Star, Settings } from "lucide-react";
+import {
+  MapPin,
+  Users,
+  MessageCircle,
+  Edit,
+  Star,
+  Settings,
+} from "lucide-react";
 import ProfileEditDialog from "../ProfileEditDialog";
 import AvatarUploader from "../profile-sections/AvatarUploader";
 import AccountTypeBadge from "../AccountTypeBadge";
 import RatingDialog from "../RatingDialog";
 import ProfileSettingsDialog from "../ProfileSettingsDialog";
+import { GraduationCap } from "lucide-react";
 import { useState } from "react";
 
 interface ProfileHeaderProps {
@@ -27,8 +41,23 @@ const ProfileHeader = ({
 }: ProfileHeaderProps) => {
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   return (
-    <Card className="border-0 shadow-sm">
-      <CardContent className="p-6">
+    <>
+      <Card className="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-6 h-6 text-blue-600" />
+            <CardTitle className="text-blue-900">
+              Welcome, {profile.full_name}!
+            </CardTitle>
+          </div>
+          <CardDescription className="text-blue-700">
+            🎓 Emerging talent on the path to success. Build your network,
+            showcase your work, and discover opportunities.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      <CardContent className="p-6 !mt-1">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
           {/* Info and Avatar */}
           <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-6">
@@ -95,7 +124,7 @@ const ProfileHeader = ({
         ratedUserId={profile.id}
         ratedUserName={profile.full_name}
       />
-    </Card>
+    </>
   );
 };
 
