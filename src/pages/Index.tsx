@@ -109,7 +109,7 @@ const Index: React.FC<IndexProps> = ({
       {/* Main Content */}
       <div className="relative top-12 grid grid-cols-12 h-screen px-4 pb-20 md:pb-8 w-full max-w-screen-xl mx-auto">
         {showNavigation && (
-          <div className="col-span-3 bg-white border-r">
+          <div className="col-span-3 bg-white">
             <ResponsiveNavigation
               loading={loading}
             />
