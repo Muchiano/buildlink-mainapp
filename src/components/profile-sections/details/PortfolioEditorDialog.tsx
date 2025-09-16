@@ -156,13 +156,28 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
   // Adding a link project
   const handleAddLink = async () => {
     if (!linkURL) return;
+    
+    // Fetch meta title for the link
+    let linkName = linkURL;
+    try {
+      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(linkURL)}`);
+      const data = await response.json();
+      const html = data.contents;
+      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+      if (titleMatch && titleMatch[1]) {
+        linkName = titleMatch[1].trim();
+      }
+    } catch (error) {
+      console.warn('Failed to fetch meta title, using URL as name');
+    }
+    
     let resolvedThumbnailUrl = thumbnailUrl;
     if (thumbnailOption === "auto") {
       resolvedThumbnailUrl = presetThumbnails[0];
     }
     const item: PortfolioItem = {
       id: Math.random().toString(36).substring(2),
-      name: linkURL,
+      name: linkName,
       url: linkURL,
       type: "link",
       description: desc,

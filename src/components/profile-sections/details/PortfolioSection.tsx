@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import MediaPreview from "@/components/ui/media-preview";
 import PortfolioGallery from "./PortfolioGallery";
 import PortfolioEditorDialog from "./PortfolioEditorDialog";
 import PortfolioThumbnails from "./PortfolioThumbnails";
@@ -13,6 +15,7 @@ import {
   Trash2,
   FolderOpen,
   FileText,
+  Edit,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MoveRight } from "lucide-react";
@@ -38,6 +41,8 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
 }) => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState<string>("");
   const [updating, setUpdating] = useState(false);
   const [portfolioList, setPortfolioList] = useState<PortfolioItem[]>([]);
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
@@ -106,19 +111,30 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
           <div className="flex items-center space-x-2">
             <h3 className="text-lg font-semibold text-foreground">Portfolio</h3>
             <span className="text-sm text-muted-foreground">
-              ({portfolioList.length})
+              ({portfolioList.length}/5 portfolio items uploaded)
             </span>
           </div>
           {canEdit && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => setEditorOpen(true)}
-              disabled={updating}>
-              <Plus className="h-4 w-4" />
-              Add Project
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2"
+                onClick={() => setGalleryOpen(true)}
+                disabled={updating || portfolioList.length === 0}>
+                <Edit className="h-4 w-4" />
+                Edit
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => setEditorOpen(true)}
+                disabled={updating}>
+                <Plus className="h-4 w-4" />
+                Add Project
+              </Button>
+            </div>
           )}
         </div>
         {portfolioList.length === 0 ? (
@@ -151,8 +167,15 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                   key={item.id}
                   className="bg-card rounded-lg border border-border transition-all duration-200 cursor-pointer overflow-hidden"
                   onClick={() => {
-                    setActiveGalleryIndex(index);
-                    setGalleryOpen(true);
+                    if (item.type === "pdf") {
+                      setSelectedPdfUrl(item.url);
+                      setPdfViewerOpen(true);
+                    } else if (item.type === "link") {
+                      window.open(item.url, '_blank');
+                    } else {
+                      setActiveGalleryIndex(index);
+                      setGalleryOpen(true);
+                    }
                   }}>
                     
                   <div className="p-4">
@@ -213,6 +236,23 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
           onRemove={handleRemove}
           updating={updating}
         />
+        
+        {/* PDF Viewer Dialog */}
+        <Dialog open={pdfViewerOpen} onOpenChange={setPdfViewerOpen}>
+          <DialogContent className="max-w-4xl w-full h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>PDF Viewer</DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-hidden">
+              <MediaPreview
+                url={selectedPdfUrl}
+                type="pdf"
+                className="w-full h-full"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+        
         <PortfolioEditorDialog
           open={editorOpen}
           setOpen={setEditorOpen}
