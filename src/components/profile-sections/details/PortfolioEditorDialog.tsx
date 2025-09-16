@@ -85,19 +85,15 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
   };
 
   // Handle project file upload (main project asset)
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  const handleFileUpload = async (file: File) => {
     setError(null);
-
-    const file = files[0];
     
     // Check PDF limit
     if (file.type === 'application/pdf') {
       const currentPdfCount = portfolioList.filter(p => p.type === 'pdf').length;
       if (currentPdfCount >= 5) {
         setError("You can only upload up to 5 PDF files in your portfolio.");
-        return;
+        return false;
       }
     }
 
@@ -114,7 +110,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
       setError("Upload failed");
       setUploading(false);
       setProgress(0);
-      return;
+      return false;
     }
 
     const { data: publicUrlData } = supabase.storage.from("portfolio").getPublicUrl(filename);
@@ -129,8 +125,6 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
         resolvedThumbnailUrl = presetThumbnails[0];
       }
     }
-    // Otherwise, use uploaded or selected
-    // thumbnailUrl is already set
 
     const item: PortfolioItem = {
       id: Math.random().toString(36).substring(2),
@@ -151,48 +145,63 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
     setThumbnailOption("auto");
     if (onPortfolioAdd) onPortfolioAdd(item);
     handleProfileUpdate();
+    return true;
   };
 
-  // Adding a link project
-  const handleAddLink = async () => {
-    if (!linkURL) return;
+  // Handle adding portfolio (both files and links)
+  const handleAddPortfolio = async () => {
+    if (!linkURL && !fileInput.current?.files?.[0]) return;
     
-    // Fetch meta title for the link
-    let linkName = linkURL;
-    try {
-      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(linkURL)}`);
-      const data = await response.json();
-      const html = data.contents;
-      const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-      if (titleMatch && titleMatch[1]) {
-        linkName = titleMatch[1].trim();
+    setUploading(true);
+    
+    // Handle file upload
+    if (fileInput.current?.files?.[0]) {
+      const file = fileInput.current.files[0];
+      await handleFileUpload(file);
+      return;
+    }
+    
+    // Handle link addition
+    if (linkURL) {
+      // Fetch meta title for the link
+      let linkName = linkURL;
+      try {
+        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(linkURL)}`);
+        const data = await response.json();
+        const html = data.contents;
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        if (titleMatch && titleMatch[1]) {
+          linkName = titleMatch[1].trim();
+        }
+      } catch (error) {
+        console.warn('Failed to fetch meta title, using URL as name');
       }
-    } catch (error) {
-      console.warn('Failed to fetch meta title, using URL as name');
+      
+      let resolvedThumbnailUrl = thumbnailUrl;
+      if (thumbnailOption === "auto") {
+        resolvedThumbnailUrl = presetThumbnails[0];
+      }
+      const item: PortfolioItem = {
+        id: Math.random().toString(36).substring(2),
+        name: linkName,
+        url: linkURL,
+        type: "link",
+        description: desc,
+        thumbnailUrl: resolvedThumbnailUrl,
+      };
+      const newPortfolio = [...portfolioList, item];
+      await updatePortfolio(newPortfolio);
+      setOpen(false);
+      setLinkURL("");
+      setDesc("");
+      setThumbnailUrl(undefined);
+      setThumbnailFile(null);
+      setThumbnailOption("auto");
+      if (onPortfolioAdd) onPortfolioAdd(item);
+      handleProfileUpdate();
     }
     
-    let resolvedThumbnailUrl = thumbnailUrl;
-    if (thumbnailOption === "auto") {
-      resolvedThumbnailUrl = presetThumbnails[0];
-    }
-    const item: PortfolioItem = {
-      id: Math.random().toString(36).substring(2),
-      name: linkName,
-      url: linkURL,
-      type: "link",
-      description: desc,
-      thumbnailUrl: resolvedThumbnailUrl,
-    };
-    const newPortfolio = [...portfolioList, item];
-    await updatePortfolio(newPortfolio);
-    setOpen(false);
-    setLinkURL("");
-    setDesc("");
-    setThumbnailUrl(undefined);
-    setThumbnailFile(null);
-    setThumbnailOption("auto");
-    if (onPortfolioAdd) onPortfolioAdd(item);
-    handleProfileUpdate();
+    setUploading(false);
   };
 
   return (
@@ -222,7 +231,6 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
             ref={fileInput}
             disabled={uploading || disabled}
             className="block disabled:opacity-50"
-            onChange={handleFileUpload}
           />
           {(progress > 0 && progress < 99) && (
             <Progress value={progress} className="mt-2" />
@@ -255,12 +263,12 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
             <Button type="button" variant="outline" disabled={uploading || disabled}>Cancel</Button>
           </DialogClose>
           <Button
-            onClick={handleAddLink}
+            onClick={handleAddPortfolio}
             type="button"
-            disabled={!linkURL || uploading || disabled}
+            disabled={(!linkURL && !fileInput.current?.files?.[0]) || uploading || disabled}
             variant="default"
           >
-            <Link2 className="h-4 w-4 mr-2" /> Add Link
+            <Plus className="h-4 w-4 mr-2" /> Add Portfolio
           </Button>
         </DialogFooter>
       </DialogContent>
