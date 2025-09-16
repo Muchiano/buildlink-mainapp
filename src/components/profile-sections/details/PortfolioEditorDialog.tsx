@@ -233,70 +233,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
             disabled={uploading || disabled}
           />
         </div>
-        <div className="mt-3">
-          <label className="block font-semibold mb-1">Short description</label>
-          <input
-            type="text"
-            value={desc}
-            onChange={e => setDesc(e.target.value)}
-            placeholder="e.g. Demo video for my landing page"
-            className="px-2 py-1 border rounded w-full"
-            disabled={uploading || disabled}
-          />
-        </div>
-        {/* Thumbnail selection */}
-        <div className="mt-6 border-t pt-4">
-          <label className="block font-semibold mb-2">Project Thumbnail</label>
-          <div className="flex gap-4 items-center mb-2">
-            <label className="flex gap-1 items-center">
-              <input type="radio" value="auto" checked={thumbnailOption==="auto"} onChange={()=>setThumbnailOption("auto")} />
-              <span className="text-sm">Auto</span>
-            </label>
-            <label className="flex gap-1 items-center">
-              <input type="radio" value="preset" checked={thumbnailOption==="preset"} onChange={()=>setThumbnailOption("preset")} />
-              <span className="text-sm">Preset</span>
-            </label>
-            <label className="flex gap-1 items-center">
-              <input type="radio" value="upload" checked={thumbnailOption==="upload"} onChange={()=>setThumbnailOption("upload")} />
-              <span className="text-sm">Upload</span>
-            </label>
-          </div>
-          {thumbnailOption==="upload" && (
-            <div className="mb-2">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleThumbnailUpload}
-                disabled={thumbnailUploading}
-              />
-              {thumbnailUploading && <div className="text-xs text-gray-400">Uploading...</div>}
-              {thumbnailUrl && (
-                <img src={thumbnailUrl} alt="Thumbnail" className="h-16 rounded mt-2 border" />
-              )}
-            </div>
-          )}
-          {thumbnailOption==="preset" && (
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {presetThumbnails.map(url => (
-                <button
-                  key={url}
-                  type="button"
-                  onClick={()=>{setThumbnailUrl(url);}}
-                  className={`border rounded shadow hover:ring-2 focus:ring-2 ${thumbnailUrl===url ? 'ring-2 ring-primary border-primary' : ''}`}
-                  style={{padding:2, background:"white", outline:"none"}}
-                  tabIndex={0}
-                >
-                  <img src={url} alt="Preset" className="h-12 w-16 rounded" />
-                </button>
-              ))}
-            </div>
-          )}
-          {thumbnailOption==="auto" && (
-            <div className="text-xs italic text-gray-500">
-              Uses the cover image (if uploading an image) or will choose a default preset.
-            </div>
-          )}
-        </div>
+      
         {error && <div className="text-red-500 mt-2">{error}</div>}
         <DialogFooter className="mt-1">
           <DialogClose asChild>
