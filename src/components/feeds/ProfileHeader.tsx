@@ -57,7 +57,7 @@ const ProfileHeader = ({
         </CardHeader>
       </Card>
 
-      <CardContent className="p-6 !mt-1">
+      <CardContent className="py-6 px-0 !mt-1">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
           {/* Info and Avatar */}
           <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-6">

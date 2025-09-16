@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Edit, Link2, Plus, BadgePlus } from "lucide-react";
+import { Edit, Link2, Plus, BadgePlus, X } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { getType } from "./getPortfolioFileType";
@@ -43,19 +43,8 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
   const [desc, setDesc] = useState("");
   const [error, setError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
-  const [thumbnailOption, setThumbnailOption] = useState<"auto" | "upload" | "preset">("auto");
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailUploading, setThumbnailUploading] = useState(false);
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | undefined>(undefined);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  // Preset thumbnails (can be your selection, or placeholders)
-  const presetThumbnails = [
-    "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b", // laptop
-    "https://images.unsplash.com/photo-1518770660439-4636190af475", // circuit board
-    "https://images.unsplash.com/photo-1461749280684-dccba630e2f6", // monitor java
-    "https://images.unsplash.com/photo-1649972904349-6e44c42644a7", // woman on laptop
-    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d", // macbook user
-  ];
 
   const updatePortfolio = async (newPortfolio: PortfolioItem[]) => {
     await supabase
@@ -64,7 +53,54 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
       .eq("id", profileId);
   };
 
-  // Handle thumbnail upload
+  // Fast meta title fetching with timeout
+  const fetchMetaTitle = async (url: string): Promise<string> => {
+    try {
+      // Use a reliable CORS proxy with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        const html = await response.text();
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        if (titleMatch && titleMatch[1]) {
+          const title = titleMatch[1].trim();
+          // Clean up common title suffixes
+          return title.replace(/\s*[-|â€"]\s*.*$/, '').trim() || title;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to fetch meta title:', error);
+    }
+    
+    // Fallback: extract domain name from URL for a cleaner display
+    try {
+      const urlObj = new URL(url);
+      let domain = urlObj.hostname.replace('www.', '');
+      // Capitalize first letter and remove TLD for cleaner display
+      domain = domain.split('.')[0];
+      return domain.charAt(0).toUpperCase() + domain.slice(1);
+    } catch {
+      return url;
+    }
+  };
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    setSelectedFile(files && files.length > 0 ? files[0] : null);
+  };
+
+  const handleFileDelete = () => {
+    setSelectedFile(null);
+    if (fileInput.current) {
+      fileInput.current.value = '';
+    }
+  };
   const handleThumbnailUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
@@ -115,16 +151,6 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
 
     const { data: publicUrlData } = supabase.storage.from("portfolio").getPublicUrl(filename);
     const url = publicUrlData.publicUrl;
-    let resolvedThumbnailUrl = thumbnailUrl;
-
-    if (thumbnailOption === "auto") {
-      // Use main asset as thumbnail if it's an image, otherwise fallback to preset
-      if (file.type.startsWith('image/')) {
-        resolvedThumbnailUrl = url;
-      } else {
-        resolvedThumbnailUrl = presetThumbnails[0];
-      }
-    }
 
     const item: PortfolioItem = {
       id: Math.random().toString(36).substring(2),
@@ -132,7 +158,6 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
       url,
       type: getType(file.name),
       description: desc,
-      thumbnailUrl: resolvedThumbnailUrl,
     };
     const newPortfolio = [...portfolioList, item];
     await updatePortfolio(newPortfolio);
@@ -140,9 +165,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
     setProgress(100);
     setOpen(false);
     setDesc("");
-    setThumbnailUrl(undefined);
-    setThumbnailFile(null);
-    setThumbnailOption("auto");
+    setSelectedFile(null);
     if (onPortfolioAdd) onPortfolioAdd(item);
     handleProfileUpdate();
     return true;
@@ -150,59 +173,46 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
 
   // Handle adding portfolio (both files and links)
   const handleAddPortfolio = async () => {
-    if (!linkURL && !fileInput.current?.files?.[0]) return;
+    if (!linkURL && !selectedFile) return;
     
     setUploading(true);
     
     // Handle file upload
-    if (fileInput.current?.files?.[0]) {
-      const file = fileInput.current.files[0];
-      await handleFileUpload(file);
+    if (selectedFile) {
+      await handleFileUpload(selectedFile);
       return;
     }
     
     // Handle link addition
     if (linkURL) {
-      // Fetch meta title for the link
-      let linkName = linkURL;
-      try {
-        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(linkURL)}`);
-        const data = await response.json();
-        const html = data.contents;
-        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-        if (titleMatch && titleMatch[1]) {
-          linkName = titleMatch[1].trim();
-        }
-      } catch (error) {
-        console.warn('Failed to fetch meta title, using URL as name');
-      }
+      // Fetch meta title with timeout
+      const linkName = await fetchMetaTitle(linkURL);
       
-      let resolvedThumbnailUrl = thumbnailUrl;
-      if (thumbnailOption === "auto") {
-        resolvedThumbnailUrl = presetThumbnails[0];
-      }
       const item: PortfolioItem = {
         id: Math.random().toString(36).substring(2),
         name: linkName,
         url: linkURL,
         type: "link",
         description: desc,
-        thumbnailUrl: resolvedThumbnailUrl,
       };
       const newPortfolio = [...portfolioList, item];
       await updatePortfolio(newPortfolio);
       setOpen(false);
       setLinkURL("");
       setDesc("");
-      setThumbnailUrl(undefined);
-      setThumbnailFile(null);
-      setThumbnailOption("auto");
+      setSelectedFile(null);
       if (onPortfolioAdd) onPortfolioAdd(item);
       handleProfileUpdate();
     }
     
     setUploading(false);
   };
+
+  // Updated validation logic - only one item at a time
+  const hasFile = selectedFile !== null;
+  const hasLink = linkURL.trim() !== "";
+  const hasBothInputs = hasFile && hasLink;
+  const hasValidInput = (hasFile || hasLink) && !hasBothInputs;
 
   return (
     <Dialog open={open} onOpenChange={disabled ? () => {} : setOpen}>
@@ -220,23 +230,42 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
             Add New Portfolio Project
           </DialogTitle>
           <DialogDescription>
-            Share your best work—upload files or add live project/web links. You can set a custom thumbnail that will show in your gallery.
+            Share your best workâ€"upload files or add live project/web links.
           </DialogDescription>
         </DialogHeader>
         <div className="mt-2">
           <label className="block font-semibold mb-1">Attach a File</label>
-          <input
-            type="file"
-            accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,video/*"
-            ref={fileInput}
-            disabled={uploading || disabled}
-            className="block disabled:opacity-50"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              accept=".pdf"
+              ref={fileInput}
+              onChange={handleFileChange}
+              disabled={uploading || disabled}
+              className="block disabled:opacity-50 flex-1"
+            />
+            {selectedFile && (
+              <button
+                type="button"
+                onClick={handleFileDelete}
+                disabled={uploading || disabled}
+                className="text-red-500 hover:text-red-700 disabled:opacity-50 p-1"
+                aria-label="Remove selected file"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          {selectedFile && (
+            <div className="text-sm text-gray-600 mt-1">
+              Selected: {selectedFile.name}
+            </div>
+          )}
           {(progress > 0 && progress < 99) && (
             <Progress value={progress} className="mt-2" />
           )}
           <div className="text-xs text-gray-500 mt-1 mb-2">
-            Max 50MB. Supported: images, video, PDF, DOCX, PPT, XLS files.
+            Max 50MB. PDF files only.
             {portfolioList.filter(item => item.type === 'pdf').length >= 5 && (
               <div className="text-red-600 mt-1">PDF limit reached (5/5). Remove existing PDFs to upload new ones.</div>
             )}
@@ -257,6 +286,12 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
           />
         </div>
       
+        {hasBothInputs && (
+          <div className="text-red-500 text-sm mt-1">
+            Only upload one portfolio item at a time
+          </div>
+        )}
+
         {error && <div className="text-red-500 mt-2">{error}</div>}
         <DialogFooter className="mt-1">
           <DialogClose asChild>
@@ -265,7 +300,7 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
           <Button
             onClick={handleAddPortfolio}
             type="button"
-            disabled={(!linkURL && !fileInput.current?.files?.[0]) || uploading || disabled}
+            disabled={!hasValidInput || uploading || disabled}
             variant="default"
           >
             <Plus className="h-4 w-4 mr-2" /> Add Portfolio

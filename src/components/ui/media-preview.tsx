@@ -46,49 +46,6 @@ const MediaPreview = ({
     }
   };
 
-  const renderThumbnail = () => {
-    if (type === "image") {
-      return (
-        <img
-          src={thumbnailUrl || url}
-          alt={name || "Image preview"}
-          className="w-full h-full object-cover"
-          onLoad={() => setIsLoading(false)}
-          onError={() => {
-            setHasError(true);
-            setIsLoading(false);
-          }}
-        />
-      );
-    }
-
-    if (type === "pdf") {
-      return (
-        <div className="w-full flex items-center justify-between bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md p-4">
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0">
-              <FileText className="h-8 w-8 text-red-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-red-900 truncate">
-                {name || "PDF Document"}
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 border-2 border-gray-200 rounded-lg">
-        {getFileIcon()}
-        <span className="text-xs font-medium text-gray-700 mt-1 truncate px-2">
-          {name || type.toUpperCase()}
-        </span>
-      </div>
-    );
-  };
-
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
     const link = document.createElement("a");
@@ -101,15 +58,10 @@ const MediaPreview = ({
     document.body.removeChild(link);
   };
 
-  const handlePreview = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
   const renderPdfViewer = () => {
     if (hasError) {
       return (
-        <div className="w-full h-[calc(95vh-180px)] flex flex-col items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+        <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
           <FileText className="h-20 w-20 text-gray-400 mb-6" />
           <h3 className="text-xl font-semibold text-gray-700 mb-2">
             Cannot Display PDF
@@ -118,11 +70,7 @@ const MediaPreview = ({
             There was an error loading this PDF. Please try downloading it or
             opening it in a new tab.
           </p>
-          <div className="flex gap-3">
-            <Button onClick={handlePreview} className="flex items-center gap-2">
-              <ExternalLink className="h-4 w-4" />
-              Open in New Tab
-            </Button>
+          <div>
             <Button
               variant="outline"
               onClick={handleDownload}
@@ -136,71 +84,70 @@ const MediaPreview = ({
     }
 
     return (
-      <div className="w-full h-[calc(95vh-180px)] bg-white rounded-lg border overflow-hidden">
-        {/* Direct PDF Iframe */}
-        <div className="flex-1 overflow-auto bg-gray-100">
-          <iframe
-            src={url}
-            className="w-full h-full min-h-[500px] border-0"
-            onLoad={() => setIsLoading(false)}
-            onError={() => {
-              setHasError(true);
-              setIsLoading(false);
-            }}
-            title={name || getFilenameFromUrl(url)}
-          />
-        </div>
+      <div className="w-full h-full bg-white rounded-lg border overflow-hidden relative">
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
+            <div className="flex flex-col items-center gap-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <p className="text-sm text-gray-600">Loading PDF...</p>
+            </div>
+          </div>
+        )}
+        <iframe
+          src={`${url}#toolbar=1&navpanes=1&scrollbar=1`}
+          className="w-full h-full border-0"
+          onLoad={() => setIsLoading(false)}
+          onError={() => {
+            setHasError(true);
+            setIsLoading(false);
+          }}
+          title={name || getFilenameFromUrl(url)}
+          allow="fullscreen"
+        />
       </div>
     );
   };
 
+  // For PDF type, render directly without wrapping Dialog
+  if (type === "pdf") {
     return (
       <div className={cn("relative group", className)}>
-        <Dialog>
-          <DialogTrigger asChild>
-            <div className={cn(sizeClasses[size], "rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer")}>
-              {renderThumbnail()}
-            </div>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[95vh] p-6">
-            {type === "pdf" ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{name || "PDF Document"}</h3>
-                  <div className="flex gap-2">
-                    {showActions && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handlePreview}
-                          className="flex items-center gap-2"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          Open in New Tab
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleDownload}
-                          className="flex items-center gap-2"
-                        >
-                          <Download className="h-4 w-4" />
-                          Download
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-                {renderPdfViewer()}
+        <div className="flex flex-col h-full">
+          {showActions && (
+            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+              <h3 className="text-lg font-semibold">
+                {name || getFilenameFromUrl(url) || "PDF Document"}
+              </h3>
+              <div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownload}
+                  className="flex items-center gap-2 mr-8">
+                  <Download className="h-4 w-4" />
+                  Download
+                </Button>
               </div>
-            ) : (
-              renderThumbnail()
-            )}
-          </DialogContent>
-        </Dialog>
+            </div>
+          )}
+          <div className="flex-1 min-h-0">
+            {renderPdfViewer()}
+          </div>
+        </div>
       </div>
     );
+  }
+
+  // For other media types, keep the original dialog structure
+  return (
+    <div className={cn("relative group", className)}>
+      <Dialog>
+        <DialogContent className="max-w-4xl max-h-[95vh] p-6">
+          {/* Handle other media types here if needed */}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 };
 
 export default MediaPreview;

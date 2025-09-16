@@ -16,6 +16,8 @@ import {
   FolderOpen,
   FileText,
   Edit,
+  Download,
+  ExternalLink,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MoveRight } from "lucide-react";
@@ -43,6 +45,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [pdfViewerOpen, setPdfViewerOpen] = useState(false);
   const [selectedPdfUrl, setSelectedPdfUrl] = useState<string>("");
+  const [selectedPdfName, setSelectedPdfName] = useState<string>("");
   const [updating, setUpdating] = useState(false);
   const [portfolioList, setPortfolioList] = useState<PortfolioItem[]>([]);
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
@@ -106,8 +109,8 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
 
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-6">
+      <CardContent className="py-6 px-0">
+        <div className="flex flex-wrap gap-y-2 items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <h3 className="text-lg font-semibold text-foreground">Portfolio</h3>
             <span className="text-sm text-muted-foreground">
@@ -169,6 +172,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                   onClick={() => {
                     if (item.type === "pdf") {
                       setSelectedPdfUrl(item.url);
+                      setSelectedPdfName(item.name.replace(/\.(pdf|PDF)$/, ""));
                       setPdfViewerOpen(true);
                     } else if (item.type === "link") {
                       window.open(item.url, '_blank');
@@ -180,7 +184,7 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                     
                   <div className="p-4">
                     <h4 className="font-semibold py-4">
-                      {item.name}
+                      {item.name.replace(/\.(pdf|PDF)$/, "")}
                     </h4>
                     {item.description && (
                       <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
@@ -213,17 +217,6 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                 </div>
               ))}
             </div>
-
-            {/* PDF Count Indicator */}
-            {portfolioList.filter((item) => item.type === "pdf").length > 0 && (
-              <div className="text-center py-2">
-                <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-red-50 px-3 py-1 rounded-full">
-                  <FileText className="h-4 w-4" />
-                  {portfolioList.filter((item) => item.type === "pdf").length}/5
-                  PDF documents uploaded
-                </div>
-              </div>
-            )}
           </div>
         )}
         <PortfolioGallery
@@ -239,15 +232,14 @@ const PortfolioSection: React.FC<PortfolioSectionProps> = ({
         
         {/* PDF Viewer Dialog */}
         <Dialog open={pdfViewerOpen} onOpenChange={setPdfViewerOpen}>
-          <DialogContent className="max-w-4xl w-full h-[80vh]">
-            <DialogHeader>
-              <DialogTitle>PDF Viewer</DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 overflow-hidden">
+          <DialogContent className="max-w-6xl w-full h-[90vh] flex flex-col">
+            <div className="flex-1 min-h-0">
               <MediaPreview
                 url={selectedPdfUrl}
                 type="pdf"
+                name={selectedPdfName}
                 className="w-full h-full"
+                showActions={true}
               />
             </div>
           </DialogContent>
