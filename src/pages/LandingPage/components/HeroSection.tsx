@@ -31,7 +31,7 @@ const HeroSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-            <a href="#">
+            <a href="/auth">
               <Button variant="hero" size="lg" className="text-lg px-8 py-6">
                 Register
                 <ArrowRight className="ml-2" size={20} />

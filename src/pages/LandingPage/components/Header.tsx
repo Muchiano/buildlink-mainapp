@@ -30,7 +30,7 @@ const Header = () => {
             <a href="#process" className="text-foreground hover:text-primary transition-colors">
               Process
             </a>
-            <a href="#">
+            <a href="/auth">
             <Button variant="cta" size="sm">
               Register
             </Button>
@@ -60,9 +60,9 @@ const Header = () => {
               Process
             </a>
               <div className="flex flex-col space-y-2 pt-4">
-               <a href="#">
+               <a href="/auth">
                 <Button variant="cta" size="sm" className="w-full">
-                  Sign In
+                  Register
                 </Button>
                 </a>
               </div>

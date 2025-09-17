@@ -22,7 +22,7 @@ const CTASection = () => {
 
           {/* CTA Button */}
           <div className="flex justify-center">
-            <a href="#">
+            <a href="/auth">
               <Button 
               variant="secondary" 
               size="lg" 
