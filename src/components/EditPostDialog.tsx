@@ -118,18 +118,6 @@ const EditPostDialog = ({
 
       // Handle document upload
       if (documentFile) {
-        // Check file size (limit to 10MB for PDFs)
-        if (documentFile.size > 10 * 1024 * 1024) {
-          toast({
-            title: "File Too Large",
-            description: "PDF files must be smaller than 10MB.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        const fileExt = documentFile.name.split(".").pop();
         const filePath = `user-${user.id}/${Date.now()}_${documentFile.name}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("post-media")
