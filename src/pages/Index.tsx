@@ -10,7 +10,6 @@ import ProfileBoard from "@/components/feeds/ProfileBoard";
 import ResponsiveNavigation from "@/components/ResponsiveNavigation";
 import ContentFilters from "@/components/ContentFilters";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
-import Footer from "@/components/Footer";
 
 interface IndexProps {
   customContent?: ReactNode;
