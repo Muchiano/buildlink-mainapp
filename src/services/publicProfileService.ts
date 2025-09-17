@@ -3,59 +3,8 @@ import { secureProfileService } from './secureProfileService';
 
 export const publicProfileService = {
   async getPublicProfile(profileId: string) {
-    // Check if user is authenticated to determine access level
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (user) {
-      // Authenticated users can see profile information for public profiles or users who have posted publicly
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          full_name,
-          user_type,
-          title,
-          profession,
-          organization,
-          avatar,
-          bio,
-          skills,
-          banner,
-          profile_completion_score,
-          profile_visibility,
-          created_at,
-          experiences,
-          education,
-          certifications,
-          social_links,
-          verification_badges
-        `)
-        .eq('id', profileId)
-        .single();
-      
-      return { data, error };
-    } else {
-      // Anonymous users can only see basic public profile information
-      // This relies on RLS policies to ensure proper access control
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          full_name,
-          title,
-          profession,
-          organization,
-          avatar,
-          user_type,
-          profile_visibility,
-          created_at
-        `)
-        .eq('id', profileId)
-        .eq('profile_visibility', 'public')
-        .single();
-      
-      return { data, error };
-    }
+    // Use the secure profile service which respects connection-based access
+    return await secureProfileService.getProfileByRelationship(profileId);
   },
 
   async recordProfileView(viewedProfileId: string) {
@@ -90,49 +39,16 @@ export const publicProfileService = {
   },
 
   // Method for getting basic profile info for search results, user lists, etc.
-  // This uses the secure public_profiles view for anonymous access
   async getBasicProfile(profileId: string) {
-    const { data: { user } } = await supabase.auth.getUser();
+    // Use the secure function created in the migration for basic author info
+    const { data, error } = await supabase
+      .rpc('get_post_author_info', { author_id_param: profileId });
     
-    if (user) {
-      // Authenticated users can access more profile fields
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          full_name,
-          title,
-          profession,
-          organization,
-          avatar,
-          user_type,
-          profile_visibility
-        `)
-        .eq('id', profileId)
-        .single();
-      
-      return { data, error };
-    } else {
-      // Anonymous users can only see basic public profile information  
-      // This relies on RLS policies to ensure proper access control
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          full_name,
-          title,
-          profession,
-          organization,
-          avatar,
-          user_type,
-          profile_visibility
-        `)
-        .eq('id', profileId)
-        .eq('profile_visibility', 'public')
-        .single();
-      
-      return { data, error };
+    if (data && data.length > 0) {
+      return { data: data[0], error: null };
     }
+    
+    return { data: null, error: error || 'Profile not found or not accessible' };
   },
 
   async updateProfileCompletion(userId: string) {
