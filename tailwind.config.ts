@@ -27,7 +27,7 @@ export default {
         primary: {
           DEFAULT: "#8a1f0c",
           foreground: "#FFFFFF",
-          50: "#f9e7e4", // very light tint
+          50: "#f9e7e4", 
           100: "#f1c7c0",
           200: "#e6a197",
           300: "#d97a6d",
