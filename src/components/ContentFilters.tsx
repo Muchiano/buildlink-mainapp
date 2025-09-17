@@ -60,7 +60,7 @@ const ContentFilters = ({ activeFilter, onFilterChange, filterType = "home" }: C
                   "whitespace-nowrap text-xs h-7",
                   activeFilter === filter.id 
                     ? "bg-primary text-primary-foreground" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    : "text-muted-foreground hover:text-white hover:bg-accent"
                 )}
               >
                 {filter.label}

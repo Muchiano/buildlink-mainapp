@@ -1,7 +1,6 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -25,18 +24,18 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#8a1f0c",
+          DEFAULT: "#a51e06",
           foreground: "#FFFFFF",
-          50: "#f9e7e4", 
-          100: "#f1c7c0",
-          200: "#e6a197",
-          300: "#d97a6d",
-          400: "#c75a48",
-          500: "#8a1f0c", // base
-          600: "#741a0a",
-          700: "#5d1508",
-          800: "#471006",
-          900: "#320b04",
+          50: "#fce8e5", // very light tint
+          100: "#f7c4bc",
+          200: "#f29b8e",
+          300: "#e86e5d",
+          400: "#d94432",
+          500: "#a51e06", // base
+          600: "#8c1a05",
+          700: "#711504",
+          800: "#571003",
+          900: "#3c0b02",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

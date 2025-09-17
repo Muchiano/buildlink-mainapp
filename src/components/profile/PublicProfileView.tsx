@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageCircle, UserPlus, MapPin, Briefcase, GraduationCap, Eye } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { publicProfileService } from '@/services/publicProfileService';
-import { useToast } from '@/hooks/use-toast';
-import ProfileCompletionIndicator from './ProfileCompletionIndicator';
-import SocialMediaLinks from './SocialMediaLinks';
-import VerificationBadges from './VerificationBadges';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  MessageCircle,
+  UserPlus,
+  MapPin,
+  Briefcase,
+  GraduationCap,
+  Eye,
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { publicProfileService } from "@/services/publicProfileService";
+import { useToast } from "@/hooks/use-toast";
+import ProfileCompletionIndicator from "./ProfileCompletionIndicator";
+import SocialMediaLinks from "./SocialMediaLinks";
+import VerificationBadges from "./VerificationBadges";
 
 const PublicProfileView: React.FC = () => {
   const { profileId } = useParams<{ profileId: string }>();
@@ -30,13 +37,15 @@ const PublicProfileView: React.FC = () => {
     if (!profileId) return;
 
     try {
-      const { data, error } = await publicProfileService.getPublicProfile(profileId);
-      
+      const { data, error } = await publicProfileService.getPublicProfile(
+        profileId
+      );
+
       if (error) {
         toast({
-          title: 'Error',
-          description: 'Failed to load profile or profile is not public',
-          variant: 'destructive'
+          title: "Error",
+          description: "Failed to load profile or profile is not public",
+          variant: "destructive",
         });
         return;
       }
@@ -49,7 +58,7 @@ const PublicProfileView: React.FC = () => {
         setViewRecorded(true);
       }
     } catch (error) {
-      console.error('Error loading public profile:', error);
+      console.error("Error loading public profile:", error);
     } finally {
       setLoading(false);
     }
@@ -83,21 +92,23 @@ const PublicProfileView: React.FC = () => {
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-shrink-0">
-              <Avatar className="h-24 w-24 md:h-32 md:w-32">
+              <Avatar className="h-24 w-24 md:h-24 md:w-24">
                 <AvatarImage src={profile.avatar} />
                 <AvatarFallback className="text-2xl">
-                  {profile.full_name?.charAt(0) || 'U'}
+                  {profile.full_name?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
             </div>
-            
+
             <div className="flex-1 space-y-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <h1 className="text-2xl font-bold">{profile.full_name}</h1>
-                  <VerificationBadges badges={profile.verification_badges || []} />
+                  <VerificationBadges
+                    badges={profile.verification_badges || []}
+                  />
                 </div>
-                
+
                 {profile.profession && (
                   <div className="flex items-center text-muted-foreground mb-1">
                     <Briefcase className="h-4 w-4 mr-2" />
@@ -107,37 +118,35 @@ const PublicProfileView: React.FC = () => {
                     )}
                   </div>
                 )}
-                
+
                 {profile.title && (
                   <div className="flex items-center text-muted-foreground mb-1">
                     <GraduationCap className="h-4 w-4 mr-2" />
                     <span>{profile.title}</span>
                   </div>
                 )}
-                
-                <ProfileCompletionIndicator score={profile.profile_completion_score || 0} />
               </div>
-              
-              {profile.bio && (
-                <p className="text-muted-foreground">{profile.bio}</p>
-              )}
-              
-              <SocialMediaLinks links={profile.social_links || {}} />
-              
-              {user && user.id !== profile.id && (
-                <div className="flex gap-2">
-                  <Button>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Connect
-                  </Button>
-                  <Button variant="outline">
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Message
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
+
+          {profile.bio && (
+            <p className="text-muted-foreground mt-4">{profile.bio}</p>
+          )}
+
+          <SocialMediaLinks links={profile.social_links || {}} />
+
+          {user && user.id !== profile.id && (
+            <div className="flex gap-2 mt-4">
+              <Button>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Connect
+              </Button>
+              <Button variant="outline">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Message
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -171,7 +180,7 @@ const PublicProfileView: React.FC = () => {
                 <h3 className="font-semibold">{exp.title}</h3>
                 <p className="text-sm text-muted-foreground">{exp.company}</p>
                 <p className="text-xs text-muted-foreground">
-                  {exp.startDate} - {exp.endDate || 'Present'}
+                  {exp.startDate} - {exp.endDate || "Present"}
                 </p>
                 {exp.description && (
                   <p className="text-sm mt-2">{exp.description}</p>
@@ -192,9 +201,11 @@ const PublicProfileView: React.FC = () => {
             {profile.education.map((edu: any, index: number) => (
               <div key={index} className="border-l-2 border-muted pl-4">
                 <h3 className="font-semibold">{edu.degree}</h3>
-                <p className="text-sm text-muted-foreground">{edu.institution}</p>
+                <p className="text-sm text-muted-foreground">
+                  {edu.institution}
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  {edu.startDate} - {edu.endDate || 'Present'}
+                  {edu.startDate} - {edu.endDate || "Present"}
                 </p>
                 {edu.description && (
                   <p className="text-sm mt-2">{edu.description}</p>
