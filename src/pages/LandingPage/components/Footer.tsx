@@ -1,4 +1,5 @@
 import { Building2, Mail, Linkedin, X, Instagram } from "lucide-react";
+import buildlinkLogo from "@/assets/buildlink-logo.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -10,7 +11,7 @@ const Footer = () => {
           {/* Brand */}
            <div className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/61381431-b6bc-4161-afb6-ae3b78b1e4bb.png" 
+              src={buildlinkLogo}
               alt="BuildLink Logo" 
               className="w-auto h-10"
             />
