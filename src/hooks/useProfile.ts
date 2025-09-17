@@ -4,35 +4,50 @@ import { profileService } from "@/services/profileService";
 import { publicProfileService } from "@/services/publicProfileService";
 import { postsService } from "@/services/postsService";
 import { useToast } from "@/hooks/use-toast";
+import { useStableState } from "@/hooks/useStableState";
 
 export const useProfile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { stableCallback } = useStableState();
   const [profile, setProfile] = useState<any>(null);
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  const loadUserData = useCallback(async () => {
+  const loadUserData = useCallback(async (forceRefresh = false) => {
     if (!user) return;
+    
     try {
       setLoading(true);
-      const { data: profileData, error: profileError } = await profileService.getProfile(user.id);
-      if (profileError) throw profileError;
-      setProfile(profileData);
-
-      const { data: postsData, error: postsError } = await postsService.getPosts();
-      if (postsError) throw postsError;
       
-      const filteredPosts = postsData?.filter(post => post.author_id === user.id) || [];
-      setUserPosts(filteredPosts);
+      // Use Promise.all for concurrent requests
+      const [profileResult, postsResult] = await Promise.all([
+        profileService.getProfile(user.id),
+        postsService.getPosts()
+      ]);
+
+      if (profileResult.error) {
+        console.error('Profile error:', profileResult.error);
+      } else {
+        setProfile(profileResult.data);
+      }
+
+      if (postsResult.error) {
+        console.error('Posts error:', postsResult.error);
+      } else {
+        const filteredPosts = postsResult.data?.filter(post => post.author_id === user.id) || [];
+        setUserPosts(filteredPosts);
+      }
     } catch (error) {
       console.error('Error loading user data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load profile data',
-        variant: 'destructive'
-      });
+      if (forceRefresh) {
+        toast({
+          title: 'Error',
+          description: 'Failed to load profile data',
+          variant: 'destructive'
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -44,8 +59,8 @@ export const useProfile = () => {
     }
   }, [user, loadUserData]);
 
-  const handleProfileUpdate = () => {
-    loadUserData();
+  const handleProfileUpdate = stableCallback(() => {
+    loadUserData(true);
     // Update profile completion score
     if (user) {
       publicProfileService.updateProfileCompletion(user.id);
@@ -54,9 +69,9 @@ export const useProfile = () => {
       title: 'Success',
       description: 'Profile updated successfully!'
     });
-  };
+  }, [user]);
 
-  const handleAvatarChange = async (croppedFile: File) => {
+  const handleAvatarChange = stableCallback(async (croppedFile: File) => {
     if (!user) return;
     setUploading(true);
     try {
@@ -79,9 +94,9 @@ export const useProfile = () => {
     } finally {
       setUploading(false);
     }
-  };
+  }, [user]);
 
-  const handleAvatarRemove = async () => {
+  const handleAvatarRemove = stableCallback(async () => {
     if (!user) return;
     setUploading(true);
     try {
@@ -103,7 +118,7 @@ export const useProfile = () => {
     } finally {
       setUploading(false);
     }
-  };
+  }, [user, profile]);
 
   return {
     profile,
@@ -113,5 +128,6 @@ export const useProfile = () => {
     handleProfileUpdate,
     handleAvatarChange,
     handleAvatarRemove,
+    loadUserData: () => loadUserData(true), // Expose force refresh
   };
 };

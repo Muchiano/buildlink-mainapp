@@ -1,9 +1,26 @@
-
-import { Card, CardContent } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Button } from "../ui/button";
-import { MapPin, Users, MessageCircle, Edit } from "lucide-react";
+import {
+  MapPin,
+  Users,
+  MessageCircle,
+  Edit,
+  Star,
+  Settings,
+} from "lucide-react";
 import ProfileEditDialog from "../ProfileEditDialog";
 import AvatarUploader from "../profile-sections/AvatarUploader";
+import AccountTypeBadge from "../AccountTypeBadge";
+import RatingDialog from "../RatingDialog";
+import ProfileSettingsDialog from "../ProfileSettingsDialog";
+import { GraduationCap } from "lucide-react";
+import { useState } from "react";
 
 interface ProfileHeaderProps {
   profile: any;
@@ -21,62 +38,94 @@ const ProfileHeader = ({
   handleAvatarChange,
   handleAvatarRemove,
   handleProfileUpdate,
-}: ProfileHeaderProps) => (
-  <Card className="border-0 shadow-sm">
-    <CardContent className="p-6">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between space-y-4 md:space-y-0">
-        {/* Info and Avatar */}
-        <div className="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
-          <div className="relative">
-            <AvatarUploader
-              avatarUrl={profile.avatar || ""}
-              fullName={profile.full_name}
-              uploading={uploading}
-              onAvatarChange={handleAvatarChange}
-              onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
-            />
+}: ProfileHeaderProps) => {
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
+  return (
+    <>
+      <Card className="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-6 h-6 text-blue-600" />
+            <CardTitle className="text-blue-900">
+              Welcome, {profile.full_name}!
+            </CardTitle>
           </div>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">
-              {profile.full_name || 'User'}
-            </h1>
-            <p className="text-lg text-gray-700 mb-1">
-              {profile.profession || 'No profession specified'}
-            </p>
-            <p className="text-gray-600 mb-3">
-              {profile.organization || 'No organization specified'}
-            </p>
-            <div className="flex items-center text-sm text-gray-500 space-x-4">
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-1" />
-                Kenya
-              </div>
-              <div className="flex items-center">
-                <Users className="h-4 w-4 mr-1" />
-                {userPostsCount} posts
+          <CardDescription className="text-blue-700">
+            🎓 Emerging talent on the path to success. Build your network,
+            showcase your work, and discover opportunities.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      <CardContent className="py-6 px-0 !mt-1">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0">
+          {/* Info and Avatar */}
+          <div className="flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-6">
+            <div className="relative">
+              <AvatarUploader
+                avatarUrl={profile.avatar || ""}
+                fullName={profile.full_name}
+                uploading={uploading}
+                onAvatarChange={handleAvatarChange}
+                onAvatarRemove={profile.avatar ? handleAvatarRemove : undefined}
+              />
+            </div>
+            <div className="flex-1">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="flex-1">
+                    <h1 className="text-2xl font-bold text-foreground mb-1">
+                      {profile.full_name || "User"}
+                    </h1>
+                    <div className="flex items-center gap-2 mt-1">
+                      <AccountTypeBadge
+                        userType={profile.user_type || "student"}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-base text-muted-foreground mb-1">
+                  {profile.profession || "No profession specified"}
+                  {profile.organization && (
+                    <span> - {profile.organization}</span>
+                  )}
+                </p>
               </div>
             </div>
           </div>
-        </div>
-        {/* Action Buttons */}
-        <div className="flex space-x-2">
-          <Button variant="outline">
-            <MessageCircle className="h-4 w-4 mr-1" />
-            Message
-          </Button>
-          <ProfileEditDialog 
-            currentProfile={profile}
-            onProfileUpdated={handleProfileUpdate}
-          >
-            <Button>
-              <Edit className="h-4 w-4 mr-1" />
-              Edit Profile
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" className="flex-1 sm:flex-none">
+              <MessageCircle className="h-4 w-4 mr-1" />
+              Message
             </Button>
-          </ProfileEditDialog>
+
+            <ProfileEditDialog
+              currentProfile={profile}
+              onProfileUpdated={handleProfileUpdate}>
+              <Button className="flex-1 sm:flex-none">
+                <Edit className="h-4 w-4 mr-1" />
+                Edit Profile
+              </Button>
+            </ProfileEditDialog>
+
+            <ProfileSettingsDialog>
+              <Button variant="outline" size="icon" className="flex-shrink-0">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </ProfileSettingsDialog>
+          </div>
         </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+      </CardContent>
+
+      <RatingDialog
+        isOpen={showRatingDialog}
+        onClose={() => setShowRatingDialog(false)}
+        ratedUserId={profile.id}
+        ratedUserName={profile.full_name}
+      />
+    </>
+  );
+};
 
 export default ProfileHeader;

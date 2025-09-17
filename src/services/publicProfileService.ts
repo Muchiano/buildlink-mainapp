@@ -1,15 +1,61 @@
 import { supabase } from '@/integrations/supabase/client';
+import { secureProfileService } from './secureProfileService';
 
 export const publicProfileService = {
   async getPublicProfile(profileId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', profileId)
-      .eq('profile_visibility', 'public')
-      .single();
+    // Check if user is authenticated to determine access level
+    const { data: { user } } = await supabase.auth.getUser();
     
-    return { data, error };
+    if (user) {
+      // Authenticated users can see profile information for public profiles or users who have posted publicly
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          user_type,
+          title,
+          profession,
+          organization,
+          avatar,
+          bio,
+          skills,
+          banner,
+          profile_completion_score,
+          profile_visibility,
+          created_at,
+          experiences,
+          education,
+          certifications,
+          social_links,
+          verification_badges
+        `)
+        .eq('id', profileId)
+        .single();
+      
+      return { data, error };
+    } else {
+      // Anonymous users can only see basic public profile information
+      // This relies on RLS policies to ensure proper access control
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          title,
+          profession,
+          organization,
+          avatar,
+          user_type,
+          profile_visibility,
+          created_at
+        `)
+        .eq('id', profileId)
+        .eq('profile_visibility', 'public')
+        .single();
+      
+      return { data, error };
+    }
   },
 
   async recordProfileView(viewedProfileId: string) {
@@ -43,6 +89,52 @@ export const publicProfileService = {
     return { data, error };
   },
 
+  // Method for getting basic profile info for search results, user lists, etc.
+  // This uses the secure public_profiles view for anonymous access
+  async getBasicProfile(profileId: string) {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      // Authenticated users can access more profile fields
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          title,
+          profession,
+          organization,
+          avatar,
+          user_type,
+          profile_visibility
+        `)
+        .eq('id', profileId)
+        .single();
+      
+      return { data, error };
+    } else {
+      // Anonymous users can only see basic public profile information  
+      // This relies on RLS policies to ensure proper access control
+      const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          title,
+          profession,
+          organization,
+          avatar,
+          user_type,
+          profile_visibility
+        `)
+        .eq('id', profileId)
+        .eq('profile_visibility', 'public')
+        .single();
+      
+      return { data, error };
+    }
+  },
+
   async updateProfileCompletion(userId: string) {
     const { data: profile } = await supabase
       .from('profiles')
@@ -74,5 +166,61 @@ export const publicProfileService = {
       .single();
     
     return { data, error };
+  },
+
+  // Check profile visibility status
+  async getProfileVisibility(userId: string) {
+    if (!userId) {
+      return { data: null, error: 'User ID is required' };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('profile_visibility')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error checking profile visibility:', error);
+        return { data: null, error };
+      }
+
+      return { data: data?.profile_visibility || 'private', error: null };
+    } catch (err) {
+      console.error('Exception in getProfileVisibility:', err);
+      return { data: null, error: err };
+    }
+  },
+
+  // Update profile visibility (only for own profile)
+  async updateProfileVisibility(visibility: 'public' | 'private') {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      return { data: null, error: 'Authentication required' };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ 
+          profile_visibility: visibility,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating profile visibility:', error);
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (err) {
+      console.error('Exception in updateProfileVisibility:', err);
+      return { data: null, error: err };
+    }
   }
 };

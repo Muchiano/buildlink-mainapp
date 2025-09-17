@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import PortfolioThumbnail from "./PortfolioThumbnail";
+import MediaPreview from "@/components/ui/media-preview";
 
 type PortfolioItem = {
   id: string;
@@ -40,11 +41,13 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
               aria-label="Open main project gallery"
               style={{ pointerEvents: updating ? 'none' : 'auto' }}
             >
-              <PortfolioThumbnail
-                type={displayed[0].type}
+              <MediaPreview
+                type={displayed[0].type as "image" | "pdf" | "video" | "document"}
                 url={displayed[0].url}
                 name={displayed[0].name}
+                size="lg"
                 thumbnailUrl={displayed[0].thumbnailUrl}
+                className="w-full h-full"
               />
               <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-primary/80 to-transparent px-2 py-1">
                 <span className="text-xs text-white font-semibold">{displayed[0].name}</span>
@@ -67,11 +70,13 @@ const PortfolioThumbnails: React.FC<PortfolioThumbnailsProps> = ({
                 style={{ pointerEvents: updating ? 'none' : 'auto' }}
                 aria-label="Open project gallery"
               >
-                <PortfolioThumbnail
-                  type={item.type}
+                <MediaPreview
+                  type={item.type as "image" | "pdf" | "video" | "document"}
                   url={item.url}
                   name={item.name}
+                  size="sm"
                   thumbnailUrl={item.thumbnailUrl}
+                  className="w-full h-full"
                 />
                 <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent px-1 py-0.5">
                   <span className="text-xs text-white truncate">{item.name}</span>

@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_features: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          feature_name: string
+          id: string
+          is_premium: boolean | null
+          user_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          feature_name: string
+          id?: string
+          is_premium?: boolean | null
+          user_type: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          feature_name?: string
+          id?: string
+          is_premium?: boolean | null
+          user_type?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           author_id: string
@@ -565,7 +592,10 @@ export type Database = {
           comments_count: number | null
           content: string
           created_at: string | null
+          document_name: string | null
+          document_url: string | null
           id: string
+          image_url: string | null
           likes_count: number | null
           location: string | null
           reposts_count: number | null
@@ -577,7 +607,10 @@ export type Database = {
           comments_count?: number | null
           content: string
           created_at?: string | null
+          document_name?: string | null
+          document_url?: string | null
           id?: string
+          image_url?: string | null
           likes_count?: number | null
           location?: string | null
           reposts_count?: number | null
@@ -589,7 +622,10 @@ export type Database = {
           comments_count?: number | null
           content?: string
           created_at?: string | null
+          document_name?: string | null
+          document_url?: string | null
           id?: string
+          image_url?: string | null
           likes_count?: number | null
           location?: string | null
           reposts_count?: number | null
@@ -605,6 +641,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profile_access_logs: {
+        Row: {
+          access_type: string
+          accessed_profile_id: string
+          accessor_user_id: string | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+        }
+        Insert: {
+          access_type: string
+          accessed_profile_id: string
+          accessor_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Update: {
+          access_type?: string
+          accessed_profile_id?: string
+          accessor_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      profile_privacy_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          show_education: boolean | null
+          show_email: boolean | null
+          show_experience: boolean | null
+          show_phone: boolean | null
+          show_skills: boolean | null
+          show_social_links: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          show_education?: boolean | null
+          show_email?: boolean | null
+          show_experience?: boolean | null
+          show_phone?: boolean | null
+          show_skills?: boolean | null
+          show_social_links?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          show_education?: boolean | null
+          show_email?: boolean | null
+          show_experience?: boolean | null
+          show_phone?: boolean | null
+          show_skills?: boolean | null
+          show_social_links?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       profile_views: {
         Row: {
@@ -629,7 +734,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_tier: string | null
           avatar: string | null
+          average_rating: number | null
           banner: string | null
           bio: string | null
           certifications: Json | null
@@ -643,18 +750,23 @@ export type Database = {
           languages: Json | null
           organization: string | null
           portfolio: Json | null
+          premium_features: Json | null
           profession: string | null
           profile_completion_score: number | null
           profile_visibility: string | null
           skills: string[] | null
           social_links: Json | null
           title: string | null
+          total_ratings: number | null
           updated_at: string | null
           user_type: string
           verification_badges: Json | null
+          verification_level: string | null
         }
         Insert: {
+          account_tier?: string | null
           avatar?: string | null
+          average_rating?: number | null
           banner?: string | null
           bio?: string | null
           certifications?: Json | null
@@ -668,18 +780,23 @@ export type Database = {
           languages?: Json | null
           organization?: string | null
           portfolio?: Json | null
+          premium_features?: Json | null
           profession?: string | null
           profile_completion_score?: number | null
           profile_visibility?: string | null
           skills?: string[] | null
           social_links?: Json | null
           title?: string | null
+          total_ratings?: number | null
           updated_at?: string | null
           user_type: string
           verification_badges?: Json | null
+          verification_level?: string | null
         }
         Update: {
+          account_tier?: string | null
           avatar?: string | null
+          average_rating?: number | null
           banner?: string | null
           bio?: string | null
           certifications?: Json | null
@@ -693,15 +810,18 @@ export type Database = {
           languages?: Json | null
           organization?: string | null
           portfolio?: Json | null
+          premium_features?: Json | null
           profession?: string | null
           profile_completion_score?: number | null
           profile_visibility?: string | null
           skills?: string[] | null
           social_links?: Json | null
           title?: string | null
+          total_ratings?: number | null
           updated_at?: string | null
           user_type?: string
           verification_badges?: Json | null
+          verification_level?: string | null
         }
         Relationships: []
       }
@@ -849,6 +969,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_description: string | null
+          achievement_name: string
+          achievement_type: string
+          awarded_by: string | null
+          badge_icon: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          achievement_description?: string | null
+          achievement_name: string
+          achievement_type: string
+          awarded_by?: string | null
+          badge_icon?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          achievement_description?: string | null
+          achievement_name?: string
+          achievement_type?: string
+          awarded_by?: string | null
+          badge_icon?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_progress: {
         Row: {
           completed: boolean | null
@@ -894,6 +1050,51 @@ export type Database = {
           },
         ]
       }
+      user_ratings: {
+        Row: {
+          communication_rating: number | null
+          created_at: string
+          id: string
+          professionalism_rating: number | null
+          project_id: string | null
+          rated_user_id: string
+          rater_id: string
+          rating: number
+          review_text: string | null
+          timeliness_rating: number | null
+          updated_at: string
+          work_quality_rating: number | null
+        }
+        Insert: {
+          communication_rating?: number | null
+          created_at?: string
+          id?: string
+          professionalism_rating?: number | null
+          project_id?: string | null
+          rated_user_id: string
+          rater_id: string
+          rating: number
+          review_text?: string | null
+          timeliness_rating?: number | null
+          updated_at?: string
+          work_quality_rating?: number | null
+        }
+        Update: {
+          communication_rating?: number | null
+          created_at?: string
+          id?: string
+          professionalism_rating?: number | null
+          project_id?: string | null
+          rated_user_id?: string
+          rater_id?: string
+          rating?: number
+          review_text?: string | null
+          timeliness_rating?: number | null
+          updated_at?: string
+          work_quality_rating?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -927,12 +1128,93 @@ export type Database = {
         }
         Returns: string
       }
+      get_connected_profile_info: {
+        Args: { user_id_param: string }
+        Returns: {
+          avatar: string
+          bio: string
+          created_at: string
+          full_name: string
+          id: string
+          organization: string
+          profession: string
+          skills: string[]
+          title: string
+          user_type: string
+        }[]
+      }
+      get_filtered_profile: {
+        Args: { profile_user_id: string }
+        Returns: {
+          avatar: string
+          bio: string
+          created_at: string
+          education: Json
+          experiences: Json
+          full_name: string
+          id: string
+          organization: string
+          profession: string
+          skills: string[]
+          social_links: Json
+          title: string
+          user_type: string
+        }[]
+      }
+      get_limited_profile_info: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
+      get_post_interaction_counts: {
+        Args: { post_id_param: string }
+        Returns: {
+          bookmarks_count: number
+          likes_count: number
+          reposts_count: number
+        }[]
+      }
+      get_public_profile_info: {
+        Args: { user_id_param: string }
+        Returns: {
+          avatar: string
+          created_at: string
+          full_name: string
+          id: string
+          organization: string
+          profession: string
+          title: string
+          user_type: string
+        }[]
+      }
+      get_user_post_interactions: {
+        Args: { post_id_param: string }
+        Returns: {
+          has_bookmarked: boolean
+          has_liked: boolean
+          has_reposted: boolean
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      is_connected_user: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
+      search_connected_profiles: {
+        Args: { search_term: string }
+        Returns: {
+          avatar: string
+          full_name: string
+          id: string
+          profession: string
+          title: string
+          user_type: string
+        }[]
       }
     }
     Enums: {

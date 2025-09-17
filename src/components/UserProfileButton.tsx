@@ -8,13 +8,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings, Shield } from 'lucide-react';
 import { profileService } from '@/services/profileService';
 import { useState, useEffect } from 'react';
+import { PrivacySettingsDialog } from './PrivacySettingsDialog';
+import { useNavigate } from 'react-router-dom';
 
 const UserProfileButton = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
+  const [showPrivacySettings, setShowPrivacySettings] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -40,6 +44,10 @@ const UserProfileButton = () => {
     await signOut();
   };
 
+  const handleSettingsClick = () => {
+    navigate('/profile/settings');
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -63,15 +71,24 @@ const UserProfileButton = () => {
           )}
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleSettingsClick}>
           <Settings className="mr-2 h-4 w-4" />
           Profile Settings
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setShowPrivacySettings(true)}>
+          <Shield className="mr-2 h-4 w-4" />
+          Privacy Settings
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
+      
+      <PrivacySettingsDialog
+        open={showPrivacySettings}
+        onOpenChange={setShowPrivacySettings}
+      />
     </DropdownMenu>
   );
 };

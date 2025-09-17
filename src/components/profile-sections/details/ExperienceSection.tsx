@@ -12,7 +12,7 @@ interface ExperienceSectionProps {
 const ExperienceSection = ({ profile, handleProfileUpdate }: ExperienceSectionProps) => {
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="p-6">
+      <CardContent className="py-6 px-0">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800">Professional Experience</h2>
           <ExperienceEditDialog 

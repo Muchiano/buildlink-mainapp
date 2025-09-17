@@ -16,16 +16,26 @@ export interface User {
 
 export interface Post {
   id: string;
-  user_id: string;
-  title: string;
+  author_id: string;
   content: string;
   image_url?: string;
-  category: 'general' | 'project' | 'career' | 'technical' | 'news';
+  document_url?: string;
+  document_name?: string;
+  location?: string;
   likes_count: number;
   comments_count: number;
+  reposts_count: number;
   created_at: string;
   updated_at: string;
   user?: User;
+  profiles?: {
+    id: string;
+    full_name: string;
+    avatar?: string;
+    profession?: string;
+    user_type?: string;
+    title?: string;
+  };
 }
 
 export interface Comment {

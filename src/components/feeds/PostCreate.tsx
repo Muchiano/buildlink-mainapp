@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { postsService } from "@/services/postsService";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import MediaPreview from "@/components/ui/media-preview";
 
 // Add support for uploading a single image per post for MVP
 
@@ -21,9 +22,11 @@ const PostCreate = () => {
   const [postType, setPostType] = useState("update");
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
   const isMobile = useIsMobile();
 
   // Memorize handlers to avoid unnecessary re-renders.
@@ -44,6 +47,30 @@ const PostCreate = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, []);
 
+  const handleDocumentChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        // Check if file is PDF
+        const fileType = file.type;
+        const fileExtension = file.name.split(".").pop()?.toLowerCase();
+
+        if (fileType !== "application/pdf" && fileExtension !== "pdf") {
+          toast({
+            title: "Invalid File Type",
+            description: "Only PDF documents are supported for upload.",
+            variant: "destructive",
+          });
+          e.target.value = ""; // Clear the input
+          return;
+        }
+
+        setDocumentFile(file);
+      }
+    },
+    [toast]
+  );
+
   const handleSubmit = useCallback(async () => {
     if (!user || !content.trim()) {
       toast({
@@ -58,6 +85,8 @@ const PostCreate = () => {
 
     try {
       let image_url: string | undefined;
+      let document_url: string | undefined;
+
       if (imageFile) {
         // upload image to Supabase Storage
         const fileExt = imageFile.name.split(".").pop();
@@ -92,11 +121,47 @@ const PostCreate = () => {
         image_url = publicUrlData.publicUrl;
       }
 
+      if (documentFile) {
+        // upload document to Supabase Storage
+        const originalFileName = documentFile.name;
+        const filePath = `user-${user.id}/${originalFileName}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("post-media")
+          .upload(filePath, documentFile, { upsert: false });
+
+        if (uploadError) {
+          console.error("Document upload error:", uploadError);
+          toast({
+            title: "Upload Failed",
+            description: "Could not upload document. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("post-media")
+          .getPublicUrl(filePath);
+        if (!publicUrlData?.publicUrl) {
+          toast({
+            title: "Document URL Error",
+            description: "Could not get document URL. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        document_url = publicUrlData.publicUrl;
+      }
+
       const { error } = await postsService.createPost({
         content,
         category: postType,
         user_id: user.id,
         image_url,
+        document_url,
+        document_name: documentFile?.name,
       });
 
       if (error) {
@@ -111,8 +176,10 @@ const PostCreate = () => {
       setContent("");
       setPostType("update");
       setImageFile(null);
+      setDocumentFile(null);
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      if (documentInputRef.current) documentInputRef.current.value = "";
     } catch (error) {
       console.error("Error creating post:", error);
       toast({
@@ -123,7 +190,7 @@ const PostCreate = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user, content, imageFile, postType, toast]);
+  }, [user, content, imageFile, documentFile, postType, toast]);
 
   if (!user) {
     return (
@@ -143,8 +210,7 @@ const PostCreate = () => {
 
       {/* Content Creation */}
       <Card
-        className={cn("border-0 shadow-sm", isMobile ? "rounded-none" : "")}
-      >
+        className={cn("border-0 shadow-sm", isMobile ? "rounded-none" : "")}>
         <CardContent className={cn(isMobile ? "p-2" : "p-4")}>
           <UserAvatarHeader user={user} />
 
@@ -171,8 +237,7 @@ const PostCreate = () => {
               className={cn(
                 "relative my-4 w-full max-w-xs",
                 isMobile && "mx-auto"
-              )}
-            >
+              )}>
               <img
                 src={imagePreview}
                 className="w-full h-40 rounded-md object-cover border"
@@ -182,10 +247,22 @@ const PostCreate = () => {
                 type="button"
                 aria-label="Remove image"
                 className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-100"
-                onClick={handleRemoveImage}
-              >
+                onClick={handleRemoveImage}>
                 <X className="h-5 w-5 text-gray-600" />
               </button>
+            </div>
+          )}
+
+          {/* PDF Preview */}
+          {documentFile && (
+            <div className="my-4">
+              <MediaPreview
+                url={URL.createObjectURL(documentFile)}
+                type="pdf"
+                name={documentFile.name}
+                size="md"
+                showActions
+              />
             </div>
           )}
 
@@ -194,8 +271,7 @@ const PostCreate = () => {
             className={cn(
               "flex items-center space-x-4 mt-4 pt-4 border-t",
               isMobile && "flex-wrap space-x-2"
-            )}
-          >
+            )}>
             <Button
               variant="ghost"
               size={isMobile ? "sm" : "sm"}
@@ -203,8 +279,7 @@ const PostCreate = () => {
               asChild
               onClick={() => {
                 if (fileInputRef.current) fileInputRef.current.click();
-              }}
-            >
+              }}>
               <span>
                 <Camera className="h-4 w-4 mr-2" />
                 <span className={isMobile ? "sr-only" : ""}>Add Photos</span>
@@ -220,20 +295,23 @@ const PostCreate = () => {
             <Button
               variant="ghost"
               size={isMobile ? "sm" : "sm"}
-              className="text-gray-600"
-              disabled
-            >
+              className={cn("text-gray-600", isMobile && "px-2 py-1")}
+              onClick={() => documentInputRef.current?.click()}>
               <FileText className="h-4 w-4 mr-2" />
-              <span className={isMobile ? "sr-only" : ""}>
-                Add Document (soon)
-              </span>
+              <span className={isMobile ? "sr-only" : ""}>Add PDF</span>
+              <input
+                ref={documentInputRef}
+                type="file"
+                accept=".pdf"
+                className="hidden"
+                onChange={handleDocumentChange}
+              />
             </Button>
             <Button
               variant="ghost"
               size={isMobile ? "sm" : "sm"}
               className="text-gray-600"
-              disabled
-            >
+              disabled>
               <MapPin className="h-4 w-4 mr-2" />
               <span className={isMobile ? "sr-only" : ""}>
                 Add Location (soon)
@@ -248,8 +326,7 @@ const PostCreate = () => {
                 isMobile && "w-full py-3 text-base"
               )}
               disabled={!content.trim() || isLoading}
-              onClick={handleSubmit}
-            >
+              onClick={handleSubmit}>
               {isLoading
                 ? "Posting..."
                 : postType === "job"
@@ -266,12 +343,13 @@ const PostCreate = () => {
 
       {/* Quick Templates */}
       <Card
-        className={cn("border-0 shadow-sm", isMobile ? "rounded-none" : "")}
-      >
+        className={cn("border-0 shadow-sm", isMobile ? "rounded-none" : "")}>
         <CardHeader>
           <CardTitle
-            className={cn("text-lg text-gray-800", isMobile ? "text-base" : "")}
-          >
+            className={cn(
+              "text-lg text-gray-800",
+              isMobile ? "text-base" : ""
+            )}>
             Quick Templates
           </CardTitle>
         </CardHeader>
@@ -287,8 +365,7 @@ const PostCreate = () => {
                 setContent(
                   "🎉 Excited to announce that our team just completed [Project Name]! The project involved [brief description]. Key learnings include [insights]. #ProjectComplete #BuildingKenya"
                 )
-              }
-            >
+              }>
               <div>
                 <div className={cn("font-medium", isMobile ? "text-base" : "")}>
                   Project Completion
@@ -308,8 +385,7 @@ const PostCreate = () => {
                 setContent(
                   "💡 Industry Insight: After working on [project type] for [duration], I've learned that [key insight]. This could help fellow professionals because [explanation]. What's your experience? #IndustryInsights"
                 )
-              }
-            >
+              }>
               <div>
                 <div className={cn("font-medium", isMobile ? "text-base" : "")}>
                   Industry Insight
@@ -329,8 +405,7 @@ const PostCreate = () => {
                 setContent(
                   "📢 We're hiring! Looking for a [position] to join our team at [company]. Requirements: [key requirements]. Interested candidates can [how to apply]. #JobOpening #Hiring"
                 )
-              }
-            >
+              }>
               <div>
                 <div className={cn("font-medium", isMobile ? "text-base" : "")}>
                   Job Opening

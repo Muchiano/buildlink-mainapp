@@ -24,7 +24,6 @@ export const profileService = {
     experiences?: any[];
     education?: any[];
     certifications?: any[];
-    interests?: string[];
     banner?: string;
     social_links?: Record<string, string>;
     verification_badges?: any[];
@@ -70,13 +69,17 @@ export const profileService = {
   },
 
   async getStats() {
+    // Only query basic profile info for stats, not sensitive data
     const { count: professionalsCount, error: professionalsError } = await supabase
       .from('profiles')
-      .select('*', { count: 'exact', head: true });
+      .select('id', { count: 'exact', head: true })
+      .eq('profile_visibility', 'public');
 
     const { data: companies, error: companiesError } = await supabase
       .from('profiles')
-      .select('organization');
+      .select('organization')
+      .eq('profile_visibility', 'public')
+      .not('organization', 'is', null);
 
     if (professionalsError || companiesError) {
         return { data: null, error: professionalsError || companiesError };

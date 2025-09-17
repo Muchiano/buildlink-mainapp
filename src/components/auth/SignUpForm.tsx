@@ -114,6 +114,7 @@ const SignUpForm = () => {
                 <SelectItem value="civil-engineering">Civil Engineering</SelectItem>
                 <SelectItem value="mep-engineering">MEP Engineering</SelectItem>
                 <SelectItem value="project-management">Project Management</SelectItem>
+                <SelectItem value="project-finance">Project Finance</SelectItem>
                 <SelectItem value="construction-supplies">Construction & Supplies</SelectItem>
                 <SelectItem value="health-safety">Health & Safety</SelectItem>
                 <SelectItem value="real-estate-development">Real Estate Development</SelectItem>

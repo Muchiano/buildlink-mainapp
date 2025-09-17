@@ -8,9 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 
 const SignInForm = () => {
-  const { signIn } = useAuth();
+  const { signIn, resetPassword } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -71,6 +72,48 @@ const SignInForm = () => {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
+          
+          <div className="text-center">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-sm text-muted-foreground hover:text-foreground"
+              disabled={isResetting}
+              onClick={() => {
+                const emailInput = document.getElementById('signin-email') as HTMLInputElement;
+                const email = emailInput?.value;
+                
+                if (!email) {
+                  toast({
+                    title: 'Email required',
+                    description: 'Please enter your email address to reset your password.',
+                    variant: 'destructive',
+                  });
+                  return;
+                }
+                
+                setIsResetting(true);
+                resetPassword(email).then(({ error }) => {
+                  if (error) {
+                    toast({
+                      title: 'Reset failed',
+                      description: error.message,
+                      variant: 'destructive',
+                    });
+                  } else {
+                    toast({
+                      title: 'Reset link sent',
+                      description: 'Check your email for password reset instructions.',
+                    });
+                  }
+                  setIsResetting(false);
+                });
+              }}
+            >
+              {isResetting ? 'Sending...' : 'Forgot password?'}
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

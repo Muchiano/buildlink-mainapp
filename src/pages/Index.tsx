@@ -1,104 +1,141 @@
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { useState, useCallback, ReactNode } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import TopBar from "@/components/TopBar";
-import AppSidebar from "@/components/AppSidebar";
-import BottomNavigation from "@/components/BottomNavigation";
-import ContentFilters from "@/components/ContentFilters";
 import HomeFeed from "@/components/feeds/HomeFeed";
 import MentorshipHub from "@/components/feeds/MentorshipHub";
-import PostCreate from "@/components/feeds/PostCreate";
 import SkillUpFeed from "@/components/feeds/SkillUpFeed";
+import PostCreate from "@/components/feeds/PostCreate";
 import ProfileBoard from "@/components/feeds/ProfileBoard";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import ResponsiveNavigation from "@/components/ResponsiveNavigation";
+import ContentFilters from "@/components/ContentFilters";
+import { OfflineIndicator } from "@/components/OfflineIndicator";
 
-const Index = () => {
-  const [activeTab, setActiveTab] = useState("home");
+interface IndexProps {
+  customContent?: ReactNode;
+  showNavigation?: boolean;
+  showFilters?: boolean;
+  initialTab?: string;
+  isPublicProfile?: boolean;
+}
+
+const Index: React.FC<IndexProps> = ({ 
+  customContent, 
+  showNavigation = true, 
+  showFilters = true,
+  initialTab = "home",
+  isPublicProfile = false
+}) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [activeFilter, setActiveFilter] = useState("latest");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { isAdmin } = useIsAdmin();
+  const [loading, setLoading] = useState(false);
+
+  const handleTabChange = useCallback((tab: string) => {
+    // If we're on a public profile page and user clicks navigation, navigate to the appropriate route
+    if (isPublicProfile) {
+      switch (tab) {
+        case "home":
+          navigate("/");
+          break;
+        // case "mentorship":
+        //   navigate("/mentorship");
+        //   break;
+        case "post":
+          navigate("/post");
+          break;
+        case "skillup":
+          navigate("/skillup");
+          break;
+        case "profile":
+          navigate("/profile");
+          break;
+        default:
+          navigate("/");
+      }
+      return;
+    }
+
+    // Normal tab switching for non-public profile pages
+    setLoading(true);
+    setActiveTab(tab);
+    // Reset filter when changing tabs
+    if (tab === "home" || tab === "skillup") {
+      setActiveFilter("latest");
+    }
+    // Simulate loading time for smooth transition
+    setTimeout(() => setLoading(false), 300);
+  }, [isPublicProfile, navigate]);
 
   const handleLogoClick = () => {
-    setActiveTab("home");
+    if (isPublicProfile) {
+      navigate("/");
+      return;
+    }
+    handleTabChange("home");
     setActiveFilter("latest");
   };
 
-  const handleMenuClick = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const renderContent = () => {
+  const renderActiveContent = () => {
     switch (activeTab) {
       case "home":
         return <HomeFeed activeFilter={activeFilter} />;
-      case "mentorship":
-        return <MentorshipHub />;
+      // case "mentorship":
+      //   return <MentorshipHub />;
       case "post":
         return <PostCreate />;
       case "skillup":
         return <SkillUpFeed activeFilter={activeFilter} />;
       case "profile":
         return <ProfileBoard />;
+      case "publicProfile":
+        return customContent || <ProfileBoard />;
       default:
         return <HomeFeed activeFilter={activeFilter} />;
     }
   };
 
-  const shouldShowFilters = activeTab === "home" || activeTab === "skillup";
+  const shouldShowFilters = showFilters && (activeTab === "home" || activeTab === "skillup");
 
   return (
-    <div>
-      <SidebarProvider>
-        <div className="min-h-screen bg-gray-50 flex w-full">
-          {/* Sidebar */}
-          <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="min-h-screen bg-background">
+      <TopBar
+        onLogoClick={handleLogoClick}
+        loading={loading}
+      />
+      <OfflineIndicator />
 
-          {/* Main Content Area */}
-          <div className="flex-1 flex flex-col min-w-0">
-            {/* Top Navigation */}
-            <TopBar onLogoClick={handleLogoClick} onMenuClick={handleMenuClick} />
-            
-            {/* Content Filters */}
-            {shouldShowFilters && (
+      {/* Main Content */}
+      <div className="relative top-12 grid grid-cols-12 h-screen px-4 pb-20 md:pb-8 w-full max-w-screen-xl mx-auto">
+        {showNavigation && (
+          <div className="col-span-3 bg-white">
+            <ResponsiveNavigation
+              loading={loading}
+            />
+          </div>
+        )}
+        <div className={`xl:col-span-7 lg:col-span-9 col-span-12 ${showNavigation ? 'md:col-start-4' : ''}`}>
+          {/* Content Filters */}
+          {shouldShowFilters && (
+            <div className="mb-4">
               <ContentFilters
                 activeFilter={activeFilter}
                 onFilterChange={setActiveFilter}
                 filterType={activeTab}
               />
-            )}
-            
-            {/* Main Content */}
-            <main className={cn(
-              "flex-1 px-4 max-w-4xl mx-auto w-full",
-              shouldShowFilters ? "pt-4" : "pt-6",
-              "pb-20 md:pb-8"
-            )}>
-              <div className="animate-fade-in">
-                {renderContent()}
-              </div>
-            </main>
-          </div>
+            </div>
+          )}
 
-          {/* Bottom Navigation - Mobile Only */}
-          <div className="md:hidden">
-            <BottomNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+          {/* Content Area */}
+          <div
+            className={`transition-opacity duration-300 ${
+              loading ? "opacity-50" : "opacity-100"
+            }`}>
+            {renderActiveContent()}
           </div>
         </div>
-      </SidebarProvider>
-      {isAdmin && (
-        <div className="fixed top-4 right-4 z-50 flex gap-2">
-          <a href="/admin-analytics">
-            <button className="bg-secondary text-primary px-4 py-2 rounded shadow-md hover:bg-secondary/80 transition">
-              Analytics
-            </button>
-          </a>
-          <a href="/admin-resources">
-            <button className="bg-primary text-white px-4 py-2 rounded shadow-md hover:bg-primary/80 transition">
-              Admin Panel
-            </button>
-          </a>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

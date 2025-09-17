@@ -51,13 +51,13 @@ const AvatarUploader: React.FC<AvatarUploaderProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex flex-col justify-start space-y-2">
       <div className="relative">
         <Avatar className="h-20 w-20">
           <AvatarImage src={avatarUrl} />
           <AvatarFallback>{fullName?.charAt(0) || "U"}</AvatarFallback>
         </Avatar>
-        <label className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 cursor-pointer hover:bg-primary/90">
+        <label className="absolute bottom-0 left-0 bg-primary text-white rounded-full p-1 cursor-pointer hover:bg-primary/90">
           <Camera className="h-3 w-3" />
           <input
             type="file"

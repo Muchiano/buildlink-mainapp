@@ -44,24 +44,21 @@ const CompactSkillsSection = ({
             </Button>
           </SkillsEditDialog>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {skills.length === 0 ? (
             <div className="text-gray-500 italic">No skills added yet.</div>
           ) : (
-            skills.slice(0, 6).map((skill, idx) => (
-              <div key={idx} className="flex items-center space-x-3 animate-fade-in">
-                <span className="w-32 text-gray-700 truncate">{skill.name}</span>
-                <div className="flex-1 flex items-center">
-                  <Progress
-                    className="h-2 bg-secondary border rounded-full"
-                    value={levelToPercent(skill.level)}
-                  />
-                </div>
-                <Badge variant="outline" className="ml-2 min-w-10 text-xs text-gray-600 bg-muted">
-                  {skill.level}/5
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill, idx) => (
+                <Badge 
+                  key={idx} 
+                  variant="secondary" 
+                  className="px-3 py-1 text-sm bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  {skill.name}
                 </Badge>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </CardContent>
