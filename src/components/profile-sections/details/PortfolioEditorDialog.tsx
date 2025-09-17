@@ -44,6 +44,8 @@ const PortfolioEditorDialog: React.FC<PortfolioEditorDialogProps> = ({
   const [error, setError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
 
 
   const updatePortfolio = async (newPortfolio: PortfolioItem[]) => {

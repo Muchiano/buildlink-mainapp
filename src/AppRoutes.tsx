@@ -13,12 +13,14 @@ import AdminAnalyticsPage from "@/pages/AdminAnalytics";
 import AdminRoute from "@/components/auth/AdminRoute";
 import PublicProfile from "@/pages/PublicProfile";
 import ProfileSettings from "@/pages/ProfileSettings";
+import LandingPage from "@/pages/LandingPage";
 
 const AppRoutes = () => (
   <Routes>
+    <Route path="/" element={<LandingPage />} />
     <Route path="/auth" element={<AuthPage />} />
     <Route 
-      path="/" 
+      path="/feed" 
       element={
         <ProtectedRoute>
           <Home />
