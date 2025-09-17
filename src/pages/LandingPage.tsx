@@ -4,7 +4,7 @@ import AboutSection from "./LandingPage/components/AboutSection";
 import FeaturesSection from "./LandingPage/components/FeaturesSection";
 import HowItWorksSection from "./LandingPage/components/HowItWorksSection";
 import CTASection from "./LandingPage/components/CTASection";
-import Footer from "./LandingPage/components/LandingFooter";
+import Footer from "./LandingPage/components/Footer";
 
 const LandingPage = () => {
   return (

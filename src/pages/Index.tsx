@@ -139,9 +139,6 @@ const Index: React.FC<IndexProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 };

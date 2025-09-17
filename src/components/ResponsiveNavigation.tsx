@@ -1,7 +1,7 @@
 import { Home, Plus, BookOpen, User, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
+import { Mail, Linkedin, X, Instagram } from "lucide-react";
 
 interface ResponsiveNavigationProps {
   loading?: boolean;
@@ -14,7 +14,12 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
     { id: "home", title: "Home Feed", icon: Home, path: "/feed" },
     // { id: "mentorship", title: "Mentorship", icon: Users, path: "/mentorship" },
     { id: "post", title: "Create", icon: Plus, path: "/create-post" },
-    { id: "skillup", title: "Resource Hub", icon: BookOpen, path: "/resource-hub" },
+    {
+      id: "skillup",
+      title: "Resource Hub",
+      icon: BookOpen,
+      path: "/resource-hub",
+    },
     { id: "profile", title: "Profile Board", icon: User, path: "/profile" },
   ];
 
@@ -28,7 +33,7 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
-            
+
             return (
               <Link
                 key={item.id}
@@ -36,12 +41,11 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
                 className={cn(
                   "flex items-center gap-3 w-full p-3 rounded-md text-left transition-colors",
                   "hover:bg-accent hover:text-accent-foreground",
-                  active 
-                    ? "bg-accent text-accent-foreground font-medium" 
+                  active
+                    ? "bg-accent text-accent-foreground font-medium"
                     : "text-foreground",
                   loading && "opacity-50 cursor-not-allowed"
-                )}
-              >
+                )}>
                 <Icon size={20} />
                 <span>{item.title}</span>
                 {loading && active && (
@@ -50,6 +54,50 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
               </Link>
             );
           })}
+
+          <div className="fixed bottom-4">
+            {/* Quick Links */}
+            <div className="flex flex-row  justify-start space-x-6">
+              <a
+                href="/privacy-policy.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-foreground/60 hover:text-primary transition-colors">
+                Privacy Policy
+              </a>
+              <a
+                href="/terms-of-service.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-foreground/60 hover:text-primary transition-colors">
+                Terms of Service
+              </a>
+            </div>
+
+            {/* Contact Icons */}
+            <div className="flex justify-start space-x-4 mt-4">
+              <a
+                href="mailto:info@buildlink.co.ke"
+                className="text-foreground/60 hover:text-primary transition-colors">
+                <Mail size={20} />
+              </a>
+              <a
+                href="#"
+                className="text-foreground/60 hover:text-primary transition-colors">
+                <Linkedin size={20} />
+              </a>
+              <a
+                href="#"
+                className="text-foreground/60 hover:text-primary transition-colors">
+                <X size={20} />
+              </a>
+              <a
+                href="#"
+                className="text-foreground/60 hover:text-primary transition-colors">
+                <Instagram size={20} />
+              </a>
+            </div>
+          </div>
         </nav>
       </div>
 
@@ -65,10 +113,11 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
                 to={item.path}
                 className={cn(
                   "flex flex-col items-center p-2 min-w-[60px] transition-colors",
-                  active ? "text-primary" : "text-muted-foreground hover:text-primary",
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-primary",
                   loading && "opacity-50 cursor-not-allowed"
-                )}
-              >
+                )}>
                 <Icon
                   className={cn(
                     "h-6 w-6 mb-1",

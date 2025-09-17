@@ -9,22 +9,32 @@ const Footer = () => {
       <div className="container mx-auto px-6">
         <div className="grid md:grid-cols-[200px_1fr_1fr] grid-cols-1 gap-8 mb-8">
           {/* Brand */}
-           <div className="flex items-center space-x-2">
-            <img 
+          <div className="flex items-center space-x-2">
+            <img
               src={buildlinkLogo}
-              alt="BuildLink Logo" 
+              alt="BuildLink Logo"
               className="w-auto h-10"
             />
-            <span className="text-xl font-bold text-primary text-white">BuildLink</span>
+            <span className="text-xl font-bold text-primary text-white">
+              BuildLink
+            </span>
           </div>
 
           {/* Quick Links */}
           <div className="text-center">
             <div className="flex md:justify-center justify-start space-x-6">
-              <a href="#" className="text-primary-foreground/80 hover:text-secondary transition-colors">
+              <a
+                href="/privacy-policy.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-foreground/80 hover:text-secondary transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="text-primary-foreground/80 hover:text-secondary transition-colors">
+              <a
+                href="/terms-of-service.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-foreground/80 hover:text-secondary transition-colors">
                 Terms of Service
               </a>
             </div>
@@ -32,16 +42,24 @@ const Footer = () => {
 
           {/* Contact Icons */}
           <div className="flex md:justify-center justify-start space-x-4">
-            <a href="mailto:hello@buildlink.co.ke" className="text-primary-foreground/60 hover:text-secondary transition-colors">
+            <a
+              href="mailto:info@buildlink.co.ke"
+              className="text-primary-foreground/60 hover:text-secondary transition-colors">
               <Mail size={20} />
             </a>
-            <a href="#" className="text-primary-foreground/60 hover:text-secondary transition-colors">
+            <a
+              href="#"
+              className="text-primary-foreground/60 hover:text-secondary transition-colors">
               <Linkedin size={20} />
             </a>
-            <a href="#" className="text-primary-foreground/60 hover:text-secondary transition-colors">
+            <a
+              href="#"
+              className="text-primary-foreground/60 hover:text-secondary transition-colors">
               <X size={20} />
             </a>
-            <a href="#" className="text-primary-foreground/60 hover:text-secondary transition-colors">
+            <a
+              href="#"
+              className="text-primary-foreground/60 hover:text-secondary transition-colors">
               <Instagram size={20} />
             </a>
           </div>
