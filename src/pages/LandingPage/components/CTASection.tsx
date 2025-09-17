@@ -28,7 +28,7 @@ const CTASection = () => {
               size="lg" 
               className="text-lg px-12 py-6 bg-white text-primary hover:bg-white/90 shadow-xl"
             >
-              Join Our Waitlist
+              Register
               <ArrowRight className="ml-2" size={20} />
             </Button>
             </a>
