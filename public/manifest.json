@@ -1,0 +1,37 @@
+
+{
+  "short_name": "BuildLink KE",
+  "name": "BuildLink Kenya - Professional Network",
+  "description": "Professional networking platform for Kenya's construction industry with offline support",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48 32x32 16x16",
+      "type": "image/x-icon",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#B91C1C",
+  "orientation": "portrait-primary",
+  "categories": ["business", "social", "productivity"],
+  "lang": "en",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Feed",
+      "short_name": "Feed",
+      "description": "View the latest posts",
+      "url": "/",
+      "icons": []
+    }
+  ],
+  "features": [
+    "offline-support",
+    "data-saver-mode",
+    "background-sync"
+  ]
+}
