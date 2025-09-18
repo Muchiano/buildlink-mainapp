@@ -118,27 +118,37 @@ const EditPostDialog = ({
 
       // Handle document upload
       if (documentFile) {
-        const originalFileName = documentFile.name;
-        const filePath = `user-${user.id}/${originalFileName}`;
+        const filePath = `user-${user.id}/${Date.now()}_${documentFile.name}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("post-media")
-          .upload(filePath, documentFile);
+          .upload(filePath, documentFile, { upsert: false });
 
         if (uploadError) {
-          throw uploadError;
+          console.error("Document upload error:", uploadError);
+          toast({
+            title: "Upload Failed",
+            description: "Could not upload document. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
         }
 
         const { data: publicUrlData } = supabase.storage
           .from("post-media")
           .getPublicUrl(filePath);
-        document_url = publicUrlData?.publicUrl;
-
-        // Store the original filename
-        const document_name = documentFile.name;
-
-        console.log("File type:", documentFile.type);
-        console.log("File size:", documentFile.size);
-        console.log("Upload URL:", document_url);
+        
+        if (!publicUrlData?.publicUrl) {
+          toast({
+            title: "Document URL Error",
+            description: "Could not get document URL. Please try again.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        document_url = publicUrlData.publicUrl;
       } else if (removeExistingDocument) {
         document_url = null;
       }

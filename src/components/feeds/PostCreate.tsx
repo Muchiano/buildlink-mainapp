@@ -123,8 +123,7 @@ const PostCreate = () => {
 
       if (documentFile) {
         // upload document to Supabase Storage
-        const originalFileName = documentFile.name;
-        const filePath = `user-${user.id}/${originalFileName}`;
+        const filePath = `user-${user.id}/${Date.now()}_${documentFile.name}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("post-media")
           .upload(filePath, documentFile, { upsert: false });
