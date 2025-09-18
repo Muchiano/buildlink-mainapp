@@ -119,13 +119,19 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
 
       // Handle document upload
       if (documentFile) {
+        // Create unique filename
+        const timestamp = Date.now();
         const originalFileName = documentFile.name;
-        const filePath = `user-${user.id}/${originalFileName}`;
+        const fileExtension = originalFileName.split(".").pop();
+        const uniqueFileName = `doc-${timestamp}.${fileExtension}`;
+        const filePath = `user-${user.id}/${uniqueFileName}`;
+
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("post-media")
           .upload(filePath, documentFile);
 
         if (uploadError) {
+          console.error("Document upload error:", uploadError);
           throw uploadError;
         }
 
@@ -248,7 +254,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
                   type="pdf"
                   name={documentFile.name}
                   size="lg"
-                  showActions
+                  showActions={false}
                 />
                 <button
                   type="button"
