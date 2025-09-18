@@ -32,7 +32,7 @@ const TopBar = ({
             className="flex items-center cursor-pointer"
             onClick={onLogoClick}>
             <img src={logo} alt="BuildLink Logo" className="h-6 w-6 mr-2" />
-            <span className="font-semibold text-lg hidden sm:inline">
+            <span className="font-semibold text-lg">
               BuildLink
             </span>
           </div>
