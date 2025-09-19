@@ -36,7 +36,7 @@ const SkillsSection = ({ profile, handleProfileUpdate }: SkillsSectionProps) => 
 
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="p-6">
+      <CardContent className="py-4 px-4 shadow-md">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-lg font-semibold text-gray-800 mb-1">Skills & Specialization</h2>

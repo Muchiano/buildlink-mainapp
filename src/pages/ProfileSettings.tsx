@@ -86,7 +86,7 @@ const ProfileSettings = () => {
   };
 
   const handleGoBack = () => {
-    navigate("/");
+    navigate("/feed");
   };
 
   if (loading) {
@@ -111,7 +111,7 @@ const ProfileSettings = () => {
         <div className="mb-6">
           <Button variant="ghost" onClick={handleGoBack} className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            Back to Home Feed
           </Button>
 
           <div className="flex items-center gap-3 mb-2">

@@ -12,7 +12,7 @@ interface CertificationsSectionProps {
 const CertificationsSection = ({ profile, handleProfileUpdate }: CertificationsSectionProps) => {
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="py-6 px-0">
+      <CardContent className="py-4 px-4 shadow-md">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800">Certifications</h2>
           <CertificationsEditDialog 

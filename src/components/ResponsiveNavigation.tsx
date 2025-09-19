@@ -103,7 +103,7 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden block fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
-        <div className="flex items-center justify-around py-2 max-w-6xl mx-auto">
+        <div className="flex items-center justify-around pt-2 pb-1 max-w-6xl mx-auto">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -112,7 +112,7 @@ const ResponsiveNavigation = ({ loading }: ResponsiveNavigationProps) => {
                 key={item.id}
                 to={item.path}
                 className={cn(
-                  "flex flex-col items-center p-2 min-w-[60px] transition-colors",
+                  "flex flex-col items-center min-w-[60px] transition-colors",
                   active
                     ? "text-primary"
                     : "text-muted-foreground hover:text-primary",

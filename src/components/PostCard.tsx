@@ -193,13 +193,13 @@ const PostCard = ({
                   post.user?.full_name ||
                   "Anonymous User"}
               </p>
-              <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+              <div className="flex md:flex-row flex-col justify-start md:space-x-2 text-xs text-muted-foreground">
                 <span>
                   {post.profiles?.profession ||
                     post.user?.profession ||
                     "No profession"}
                 </span>
-                <span>•</span>
+                <span className="hidden md:block">•</span>
                 <span>
                   {formatDistanceToNow(new Date(post.created_at))} ago
                 </span>

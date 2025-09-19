@@ -26,7 +26,7 @@ const CompactSkillsSection = ({
 
   return (
     <Card className="border-0 shadow-sm">
-      <CardContent className="px-6 py-4">
+      <CardContent className="py-4 px-4 shadow-md">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-semibold text-gray-800">Skills</h2>
           <SkillsEditDialog
