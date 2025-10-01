@@ -240,7 +240,7 @@ const PostCard = ({
       <CardContent className="pt-0">
         <div className="space-y-3">
           <div>
-            <p className="text-muted-foreground">{post.content}</p>
+            <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
           </div>
 
           {post.image_url && (
