@@ -1050,51 +1050,6 @@ export type Database = {
           },
         ]
       }
-      user_ratings: {
-        Row: {
-          communication_rating: number | null
-          created_at: string
-          id: string
-          professionalism_rating: number | null
-          project_id: string | null
-          rated_user_id: string
-          rater_id: string
-          rating: number
-          review_text: string | null
-          timeliness_rating: number | null
-          updated_at: string
-          work_quality_rating: number | null
-        }
-        Insert: {
-          communication_rating?: number | null
-          created_at?: string
-          id?: string
-          professionalism_rating?: number | null
-          project_id?: string | null
-          rated_user_id: string
-          rater_id: string
-          rating: number
-          review_text?: string | null
-          timeliness_rating?: number | null
-          updated_at?: string
-          work_quality_rating?: number | null
-        }
-        Update: {
-          communication_rating?: number | null
-          created_at?: string
-          id?: string
-          professionalism_rating?: number | null
-          project_id?: string | null
-          rated_user_id?: string
-          rater_id?: string
-          rating?: number
-          review_text?: string | null
-          timeliness_rating?: number | null
-          updated_at?: string
-          work_quality_rating?: number | null
-        }
-        Relationships: []
-      }
       user_roles: {
         Row: {
           id: string
@@ -1165,6 +1120,15 @@ export type Database = {
         Args: { profile_user_id: string }
         Returns: boolean
       }
+      get_post_author_info: {
+        Args: { author_id_param: string }
+        Returns: {
+          avatar: string
+          full_name: string
+          id: string
+          user_type: string
+        }[]
+      }
       get_post_interaction_counts: {
         Args: { post_id_param: string }
         Returns: {
@@ -1199,6 +1163,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: { user_id_param?: string }
         Returns: boolean
       }
       is_connected_user: {

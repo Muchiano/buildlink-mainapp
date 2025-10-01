@@ -13,6 +13,8 @@ import { postsService } from "@/services/postsService";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import MediaPreview from "@/components/ui/media-preview";
+import { postContentSchema } from "@/lib/validationSchemas";
+import { z } from "zod";
 
 // Add support for uploading a single image per post for MVP
 
@@ -72,18 +74,16 @@ const PostCreate = () => {
   );
 
   const handleSubmit = useCallback(async () => {
-    if (!user || !content.trim()) {
-      toast({
-        title: "Error",
-        description: "Please write something before posting",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!user) return;
 
     setIsLoading(true);
 
     try {
+      // Validate input
+      const validatedData = postContentSchema.parse({
+        content,
+        category: postType,
+      });
       let image_url: string | undefined;
       let document_url: string | undefined;
 
@@ -155,8 +155,8 @@ const PostCreate = () => {
       }
 
       const { error } = await postsService.createPost({
-        content,
-        category: postType,
+        content: validatedData.content,
+        category: validatedData.category,
         user_id: user.id,
         image_url,
         document_url,
@@ -180,12 +180,19 @@ const PostCreate = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
       if (documentInputRef.current) documentInputRef.current.value = "";
     } catch (error) {
-      console.error("Error creating post:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create post. Please try again.",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to create post. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
