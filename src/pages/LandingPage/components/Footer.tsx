@@ -15,7 +15,7 @@ const Footer = () => {
               alt="BuildLink Logo"
               className="w-auto h-10"
             />
-            <span className="text-xl font-bold text-primary text-white">
+            <span className="text-xl font-bold text-white">
               BuildLink
             </span>
           </div>

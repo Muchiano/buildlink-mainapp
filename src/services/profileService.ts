@@ -69,25 +69,46 @@ export const profileService = {
   },
 
   async getStats() {
-    // Only query basic profile info for stats, not sensitive data
-    const { count: professionalsCount, error: professionalsError } = await supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('profile_visibility', 'public');
+    try {
+      // Method 1: Use separate count queries (more reliable)
+      const { count: professionalsCount, error: professionalsError } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact' })
+        .in('user_type', ['student', 'graduate', 'professional']);
 
-    const { data: companies, error: companiesError } = await supabase
-      .from('profiles')
-      .select('organization')
-      .eq('profile_visibility', 'public')
-      .not('organization', 'is', null);
+      const { count: companiesCount, error: companiesError } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact' })
+        .eq('user_type', 'company');
 
-    if (professionalsError || companiesError) {
-        return { data: null, error: professionalsError || companiesError };
+      if (professionalsError) {
+        console.error('Error counting professionals:', professionalsError);
+        throw professionalsError;
+      }
+
+      if (companiesError) {
+        console.error('Error counting companies:', companiesError);
+        throw companiesError;
+      }
+
+      console.log('Raw counts from Supabase:', {
+        professionalsCount,
+        companiesCount
+      });
+
+      return { 
+        data: { 
+          professionalsCount: professionalsCount || 0, 
+          companiesCount: companiesCount || 0 
+        }, 
+        error: null 
+      };
+    } catch (error) {
+      console.error('Error in getStats:', error);
+      return { 
+        data: null, 
+        error: error 
+      };
     }
-
-    const uniqueCompanies = new Set(companies.map(p => p.organization).filter(Boolean));
-    const companiesCount = uniqueCompanies.size;
-    
-    return { data: { professionalsCount, companiesCount }, error: null };
   }
 };
