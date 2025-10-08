@@ -42,7 +42,7 @@ const TopBar = ({
         </div>
 
         {/* Center - Search Bar */}
-        <div className="hidden md:flex flex-1 max-w-md mx-4">
+        <div className="hidden sm:flex flex-1 max-w-md mx-2 lg:mx-4">
           <SearchDialog>
             <div className="relative w-full cursor-pointer">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -58,7 +58,7 @@ const TopBar = ({
         {/* Right side actions */}
         <div className="flex items-center space-x-1">
           <SearchDialog>
-            <Button variant="ghost" size="icon" className="md:hidden">
+            <Button variant="ghost" size="icon" className="sm:hidden">
               <Search className="h-5 w-5" />
             </Button>
           </SearchDialog>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { signUpSchema } from '@/lib/validationSchemas';
+import { z } from 'zod';
 
 const SignUpForm = () => {
   const { signUp } = useAuth();
@@ -17,33 +18,54 @@ const SignUpForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const fullName = formData.get('fullName') as string;
-    const userType = formData.get('userType') as string;
-    const profession = formData.get('profession') as string;
+    try {
+      const formData = new FormData(e.currentTarget);
+      const rawData = {
+        email: formData.get('email') as string,
+        password: formData.get('password') as string,
+        fullName: formData.get('fullName') as string,
+        userType: formData.get('userType') as string,
+        profession: formData.get('profession') as string,
+      };
 
-    const { error } = await signUp(email, password, {
-      full_name: fullName,
-      user_type: userType,
-      profession: profession
-    });
+      // Validate input data
+      const validatedData = signUpSchema.parse(rawData);
 
-    if (error) {
-      toast({
-        title: 'Sign up failed',
-        description: error.message,
-        variant: 'destructive',
+      const { error } = await signUp(validatedData.email, validatedData.password, {
+        full_name: validatedData.fullName,
+        user_type: validatedData.userType,
+        profession: validatedData.profession
       });
-    } else {
-      toast({
-        title: 'Account created!',
-        description: 'Please check your email to verify your account.',
-      });
+
+      if (error) {
+        toast({
+          title: 'Sign up failed',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Account created!',
+          description: 'Please check your email to verify your account.',
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: 'Validation Error',
+          description: error.errors[0].message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'An unexpected error occurred',
+          variant: 'destructive',
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
